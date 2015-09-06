@@ -29,13 +29,21 @@ fs_text = "Formosa Strait"
 fs_x = 1390 
 fs_y = 70
 
-def five_block_w(start_w, start_h, b_image):
+player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
+
+#player is 1 base
+def five_block_w(start_w, start_h, b_image, player):
     for i in range(0, 5):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
+        player_image_pos[player-1][i][0] = start_w + i*b_image.get_width()
+        player_image_pos[player-1][i][1] = start_h
 
-def five_block_h(start_w, start_h, b_image):
+#player is 1 base        
+def five_block_h(start_w, start_h, b_image, player):
     for i in range(0, 5):
-        screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))        
+        screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))
+        player_image_pos[player-1][i][0] = start_w
+        player_image_pos[player-1][i][1] = start_h + i*b_image.get_height()
 
 def draw_map(Surface):
     width = 2
@@ -114,12 +122,12 @@ def write(msg="pygame is cool", color= (0,0,0), size = 14):
 def main():
     while True:
         screen.blit(background, (0,0))
-        five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
-        five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2)
-        five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block)
-        five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block)
-        five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2)
-        five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block)
+        five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
+        five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
+        five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
+        five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
+        five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
+        five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
         draw_map(screen)
         pygame.display.update()
         for event in pygame.event.get():
