@@ -5,7 +5,7 @@ background_image_filename = 'Image/Formosa-1863_1600x900.jpg'
 block_image = 'Image/wood_40x27.jpg'
 block2_image = 'Image/wood_27x40.jpg'
 
-screen_width = 1600
+screen_width = 1599
 screen_height = 860
 
 pygame.init()
@@ -24,10 +24,6 @@ player_2_5_block_start_h = int((screen_height - 5*block2.get_height())/2)
 player_3_4_block_start_h = 0
 player_4_6_block_start_w = screen_width - player1_start_w - 5*block.get_width()
 player_5_block_start_w = screen_width - block2.get_width()
-
-fs_text = "Formosa Strait"
-fs_x = 1390 
-fs_y = 70
 
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
 
@@ -48,18 +44,24 @@ def five_block_h(start_w, start_h, b_image, player):
 def draw_map(Surface):
     width = 2
     twidth = 1
-    margin = 60
     dark_blue = 0x0000aa
     red = 0xff0000
     big_block = 160
+    margin = 60
     
     #each block width is 61, but last right block is 62
     wblock = 61
-    last_wblock = 62
+    last_wblock = 61
     
     #each block width is 65, but bottom block is 70
     hblock = 60
     last_hblock = 60
+    
+    fs_text = "Formosa Strait"
+    fs_x = 1390 
+    fs_y = 70
+    sc_x = margin + big_block + 8*wblock + int(wblock/2) - 12
+    sc_y = margin + big_block - 23 
     
     #outer line
     pygame.draw.line(Surface, dark_blue, (margin, margin), (screen_width - margin,margin), width)
@@ -112,6 +114,14 @@ def draw_map(Surface):
     
     #Display font "Formosa Strait"
     screen.blit(write(fs_text, (0, 0, 0), 22), (fs_x, fs_y))
+    
+    for sc in range(0, 12):
+        if 0 == sc:
+            screen.blit(write('-5', (0xff, 0, 0), 22), (sc_x, sc_y))
+        elif 11 == sc:
+            screen.blit(write('15', (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
+        else:
+            screen.blit(write(str(sc), (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
     myfont = pygame.font.Font("wqy-zenhei.ttf", size)
