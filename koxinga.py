@@ -6,7 +6,7 @@ block_image = 'Image/wood_40x27.jpg'
 block2_image = 'Image/wood_27x40.jpg'
 
 screen_width = 1600
-screen_height = 900
+screen_height = 850
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
