@@ -6,7 +6,7 @@ block_image = 'Image/wood_40x27.jpg'
 block2_image = 'Image/wood_27x40.jpg'
 
 screen_width = 1600
-screen_height = 850
+screen_height = 860
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -58,8 +58,8 @@ def draw_map(Surface):
     last_wblock = 62
     
     #each block width is 65, but bottom block is 70
-    hblock = 65
-    last_hblock = 70
+    hblock = 60
+    last_hblock = 60
     
     #outer line
     pygame.draw.line(Surface, dark_blue, (margin, margin), (screen_width - margin,margin), width)
