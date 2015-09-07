@@ -49,13 +49,11 @@ def draw_map(Surface):
     big_block = 160
     margin = 60
     
-    #each block width is 61, but last right block is 62
+    #each block width is 61
     wblock = 61
-    last_wblock = 61
     
-    #each block width is 65, but bottom block is 70
+    #each block width is 60
     hblock = 60
-    last_hblock = 60
     
     fs_text = "Formosa Strait"
     fs_x = 1390 
@@ -93,8 +91,8 @@ def draw_map(Surface):
     pygame.draw.line(Surface, dark_blue, (screen_width - margin-int(big_block/2), margin+big_block+6*hblock), (screen_width - margin,margin+big_block+6*hblock), twidth)    
     
     #bottom left to bottom right
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin-int(big_block/2), screen_height - margin), (screen_width - margin-int(big_block/2), screen_height - margin - big_block - last_hblock - hblock), twidth)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin, screen_height -margin - int(big_block/2)), (screen_width - margin - big_block - last_wblock - wblock, screen_height -margin - int(big_block/2)), twidth)
+    pygame.draw.line(Surface, dark_blue, (screen_width - margin-int(big_block/2), screen_height - margin), (screen_width - margin-int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
+    pygame.draw.line(Surface, dark_blue, (screen_width - margin, screen_height -margin - int(big_block/2)), (screen_width - margin - big_block - 2*wblock, screen_height -margin - int(big_block/2)), twidth)
     #half block
     pygame.draw.line(Surface, dark_blue, (margin+big_block+wblock, screen_height - margin - int(big_block/2)), (margin+big_block+wblock,screen_height - margin), twidth)
     for i in range(0, 16):
@@ -104,7 +102,7 @@ def draw_map(Surface):
     
     #top left to button left
     pygame.draw.line(Surface, dark_blue, (margin, screen_height - margin - int(big_block/2)), (margin + big_block + 2*wblock, screen_height - margin - int(big_block/2)), twidth)
-    pygame.draw.line(Surface, dark_blue, (margin + int(big_block/2), screen_height - margin), (margin + int(big_block/2), screen_height - margin - big_block - last_hblock - hblock), twidth)
+    pygame.draw.line(Surface, dark_blue, (margin + int(big_block/2), screen_height - margin), (margin + int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
     #half block
     pygame.draw.line(Surface, dark_blue, (margin, margin + big_block + hblock), (margin + int(big_block/2), margin+big_block+hblock), twidth)
     for i in range(0, 4):
