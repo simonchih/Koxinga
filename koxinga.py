@@ -6,7 +6,8 @@ block_image = 'Image/wood_40x27.jpg'
 block2_image = 'Image/wood_27x40.jpg'
 block_selected_image = 'Image/wood_selected_40x27.jpg'
 block2_selected_image = 'Image/wood_selected_27x40.jpg'
-coin_image = 'Image/gold_coin_14x14.jpg'
+coin_image = 'Image/gold_coin_14x14.gif'
+treasure_image = 'Image/treasure_30x30.gif'
 
 screen_width = 1599
 screen_height = 860
@@ -21,6 +22,7 @@ block2 = pygame.image.load(block2_image).convert()
 block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
+treasure = pygame.image.load(treasure_image).convert()
 
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
