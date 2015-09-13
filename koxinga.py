@@ -26,6 +26,7 @@ block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 
+map_block_num = 71
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -37,22 +38,30 @@ player_5_block_start_w = screen_width - block2.get_width()
 
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
 
-main_map = [game_map] * 71
+main_map = [game_map] * map_block_num
+map_mark = [0] * map_block_num
 
 #player is 1 base
-def five_block_w(start_w, start_h, b_image, player):
+def five_block_w(start_w, start_h, b_image):
     for i in range(0, 5):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
+
+#player is 1 base        
+def five_block_h(start_w, start_h, b_image):
+    for i in range(0, 5):
+        screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))
+
+def generate_five_block_w(start_w, start_h, b_image, player):
+    for i in range(0, 5):
         player_image_pos[player-1][i][0] = start_w + i*b_image.get_width()
         player_image_pos[player-1][i][1] = start_h
 
 #player is 1 base        
-def five_block_h(start_w, start_h, b_image, player):
+def generate_five_block_h(start_w, start_h, b_image, player):
     for i in range(0, 5):
-        screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))
         player_image_pos[player-1][i][0] = start_w
-        player_image_pos[player-1][i][1] = start_h + i*b_image.get_height()
-
+        player_image_pos[player-1][i][1] = start_h + i*b_image.get_height()        
+        
 def draw_map(Surface):
     width = 2
     twidth = 1
@@ -139,23 +148,101 @@ def write(msg="pygame is cool", color= (0,0,0), size = 14):
     mytext = mytext.convert_alpha()
     return mytext 
 
+def set_random_item(mark, low, high, type=0, value=0):
+    global main_map
+    index = random.randint(0, high - low)
+    i = 0
+    if low == high:
+        if 0 == mark[low]:
+            mark[low] = 1
+            main_map[low].type = type
+            main_map[low].value = value
+    else:
+        while index >= 0:
+            v = low + (i % (high - low + 1))
+            if 1 == mark[v]:
+                i += 1
+            elif 0 == index:
+                mark[v] = 1
+                main_map[v].type = type
+                main_map[v].value = value
+                index -= 1
+            else:
+                i += 1
+                index -= 1
+                
+# formosa strait:0
+# right bock:1 ~ 5
+# outer block: 6 ~ 12
+# inner block: 13 ~ 15
+
+# bottom block: 16 ~ 30
+# outer block: 31 ~ 37
+# inner block: 38 ~ 40
+
+# left block: 41 ~ 43
+# outer block: 44 ~ 50
+# inner block: 51 ~ 53
+
+# top block: 54 ~ 70   
 def generate_map(Surface):
+    global main_map
+    global map_mark
+    # right treasure
     r = random.randint(1, 5)
     main_map[r].type = 1
+    map_mark[r] = 1
     
-def generate_draw_dock():
-    five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
-    five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
-    five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
-    five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
-    five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
-    five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
+    # right bottom treasure
+    set_random_item(map_mark, 7, 11, 1)
+    set_random_item(map_mark, 7, 11, 1)
+    
+    # bottom treasure
+    r = random.randint(16, 30)
+    main_map[r].type = 1
+    map_mark[r] = 1
+    
+    # left bottom treasure
+    set_random_item(map_mark, 32, 36, 1)
+    set_random_item(map_mark, 32, 36, 1)
+    
+    # left treasure
+    r = random.randint(41, 43)
+    main_map[r].type = 1
+    map_mark[r] = 1
+    
+    # left top treasure
+    set_random_item(map_mark, 45, 49, 1)
+    set_random_item(map_mark, 45, 49, 1)
+    
+    # top treasure
+    r = random.randint(54, 70)
+    main_map[r].type = 1
+    map_mark[r] = 1
+    
+def draw_dock():
+    # player 1~6
+    five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
+    five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2)
+    five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block)
+    five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block)
+    five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2)
+    five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block)
+
+def generate_dock():
+    generate_five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
+    generate_five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
+    generate_five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
+    generate_five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
+    generate_five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
+    generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
     
 def main():
+    generate_map(screen)
+    generate_dock()
     while True:
         screen.blit(background, (0,0))
-        generate_draw_dock()
-        generate_map(screen)
+        draw_dock()
         draw_map(screen)
         pygame.display.update()
         for event in pygame.event.get():
