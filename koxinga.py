@@ -26,7 +26,26 @@ block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 
+RED = (0xff, 0, 0)
+BLACK = (0, 0, 0)
+
+item_size = 30
 map_block_num = 71
+inner_block_num = 3
+r_start = 1
+r_end = 5
+rb_outer_start = 6
+rb_outer_end = 12
+b_start = 16
+b_end = 30
+lb_outer_start = 31
+lb_outer_end = 37
+l_start = 41
+l_end = 43
+lt_outer_start = 44
+lt_outer_end = 50
+t_start = 54
+t_end = 70
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -38,8 +57,36 @@ player_5_block_start_w = screen_width - block2.get_width()
 
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
 
-main_map = [game_map] * map_block_num
+main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
+
+def draw_item(Surface, type, value, pos):
+    (x, y) = pos
+    radius = 6
+    width = 2
+    c_left = 7
+    c_middle = 15
+    c_right = 22
+    c_top = 7
+    c_bottom = 22
+    if 1 == type:
+        Surface.blit(treasure, (x, y))
+    elif 2 == type:
+        Surface.blit(write(str(value), BLACK, 14), (x, y))
+        Surface.blit(coin, (x+15, y+2))
+    elif 3 == type:
+        if 2 == value:
+            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_middle), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_middle), radius, width)
+        elif 3 == value:
+            pygame.draw.circle(Surface, BLACK, (x+c_middle, y+c_top), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_bottom), radius, width)
+        elif 4 == value:
+            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_top), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_top), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_bottom), radius, width)
 
 #player is 1 base
 def five_block_w(start_w, start_h, b_image):
@@ -63,6 +110,8 @@ def generate_five_block_h(start_w, start_h, b_image, player):
         player_image_pos[player-1][i][1] = start_h + i*b_image.get_height()        
         
 def draw_map(Surface):
+    global main_map
+
     width = 2
     twidth = 1
     dark_blue = 0x0000aa
@@ -80,7 +129,9 @@ def draw_map(Surface):
     fs_x = 1390 
     fs_y = 70
     sc_x = margin + big_block + 8*wblock + int(wblock/2) - 12
-    sc_y = margin + big_block - 23 
+    sc_y = margin + big_block - 23
+    sc_size = 22
+    sc_num = 12    
     
     #outer line
     pygame.draw.line(Surface, dark_blue, (margin, margin), (screen_width - margin,margin), width)
@@ -134,13 +185,20 @@ def draw_map(Surface):
     #Display font "Formosa Strait"
     Surface.blit(write(fs_text, (0, 0, 0), 22), (fs_x, fs_y))
     
-    for sc in range(0, 12):
+    for sc in range(0, sc_num):
         if 0 == sc:
-            Surface.blit(write('-5', (0xff, 0, 0), 22), (sc_x, sc_y))
+            Surface.blit(write('-5', RED, sc_size), (sc_x, sc_y))
         elif 11 == sc:
-            Surface.blit(write('15', (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
+            Surface.blit(write('15', BLACK, sc_size), (sc_x+sc*wblock, sc_y))
         else:
-            Surface.blit(write(str(sc), (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
+            Surface.blit(write(str(sc), BLACK, sc_size), (sc_x+sc*wblock, sc_y))
+            
+    for i in range(1, t_end+1):
+        map_type = main_map[i].type
+        map_value = main_map[i].value
+        if i >= r_start and i <= r_end:
+            draw_item(Surface, map_type, map_value, (screen_width - margin - int((big_block+item_size)/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock))
+        
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
     myfont = pygame.font.Font("wqy-zenhei.ttf", size)
@@ -188,98 +246,102 @@ def set_random_item(mark, low, high, type=0, value=0):
 def generate_map(Surface):
     global main_map
     global map_mark
+    
+    for i in range(0, map_block_num):
+        main_map[i] = game_map()
+    
     # right treasure
-    r = random.randint(1, 5)
+    r = random.randint(r_start, r_end)
     main_map[r].type = 1
     map_mark[r] = 1
     
     # right bottom treasure
-    set_random_item(map_mark, 7, 11, 1)
-    set_random_item(map_mark, 7, 11, 1)
+    set_random_item(map_mark, rb_outer_start+1, rb_outer_end-1, 1)
+    set_random_item(map_mark, rb_outer_start+1, rb_outer_end-1, 1)
     
     # right
-    set_random_item(map_mark, 1, 15, 2, 3)
-    set_random_item(map_mark, 1, 15, 2, 5)
-    set_random_item(map_mark, 1, 15, 3, 4)
-    set_random_item(map_mark, 1, 15, 3, 4)
-    set_random_item(map_mark, 1, 15, 3, 3)
-    set_random_item(map_mark, 1, 15, 3, 3)
-    set_random_item(map_mark, 1, 15, 3, 3)
-    set_random_item(map_mark, 1, 15, 3, 3)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 2, 3)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 2, 5)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 4)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 4)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, r_start, rb_outer_end+inner_block_num, 3, 3)
     
     # rest of right
-    for i in range(1, 16):
+    for i in range(r_start, b_start):
         if 0 == map_mark[i]:
             map_mark[i] = 1
             main_map[i].type = 3
             main_map[i].value = 2
     
     # bottom treasure
-    set_random_item(map_mark, 16, 30, 1)
+    set_random_item(map_mark, b_start, b_end, 1)
     
     # bottom
-    set_random_item(map_mark, 16, 30, 2, 3)
-    set_random_item(map_mark, 16, 30, 2, 5)
-    set_random_item(map_mark, 16, 30, 3, 4)
-    set_random_item(map_mark, 16, 30, 3, 4)
-    set_random_item(map_mark, 16, 30, 3, 3)
-    set_random_item(map_mark, 16, 30, 3, 3)
-    set_random_item(map_mark, 16, 30, 3, 3)
-    set_random_item(map_mark, 16, 30, 3, 3)
+    set_random_item(map_mark, b_start, b_end, 2, 3)
+    set_random_item(map_mark, b_start, b_end, 2, 5)
+    set_random_item(map_mark, b_start, b_end, 3, 4)
+    set_random_item(map_mark, b_start, b_end, 3, 4)
+    set_random_item(map_mark, b_start, b_end, 3, 3)
+    set_random_item(map_mark, b_start, b_end, 3, 3)
+    set_random_item(map_mark, b_start, b_end, 3, 3)
+    set_random_item(map_mark, b_start, b_end, 3, 3)
     
     # rest of bottom
-    for i in range(16, 31):
+    for i in range(b_start, lb_outer_start):
         if 0 == map_mark[i]:
             map_mark[i] = 1
             main_map[i].type = 3
             main_map[i].value = 2
     
     # left bottom treasure
-    set_random_item(map_mark, 32, 36, 1)
-    set_random_item(map_mark, 32, 36, 1)
+    set_random_item(map_mark, lb_outer_start+1, lb_outer_end-1, 1)
+    set_random_item(map_mark, lb_outer_start+1, lb_outer_end-1, 1)
     
     # left treasure
-    set_random_item(map_mark, 41, 43, 1)
+    set_random_item(map_mark, l_start, l_end, 1)
     
     # left top treasure
-    set_random_item(map_mark, 45, 49, 1)
-    set_random_item(map_mark, 45, 49, 1)
+    set_random_item(map_mark, lt_outer_start+1, lt_outer_end-1, 1)
+    set_random_item(map_mark, lt_outer_start+1, lt_outer_end-1, 1)
     
     # left
-    set_random_item(map_mark, 31, 53, 2, 3)
-    set_random_item(map_mark, 31, 53, 2, 5)
-    set_random_item(map_mark, 31, 53, 3, 4)
-    set_random_item(map_mark, 31, 53, 3, 4)
-    set_random_item(map_mark, 31, 53, 3, 4)
-    set_random_item(map_mark, 31, 53, 3, 3)
-    set_random_item(map_mark, 31, 53, 3, 3)
-    set_random_item(map_mark, 31, 53, 3, 3)
-    set_random_item(map_mark, 31, 53, 3, 3)
-    set_random_item(map_mark, 31, 53, 3, 3)
-    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 2, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 2, 5)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 4)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 4)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 4)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
+    set_random_item(map_mark, lb_outer_start, lt_outer_end+inner_block_num, 3, 3)
     
     # rest of left
-    for i in range(31, 54):
+    for i in range(lb_outer_start, t_start):
         if 0 == map_mark[i]:
             map_mark[i] = 1
             main_map[i].type = 3
             main_map[i].value = 2
     
     # top treasure
-    set_random_item(map_mark, 54, 70, 1)
+    set_random_item(map_mark, t_start, t_end, 1)
     
     # top
-    set_random_item(map_mark, 54, 70, 2, 5)
-    set_random_item(map_mark, 54, 70, 2, 7)
-    set_random_item(map_mark, 54, 70, 3, 4)
-    set_random_item(map_mark, 54, 70, 3, 4)
-    set_random_item(map_mark, 54, 70, 3, 3)
-    set_random_item(map_mark, 54, 70, 3, 3)
-    set_random_item(map_mark, 54, 70, 3, 3)
-    set_random_item(map_mark, 54, 70, 3, 3)
+    set_random_item(map_mark, t_start, t_end, 2, 5)
+    set_random_item(map_mark, t_start, t_end, 2, 7)
+    set_random_item(map_mark, t_start, t_end, 3, 4)
+    set_random_item(map_mark, t_start, t_end, 3, 4)
+    set_random_item(map_mark, t_start, t_end, 3, 3)
+    set_random_item(map_mark, t_start, t_end, 3, 3)
+    set_random_item(map_mark, t_start, t_end, 3, 3)
+    set_random_item(map_mark, t_start, t_end, 3, 3)
     
     # rest of top
-    for i in range(54, 71):
+    for i in range(t_start, t_end+1):
         if 0 == map_mark[i]:
             map_mark[i] = 1
             main_map[i].type = 3
