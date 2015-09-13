@@ -1,5 +1,7 @@
+import random
 import time
 import pygame
+from game_map import *
 
 background_image_filename = 'Image/Formosa-1863_1600x900.jpg'
 block_image = 'Image/wood_40x27.jpg'
@@ -34,6 +36,8 @@ player_4_6_block_start_w = screen_width - player1_start_w - 5*block.get_width()
 player_5_block_start_w = screen_width - block2.get_width()
 
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
+
+main_map = [game_map] * 71
 
 #player is 1 base
 def five_block_w(start_w, start_h, b_image, player):
@@ -119,31 +123,39 @@ def draw_map(Surface):
     pygame.draw.line(Surface, dark_blue, (margin, margin + big_block + 6*hblock), (margin + int(big_block/2), margin+big_block+6*hblock), twidth)
     
     #Display font "Formosa Strait"
-    screen.blit(write(fs_text, (0, 0, 0), 22), (fs_x, fs_y))
+    Surface.blit(write(fs_text, (0, 0, 0), 22), (fs_x, fs_y))
     
     for sc in range(0, 12):
         if 0 == sc:
-            screen.blit(write('-5', (0xff, 0, 0), 22), (sc_x, sc_y))
+            Surface.blit(write('-5', (0xff, 0, 0), 22), (sc_x, sc_y))
         elif 11 == sc:
-            screen.blit(write('15', (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
+            Surface.blit(write('15', (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
         else:
-            screen.blit(write(str(sc), (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
+            Surface.blit(write(str(sc), (0, 0, 0), 22), (sc_x+sc*wblock, sc_y))
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
     myfont = pygame.font.Font("wqy-zenhei.ttf", size)
     mytext = myfont.render(msg, True, color)
     mytext = mytext.convert_alpha()
     return mytext 
+
+def generate_map(Surface):
+    r = random.randint(1, 5)
+    main_map[r].type = 1
+    
+def generate_draw_dock():
+    five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
+    five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
+    five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
+    five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
+    five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
+    five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
     
 def main():
     while True:
         screen.blit(background, (0,0))
-        five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
-        five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
-        five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
-        five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
-        five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
-        five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
+        generate_draw_dock()
+        generate_map(screen)
         draw_map(screen)
         pygame.display.update()
         for event in pygame.event.get():
