@@ -198,6 +198,8 @@ def draw_map(Surface):
         map_value = main_map[i].value
         if i >= r_start and i <= r_end:
             draw_item(Surface, map_type, map_value, (screen_width - margin - int((big_block+item_size)/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock))
+        elif i >= rb_outer_start and i <= rb_outer_start+1:
+            draw_item(Surface, map_type, map_value, (screen_width - margin - int((big_block+item_size)/4), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock))
         
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
