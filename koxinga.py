@@ -197,28 +197,93 @@ def generate_map(Surface):
     set_random_item(map_mark, 7, 11, 1)
     set_random_item(map_mark, 7, 11, 1)
     
+    # right
+    set_random_item(map_mark, 1, 15, 2, 3)
+    set_random_item(map_mark, 1, 15, 2, 5)
+    set_random_item(map_mark, 1, 15, 3, 4)
+    set_random_item(map_mark, 1, 15, 3, 4)
+    set_random_item(map_mark, 1, 15, 3, 3)
+    set_random_item(map_mark, 1, 15, 3, 3)
+    set_random_item(map_mark, 1, 15, 3, 3)
+    set_random_item(map_mark, 1, 15, 3, 3)
+    
+    # rest of right
+    for i in range(1, 16):
+        if 0 == map_mark[i]:
+            map_mark[i] = 1
+            main_map[i].type = 3
+            main_map[i].value = 2
+    
     # bottom treasure
-    r = random.randint(16, 30)
-    main_map[r].type = 1
-    map_mark[r] = 1
+    set_random_item(map_mark, 16, 30, 1)
+    
+    # bottom
+    set_random_item(map_mark, 16, 30, 2, 3)
+    set_random_item(map_mark, 16, 30, 2, 5)
+    set_random_item(map_mark, 16, 30, 3, 4)
+    set_random_item(map_mark, 16, 30, 3, 4)
+    set_random_item(map_mark, 16, 30, 3, 3)
+    set_random_item(map_mark, 16, 30, 3, 3)
+    set_random_item(map_mark, 16, 30, 3, 3)
+    set_random_item(map_mark, 16, 30, 3, 3)
+    
+    # rest of bottom
+    for i in range(16, 31):
+        if 0 == map_mark[i]:
+            map_mark[i] = 1
+            main_map[i].type = 3
+            main_map[i].value = 2
     
     # left bottom treasure
     set_random_item(map_mark, 32, 36, 1)
     set_random_item(map_mark, 32, 36, 1)
     
     # left treasure
-    r = random.randint(41, 43)
-    main_map[r].type = 1
-    map_mark[r] = 1
+    set_random_item(map_mark, 41, 43, 1)
     
     # left top treasure
     set_random_item(map_mark, 45, 49, 1)
     set_random_item(map_mark, 45, 49, 1)
     
+    # left
+    set_random_item(map_mark, 31, 53, 2, 3)
+    set_random_item(map_mark, 31, 53, 2, 5)
+    set_random_item(map_mark, 31, 53, 3, 4)
+    set_random_item(map_mark, 31, 53, 3, 4)
+    set_random_item(map_mark, 31, 53, 3, 4)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    set_random_item(map_mark, 31, 53, 3, 3)
+    
+    # rest of left
+    for i in range(31, 54):
+        if 0 == map_mark[i]:
+            map_mark[i] = 1
+            main_map[i].type = 3
+            main_map[i].value = 2
+    
     # top treasure
-    r = random.randint(54, 70)
-    main_map[r].type = 1
-    map_mark[r] = 1
+    set_random_item(map_mark, 54, 70, 1)
+    
+    # top
+    set_random_item(map_mark, 54, 70, 2, 5)
+    set_random_item(map_mark, 54, 70, 2, 7)
+    set_random_item(map_mark, 54, 70, 3, 4)
+    set_random_item(map_mark, 54, 70, 3, 4)
+    set_random_item(map_mark, 54, 70, 3, 3)
+    set_random_item(map_mark, 54, 70, 3, 3)
+    set_random_item(map_mark, 54, 70, 3, 3)
+    set_random_item(map_mark, 54, 70, 3, 3)
+    
+    # rest of top
+    for i in range(54, 71):
+        if 0 == map_mark[i]:
+            map_mark[i] = 1
+            main_map[i].type = 3
+            main_map[i].value = 2
     
 def draw_dock():
     # player 1~6
