@@ -28,6 +28,16 @@ treasure = pygame.image.load(treasure_image).convert()
 
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
+Dark_Blue = (0, 0, 0xaa)
+
+big_block = 160
+margin = 60
+
+#each block width is 61
+wblock = 61
+
+#each block width is 60
+hblock = 60
 
 item_size = 30
 map_block_num = 71
@@ -114,16 +124,6 @@ def draw_map(Surface):
 
     width = 2
     twidth = 1
-    dark_blue = 0x0000aa
-    red = 0xff0000
-    big_block = 160
-    margin = 60
-    
-    #each block width is 61
-    wblock = 61
-    
-    #each block width is 60
-    hblock = 60
     
     fs_text = "Formosa Strait"
     fs_x = 1390 
@@ -134,53 +134,53 @@ def draw_map(Surface):
     sc_num = 12    
     
     #outer line
-    pygame.draw.line(Surface, dark_blue, (margin, margin), (screen_width - margin,margin), width)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin,margin), (screen_width - margin,screen_height - margin), width)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin,screen_height - margin), (margin,screen_height - margin), width)
-    pygame.draw.line(Surface, dark_blue, (margin,screen_height - margin), (margin,margin), width)
+    pygame.draw.line(Surface, Dark_Blue, (margin, margin), (screen_width - margin,margin), width)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin,margin), (screen_width - margin,screen_height - margin), width)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin,screen_height - margin), (margin,screen_height - margin), width)
+    pygame.draw.line(Surface, Dark_Blue, (margin,screen_height - margin), (margin,margin), width)
     
     #inner line
-    pygame.draw.line(Surface, dark_blue, (margin, margin+big_block), (screen_width - margin,margin+big_block), twidth)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin-big_block,margin), (screen_width - margin-big_block,screen_height - margin), twidth)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin,screen_height - margin - big_block), (margin,screen_height - margin - big_block), twidth)
-    pygame.draw.line(Surface, dark_blue, (margin+big_block,screen_height - margin), (margin + big_block,margin), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin, margin+big_block), (screen_width - margin,margin+big_block), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin-big_block,margin), (screen_width - margin-big_block,screen_height - margin), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin,screen_height - margin - big_block), (margin,screen_height - margin - big_block), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin+big_block,screen_height - margin), (margin + big_block,margin), twidth)
     
     #top left to top right
-    pygame.draw.line(Surface, dark_blue, (margin, margin+int(big_block/2)), (margin+big_block+wblock*2, margin+int(big_block/2)), twidth)
-    pygame.draw.line(Surface, dark_blue, (margin+int(big_block/2), margin), (margin+int(big_block/2), margin+big_block+hblock*2), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin, margin+int(big_block/2)), (margin+big_block+wblock*2, margin+int(big_block/2)), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin+int(big_block/2), margin), (margin+int(big_block/2), margin+big_block+hblock*2), twidth)
     #first half block
-    pygame.draw.line(Surface, dark_blue, (margin+big_block+wblock, margin), (margin+big_block+wblock,margin+int(big_block/2)), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin+big_block+wblock, margin), (margin+big_block+wblock,margin+int(big_block/2)), twidth)
     for i in range(0, 17):
         if 7 == i:
-            pygame.draw.line(Surface, red, (margin+big_block+(i+2)*wblock, margin), (margin+big_block+(i+2)*wblock,margin+big_block), twidth)
+            pygame.draw.line(Surface, RED, (margin+big_block+(i+2)*wblock, margin), (margin+big_block+(i+2)*wblock,margin+big_block), twidth)
         else:
-            pygame.draw.line(Surface, dark_blue, (margin+big_block+(i+2)*wblock, margin), (margin+big_block+(i+2)*wblock,margin+big_block), twidth)
+            pygame.draw.line(Surface, Dark_Blue, (margin+big_block+(i+2)*wblock, margin), (margin+big_block+(i+2)*wblock,margin+big_block), twidth)
         
     #top right to bottom right
     for i in range(0, 5):
-        pygame.draw.line(Surface, dark_blue, (screen_width - margin-big_block, margin+big_block+(i+1)*hblock), (screen_width - margin,margin+big_block+(i+1)*hblock), twidth)
+        pygame.draw.line(Surface, Dark_Blue, (screen_width - margin-big_block, margin+big_block+(i+1)*hblock), (screen_width - margin,margin+big_block+(i+1)*hblock), twidth)
     #half block
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin-int(big_block/2), margin+big_block+6*hblock), (screen_width - margin,margin+big_block+6*hblock), twidth)    
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin-int(big_block/2), margin+big_block+6*hblock), (screen_width - margin,margin+big_block+6*hblock), twidth)    
     
     #bottom left to bottom right
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin-int(big_block/2), screen_height - margin), (screen_width - margin-int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
-    pygame.draw.line(Surface, dark_blue, (screen_width - margin, screen_height -margin - int(big_block/2)), (screen_width - margin - big_block - 2*wblock, screen_height -margin - int(big_block/2)), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin-int(big_block/2), screen_height - margin), (screen_width - margin-int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (screen_width - margin, screen_height -margin - int(big_block/2)), (screen_width - margin - big_block - 2*wblock, screen_height -margin - int(big_block/2)), twidth)
     #half block
-    pygame.draw.line(Surface, dark_blue, (margin+big_block+wblock, screen_height - margin - int(big_block/2)), (margin+big_block+wblock,screen_height - margin), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin+big_block+wblock, screen_height - margin - int(big_block/2)), (margin+big_block+wblock,screen_height - margin), twidth)
     for i in range(0, 16):
-            pygame.draw.line(Surface, dark_blue, (margin+big_block+(i+2)*wblock, screen_height - margin - big_block), (margin+big_block+(i+2)*wblock,screen_height - margin), twidth)
+            pygame.draw.line(Surface, Dark_Blue, (margin+big_block+(i+2)*wblock, screen_height - margin - big_block), (margin+big_block+(i+2)*wblock,screen_height - margin), twidth)
     #half block
-    pygame.draw.line(Surface, dark_blue, (margin+big_block+18*wblock, screen_height - margin - int(big_block/2)), (margin+big_block+18*wblock,screen_height - margin), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin+big_block+18*wblock, screen_height - margin - int(big_block/2)), (margin+big_block+18*wblock,screen_height - margin), twidth)
     
     #top left to button left
-    pygame.draw.line(Surface, dark_blue, (margin, screen_height - margin - int(big_block/2)), (margin + big_block + 2*wblock, screen_height - margin - int(big_block/2)), twidth)
-    pygame.draw.line(Surface, dark_blue, (margin + int(big_block/2), screen_height - margin), (margin + int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin, screen_height - margin - int(big_block/2)), (margin + big_block + 2*wblock, screen_height - margin - int(big_block/2)), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin + int(big_block/2), screen_height - margin), (margin + int(big_block/2), screen_height - margin - big_block - 2*hblock), twidth)
     #half block
-    pygame.draw.line(Surface, dark_blue, (margin, margin + big_block + hblock), (margin + int(big_block/2), margin+big_block+hblock), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin, margin + big_block + hblock), (margin + int(big_block/2), margin+big_block+hblock), twidth)
     for i in range(0, 4):
-        pygame.draw.line(Surface, dark_blue, (margin, margin + big_block + (i+2)*hblock), (margin + big_block, margin+big_block+(i+2)*hblock), twidth)
+        pygame.draw.line(Surface, Dark_Blue, (margin, margin + big_block + (i+2)*hblock), (margin + big_block, margin+big_block+(i+2)*hblock), twidth)
     #half block
-    pygame.draw.line(Surface, dark_blue, (margin, margin + big_block + 6*hblock), (margin + int(big_block/2), margin+big_block+6*hblock), twidth)
+    pygame.draw.line(Surface, Dark_Blue, (margin, margin + big_block + 6*hblock), (margin + int(big_block/2), margin+big_block+6*hblock), twidth)
     
     #Display font "Formosa Strait"
     Surface.blit(write(fs_text, (0, 0, 0), 22), (fs_x, fs_y))
@@ -196,10 +196,9 @@ def draw_map(Surface):
     for i in range(1, t_end+1):
         map_type = main_map[i].type
         map_value = main_map[i].value
-        if i >= r_start and i <= r_end:
-            draw_item(Surface, map_type, map_value, (screen_width - margin - int((big_block+item_size)/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock))
-        elif i >= rb_outer_start and i <= rb_outer_start+1:
-            draw_item(Surface, map_type, map_value, (screen_width - margin - int((big_block+item_size)/4), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock))
+        map_loc = main_map[i].loc
+        if map_type != 0:
+            draw_item(Surface, map_type, map_value, map_loc)
         
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
@@ -348,6 +347,16 @@ def generate_map(Surface):
             map_mark[i] = 1
             main_map[i].type = 3
             main_map[i].value = 2
+            
+    for i in range(0, t_end+1):
+        map_type = main_map[i].type
+        map_value = main_map[i].value
+        if 0 == i:
+            main_map[i].loc = (screen_width - margin - int((big_block+item_size)/2), margin + int(big_block-item_size)/2)
+        elif i >= r_start and i <= r_end:
+            main_map[i].loc = (screen_width - margin - int((big_block+item_size)/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock)
+        elif i >= rb_outer_start and i <= rb_outer_start+1:
+            main_map[i].loc = (screen_width - margin - int((big_block+item_size)/4), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock)
     
 def draw_dock():
     # player 1~6
