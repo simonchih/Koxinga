@@ -356,8 +356,14 @@ def generate_map(Surface):
         elif i >= r_start and i <= r_end:
             main_map[i].loc = (screen_width - margin - int((big_block+item_size)/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock)
         elif i >= rb_outer_start and i <= rb_outer_start+1:
-            main_map[i].loc = (screen_width - margin - int((big_block+item_size)/4), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock)
-    
+            main_map[i].loc = (screen_width - margin - int(big_block/4) - int(item_size/2), margin+big_block+int((hblock-item_size)/2)+(i-1)*hblock)
+        elif i >= rb_outer_start+2 and i <= rb_outer_start+3:
+            main_map[i].loc = (screen_width - margin - int(big_block/4) - int(item_size/2), screen_height-margin-big_block+int((int(big_block/2)-item_size)/2)+(i-(rb_outer_start+2))*int(big_block/2))
+        elif i == rb_outer_start+4:
+            main_map[i].loc = (screen_width - margin - int(big_block/4) - int(item_size/2) - int(big_block/2), screen_height-margin-big_block+int((int(big_block/2)-item_size)/2)+int(big_block/2))
+        elif i >= rb_outer_start+5 and i <= rb_outer_end:
+            main_map[i].loc = (screen_width - margin - big_block - (i-(rb_outer_start+4))*wblock + int((wblock-item_size)/2), screen_height-margin-big_block+int((int(big_block/2)-item_size)/2)+int(big_block/2))
+            
 def draw_dock():
     # player 1~6
     five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
