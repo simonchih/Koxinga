@@ -55,7 +55,7 @@ l_end = 43
 lt_outer_start = 44
 lt_outer_end = 50
 t_start = 54
-t_end = 70
+t_end = map_block_num - 1
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -387,6 +387,8 @@ def generate_map(Surface):
             main_map[i].loc = (margin+int(big_block/2)+int(big_block/4)-int(item_size/2), screen_height-margin-big_block-hblock-int(item_size/2))
         elif i >= l_start and i <= l_end:
             main_map[i].loc = (margin+int(big_block/2)-int(item_size/2), screen_height-margin-big_block-((i-l_start+2)*hblock)-int(hblock/2)-int(item_size/2))
+        elif i >= lt_outer_start and i <= lt_outer_start+1:
+            main_map[i].loc = (margin+int(big_block/4)-int(item_size/2), screen_height-margin-big_block-((i-l_start+2)*hblock)-int(hblock/2)-int(item_size/2))
             
 def draw_dock():
     # player 1~6
