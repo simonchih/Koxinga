@@ -82,21 +82,21 @@ def draw_item(Surface, type, value, pos):
     if 1 == type:
         Surface.blit(treasure, (x, y))
     elif 2 == type:
-        Surface.blit(write(str(value), BLACK, 14), (x, y))
+        Surface.blit(write(str(value), Dark_Blue, 14), (x, y))
         Surface.blit(coin, (x+15, y+2))
     elif 3 == type:
         if 2 == value:
-            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_middle), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_middle), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_middle), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_middle), radius, width)
         elif 3 == value:
-            pygame.draw.circle(Surface, BLACK, (x+c_middle, y+c_top), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_bottom), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_middle, y+c_top), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
         elif 4 == value:
-            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_top), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_top), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_left, y+c_bottom), radius, width)
-            pygame.draw.circle(Surface, BLACK, (x+c_right, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_top), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_top), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
+            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
 #player is 1 base
 def five_block_w(start_w, start_h, b_image):
@@ -363,6 +363,30 @@ def generate_map(Surface):
             main_map[i].loc = (screen_width - margin - int(big_block/4) - int(item_size/2) - int(big_block/2), screen_height-margin-big_block+int((int(big_block/2)-item_size)/2)+int(big_block/2))
         elif i >= rb_outer_start+5 and i <= rb_outer_end:
             main_map[i].loc = (screen_width - margin - big_block - (i-(rb_outer_start+4))*wblock + int((wblock-item_size)/2), screen_height-margin-big_block+int((int(big_block/2)-item_size)/2)+int(big_block/2))
+        elif i == rb_outer_end+1:
+            main_map[i].loc = (screen_width-margin-int(big_block/2)-int(big_block/4)-int(item_size/2), screen_height-margin-big_block-hblock-int(item_size/2))
+        elif i == rb_outer_end+2:
+            main_map[i].loc = (screen_width-margin-int(big_block/2)-int(big_block/4)-int(item_size/2), screen_height-margin-int(big_block/2)-int(big_block/4)-int(item_size/2))
+        elif i == rb_outer_end+3:
+            main_map[i].loc = (screen_width-margin-big_block-wblock-int(item_size/2), screen_height-margin-int(big_block/2)-int(big_block/4)-int(item_size/2))
+        elif i >= b_start and i <= b_end:
+            main_map[i].loc = (screen_width - margin -big_block -((i-b_start+2)*wblock)- int((wblock+item_size)/2), screen_height-margin-int((big_block+item_size)/2))
+        elif i >= lb_outer_start and i <= lb_outer_start+1:
+            main_map[i].loc = (screen_width - margin -big_block -((i-b_start+2)*wblock)- int((wblock+item_size)/2), screen_height-margin-int(big_block/4)-int(item_size/2))
+        elif i == lb_outer_start+2:
+            main_map[i].loc = (margin+int(big_block/2)+int(big_block/4)-int(item_size/2), screen_height-margin-int(big_block/4)-int(item_size/2))
+        elif i >= lb_outer_start+3 and i <= lb_outer_start+4:
+            main_map[i].loc = (margin+int(big_block/4)-int(item_size/2), screen_height-margin-int(big_block/4)-int(item_size/2)-((i-(lb_outer_start+3))*int(big_block/2)))
+        elif i >= lb_outer_start+5 and i <= lb_outer_end:
+            main_map[i].loc = (margin+int(big_block/4)-int(item_size/2), screen_height-margin-big_block-((i-(lb_outer_start+5))*hblock)-int(hblock/2)-int(item_size/2))
+        elif i == lb_outer_end+1:
+            main_map[i].loc = (margin+big_block+wblock-int(item_size/2), screen_height-margin-int(big_block/2)-int(big_block/4)-int(item_size/2))
+        elif i == lb_outer_end+2:
+            main_map[i].loc = (margin+int(big_block/2)+int(big_block/4)-int(item_size/2), screen_height-margin-int(big_block/2)-int(big_block/4)-int(item_size/2))
+        elif i == lb_outer_end+3:
+            main_map[i].loc = (margin+int(big_block/2)+int(big_block/4)-int(item_size/2), screen_height-margin-big_block-hblock-int(item_size/2))
+        elif i >= l_start and i <= l_end:
+            main_map[i].loc = (margin+int(big_block/2)-int(item_size/2), screen_height-margin-big_block-((i-l_start+2)*hblock)-int(hblock/2)-int(item_size/2))
             
 def draw_dock():
     # player 1~6
