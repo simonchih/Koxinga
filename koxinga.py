@@ -2,6 +2,7 @@ import random
 import time
 import pygame
 from game_map import *
+from game_player import *
 
 background_image_filename = 'Image/Formosa-1863_1600x900.jpg'
 block_image = 'Image/wood_40x27.jpg'
@@ -10,6 +11,12 @@ block_selected_image = 'Image/wood_selected_40x27.jpg'
 block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
+piece0_image = 'Image/pawn2.gif'
+piece1_image = 'Image/pawn3.gif'
+piece2_image = 'Image/pawn4.gif'
+piece3_image = 'Image/pawn5.gif'
+piece4_image = 'Image/pawn6.gif'
+piece5_image = 'Image/pawn8.gif'
 
 screen_width = 1599
 screen_height = 860
@@ -25,6 +32,12 @@ block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
+piece0 = pygame.image.load(piece0_image).convert()
+piece1 = pygame.image.load(piece1_image).convert()
+piece2 = pygame.image.load(piece2_image).convert()
+piece3 = pygame.image.load(piece3_image).convert()
+piece4 = pygame.image.load(piece4_image).convert()
+piece5 = pygame.image.load(piece5_image).convert()
 
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
@@ -39,6 +52,7 @@ wblock = 61
 #each block width is 60
 hblock = 60
 
+player_num = 6
 item_size = 30
 map_block_num = 71
 inner_block_num = 3
@@ -69,6 +83,7 @@ player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [
 
 main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
+player_data = [0] * player_num
 
 def draw_item(Surface, type, value, pos):
     (x, y) = pos
@@ -98,22 +113,21 @@ def draw_item(Surface, type, value, pos):
             pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
             pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
-#player is 1 base
 def five_block_w(start_w, start_h, b_image):
     for i in range(0, 5):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
-
-#player is 1 base        
+      
 def five_block_h(start_w, start_h, b_image):
     for i in range(0, 5):
         screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))
 
+#player is 1 base, but player_image_pos is 0 base
 def generate_five_block_w(start_w, start_h, b_image, player):
     for i in range(0, 5):
         player_image_pos[player-1][i][0] = start_w + i*b_image.get_width()
         player_image_pos[player-1][i][1] = start_h
 
-#player is 1 base        
+#player is 1 base, but player_image_pos is 0 base        
 def generate_five_block_h(start_w, start_h, b_image, player):
     for i in range(0, 5):
         player_image_pos[player-1][i][0] = start_w
@@ -132,7 +146,7 @@ def draw_map(Surface):
     sc_y = margin + big_block - 23
     sc_size = 22
     sc_num = 12    
-    
+ 
     #outer line
     pygame.draw.line(Surface, Dark_Blue, (margin, margin), (screen_width - margin,margin), width)
     pygame.draw.line(Surface, Dark_Blue, (screen_width - margin,margin), (screen_width - margin,screen_height - margin), width)
@@ -199,7 +213,12 @@ def draw_map(Surface):
         map_loc = main_map[i].loc
         if map_type != 0:
             draw_item(Surface, map_type, map_value, map_loc)
-        
+            
+    # Test pieces only
+    #for p in range(0, player_num):
+    #    for i in range(0, map_block_num):
+    #        Surface.blit(player_id_to_image(p), player_data[p].loc[i]) 
+    # End test pieces        
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
     myfont = pygame.font.Font("wqy-zenhei.ttf", size)
@@ -229,6 +248,59 @@ def set_random_item(mark, low, high, type=0, value=0):
             else:
                 i += 1
                 index -= 1
+
+#player is 0 base                
+def map_loc_to_player_loc(map_loc, block_id, player):
+    gap = 5
+    (x, y) = map_loc
+    
+    # right and left on the map
+    # minimum width is 80
+    # minimum height is 60
+    # (x, y) = (25, 15)
+    if (block_id >=0 and block_id <= rb_outer_start+4) or (block_id >= rb_outer_end+1 and block_id <= rb_outer_end+2) or (block_id >= lb_outer_start+4 and block_id <= l_end+4) or (block_id >= lb_outer_end+2 and block_id <= lb_outer_end+3) or (block_id >= lt_outer_end+1 and block_id <= lt_outer_end+2):
+        if 0 == player:
+            #(5, 5)
+            return (x-piece0.get_height(), y-int(piece0.get_height()/2))
+        elif 1 == player:
+            #(30, 5)
+            return (x+gap, y-int(piece0.get_height()/2))
+        elif 2 == player:
+            #(55, 5)
+            return (x+2*gap+piece0.get_height(), y-int(piece0.get_height()/2))
+        elif 3 == player:
+            #(5, 30)
+            return (x-piece0.get_height(), y+int(piece0.get_height()/2)+gap)
+        elif 4 == player:
+            #(30, 30)
+            return (x+gap, y+int(piece0.get_height()/2)+gap)
+        elif 5 == player:
+            #(55, 30)
+            return (x+2*gap+piece0.get_height(), y+int(piece0.get_height()/2)+gap)
+        
+    # top and bottom on the map
+    # minimum width is 61
+    # minimum height is 80
+    # (x, y) = (15, 25)
+    else:
+        if 0 == player:
+            #(5, 5)
+            return (x-int(piece0.get_height()/2),y-piece0.get_height())
+        elif 1 == player:
+            #(5, 30)
+            return (x-int(piece0.get_height()/2),y+gap)
+        elif 2 == player:
+            #(5, 55)
+            return (x-int(piece0.get_height()/2),y+2*gap+piece0.get_height())
+        elif 3 == player:
+            #(30, 5)
+            return (x+int(piece0.get_height()/2)+gap,y-piece0.get_height())
+        elif 4 == player:
+            #(30, 30)
+            return (x+int(piece0.get_height()/2)+gap,y+gap)
+        elif 5 == player:
+            #(30, 55)
+            return (x+int(piece0.get_height()/2)+gap,y+2*gap+piece0.get_height())
                 
 # formosa strait:0
 # right bock:1 ~ 5
@@ -248,8 +320,15 @@ def generate_map(Surface):
     global main_map
     global map_mark
     
+    block_loc = [0] * map_block_num
+    
+    #ini main_map
     for i in range(0, map_block_num):
         main_map[i] = game_map()
+        
+    #ini player_data
+    for i in range(0, player_num):
+        player_data[i] = game_player()
     
     # right treasure
     r = random.randint(r_start, r_end)
@@ -403,7 +482,26 @@ def generate_map(Surface):
             main_map[i].loc = (margin+big_block+wblock-int(item_size/2), margin+int(big_block/2)+int(big_block/4)-int(item_size/2))
         elif i >= t_start and i <= t_end:
             main_map[i].loc = (margin+big_block+((i-t_start+2)*wblock)+int(wblock/2)-int(item_size/2), margin+int(big_block/2)-int(item_size/2))
-            
+    
+    for p in range(0, player_num):
+        for i in range(0, map_block_num):
+            block_loc[i] = map_loc_to_player_loc(main_map[i].loc, i, p)
+        player_data[p].loc = block_loc[:]
+
+def player_id_to_image(pid):
+    if 0 == pid:
+        return piece0
+    elif 1 == pid:
+        return piece1
+    elif 2 == pid:
+        return piece2
+    elif 3 == pid:
+        return piece3
+    elif 4 == pid:
+        return piece4
+    elif 5 == pid:
+        return piece5
+        
 def draw_dock():
     # player 1~6
     five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
