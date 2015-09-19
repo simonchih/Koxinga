@@ -483,6 +483,9 @@ def generate_map(Surface):
         elif i >= t_start and i <= t_end:
             main_map[i].loc = (margin+big_block+((i-t_start+2)*wblock)+int(wblock/2)-int(item_size/2), margin+int(big_block/2)-int(item_size/2))
     
+    # player 0 is human
+    player_data[0].IsAI = 0
+    
     for p in range(0, player_num):
         for i in range(0, map_block_num):
             block_loc[i] = map_loc_to_player_loc(main_map[i].loc, i, p)
