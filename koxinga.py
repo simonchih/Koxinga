@@ -504,7 +504,31 @@ def player_id_to_image(pid):
         return piece4
     elif 5 == pid:
         return piece5
+
+def go_dest_id(org_id, step = 0, is_forward = 1):
+    dest_outer = 0
+    dest_inner = None
+    if 1 == is_forward:
+        sudo_dest = org_id + step
+    else: #is_forward = 0
+        sudo_dest = org_id - step
+    
+    if sudo_dest <= 0:
+        return dest_outer, dest_inner
+    
+    if 1 == is_forward:
+        if (r_end >= org_id >= 0) and (r_end >= sudo_dest >= 0):
+            dest_outer = sudo_dest
+        elif (r_end >= org_id >= 0) and (sudo_dest > r_end):
+            dest_outer = sudo_dest
+            # remain step for inner
+            sudo_dest = step - (r_end - org_id + 1)
+            dest_inner = sudo_dest + rb_outer_end
+    else: #is_forward = 0
+        pass
         
+    return dest_outer, dest_inner
+    
 def draw_dock():
     # player 1~6
     five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
