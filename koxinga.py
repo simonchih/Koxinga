@@ -513,17 +513,65 @@ def go_dest_id(org_id, step = 0, is_forward = 1):
     else: #is_forward = 0
         sudo_dest = org_id - step
     
-    if sudo_dest <= 0:
+    if sudo_dest <= 0 or sudo_dest > t_end:
         return dest_outer, dest_inner
     
     if 1 == is_forward:
-        if (r_end >= org_id >= 0) and (r_end >= sudo_dest >= 0):
+        if (r_end >= org_id >= 0):
             dest_outer = sudo_dest
-        elif (r_end >= org_id >= 0) and (sudo_dest > r_end):
+            if sudo_dest > r_end:
+                # remain step for inner
+                sudo_dest = step - (r_end - org_id)
+                dest_inner = sudo_dest + rb_outer_end
+        elif (rb_outer_end >= org_id >= rb_outer_start):
+            if rb_outer_end >= sudo_dest >= rb_outer_start:
+                dest_outer = sudo_dest
+            else:
+                # remain step for outer
+                sudo_dest = step - (rb_outer_end - org_id)
+                dest_outer = sudo_dest + b_start - 1
+        elif (b_start > org_id > rb_outer_end):
             dest_outer = sudo_dest
-            # remain step for inner
-            sudo_dest = step - (r_end - org_id + 1)
-            dest_inner = sudo_dest + rb_outer_end
+        elif (b_end >= org_id >= b_start):
+            dest_outer = sudo_dest
+            if sudo_dest > b_end:
+                # remain step for inner
+                sudo_dest = step - (b_end - org_id)
+                dest_inner = sudo_dest + lb_outer_end
+        elif (lb_outer_end >= org_id >= lb_outer_start):
+            if lb_outer_end >= sudo_dest >= lb_outer_start:
+                dest_outer = sudo_dest
+            else:
+                # remain step
+                sudo_dest = step - (lb_outer_end - org_id)
+                dest_outer = sudo_dest + l_start - 1
+                if sudo_dest > (l_end - l_start + 1):
+                    sudo_dest = sudo_dest - (l_end - l_start + 1)
+                    dest_inner = sudo_dest + lt_outer_end
+        elif (l_start > org_id > lb_outer_end):
+            dest_outer = sudo_dest
+            if sudo_dest > l_end:
+                # remain step for inner
+                sudo_dest = step - (l_end - org_id)
+                dest_inner = sudo_dest + lt_outer_end
+        elif (l_end >= org_id >= l_start):
+            dest_outer = sudo_dest
+            if sudo_dest > l_end:
+                # remain step for inner
+                sudo_dest = step - (l_end - org_id)
+                dest_inner = sudo_dest + lt_outer_end
+        elif lt_outer_end >= org_id >= lt_outer_start:
+            if lt_outer_end >= sudo_dest >= lt_outer_start:
+                dest_outer = sudo_dest
+            else:
+                # remain step for outer
+                sudo_dest = step - (lt_outer_end - org_id)
+                dest_outer = sudo_dest + t_start - 1
+        elif t_start > org_id > lt_outer_end:
+            dest_outer = sudo_dest
+        else: # org_id >= t_start
+            dest_outer = sudo_dest
+
     else: #is_forward = 0
         pass
         
