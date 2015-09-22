@@ -509,71 +509,147 @@ def go_dest_id(org_id, step = 0, is_forward = 1):
     dest_outer = 0
     dest_inner = None
     if 1 == is_forward:
-        sudo_dest = org_id + step
+        pseudo_dest = org_id + step
     else: #is_forward = 0
-        sudo_dest = org_id - step
+        pseudo_dest = org_id - step
     
-    if sudo_dest <= 0 or sudo_dest > t_end:
+    if pseudo_dest <= 0 or pseudo_dest > t_end:
         return dest_outer, dest_inner
     
     if 1 == is_forward:
         if (r_end >= org_id >= 0):
-            dest_outer = sudo_dest
-            if sudo_dest > r_end:
+            dest_outer = pseudo_dest
+            if pseudo_dest > r_end:
                 # remain step for inner
-                sudo_dest = step - (r_end - org_id)
-                dest_inner = sudo_dest + rb_outer_end
+                pseudo_dest = step - (r_end - org_id)
+                dest_inner = pseudo_dest + rb_outer_end
         elif (rb_outer_end >= org_id >= rb_outer_start):
-            if rb_outer_end >= sudo_dest >= rb_outer_start:
-                dest_outer = sudo_dest
+            if rb_outer_end >= pseudo_dest >= rb_outer_start:
+                dest_outer = pseudo_dest
             else:
                 # remain step for outer
-                sudo_dest = step - (rb_outer_end - org_id)
-                dest_outer = sudo_dest + b_start - 1
+                pseudo_dest = step - (rb_outer_end - org_id)
+                dest_outer = pseudo_dest + b_start - 1
         elif (b_start > org_id > rb_outer_end):
-            dest_outer = sudo_dest
+            dest_outer = pseudo_dest
         elif (b_end >= org_id >= b_start):
-            dest_outer = sudo_dest
-            if sudo_dest > b_end:
+            dest_outer = pseudo_dest
+            if pseudo_dest > b_end:
                 # remain step for inner
-                sudo_dest = step - (b_end - org_id)
-                dest_inner = sudo_dest + lb_outer_end
+                pseudo_dest = step - (b_end - org_id)
+                dest_inner = pseudo_dest + lb_outer_end
         elif (lb_outer_end >= org_id >= lb_outer_start):
-            if lb_outer_end >= sudo_dest >= lb_outer_start:
-                dest_outer = sudo_dest
+            if lb_outer_end >= pseudo_dest >= lb_outer_start:
+                dest_outer = pseudo_dest
             else:
                 # remain step
-                sudo_dest = step - (lb_outer_end - org_id)
-                dest_outer = sudo_dest + l_start - 1
-                if sudo_dest > (l_end - l_start + 1):
-                    sudo_dest = sudo_dest - (l_end - l_start + 1)
-                    dest_inner = sudo_dest + lt_outer_end
+                pseudo_dest = step - (lb_outer_end - org_id)
+                dest_outer = pseudo_dest + l_start - 1
+                if pseudo_dest > (l_end - l_start + 1):
+                    pseudo_dest = pseudo_dest - (l_end - l_start + 1)
+                    dest_inner = pseudo_dest + lt_outer_end
         elif (l_start > org_id > lb_outer_end):
-            dest_outer = sudo_dest
-            if sudo_dest > l_end:
+            dest_outer = pseudo_dest
+            if pseudo_dest > l_end:
                 # remain step for inner
-                sudo_dest = step - (l_end - org_id)
-                dest_inner = sudo_dest + lt_outer_end
+                pseudo_dest = step - (l_end - org_id)
+                dest_inner = pseudo_dest + lt_outer_end
         elif (l_end >= org_id >= l_start):
-            dest_outer = sudo_dest
-            if sudo_dest > l_end:
+            dest_outer = pseudo_dest
+            if pseudo_dest > l_end:
                 # remain step for inner
-                sudo_dest = step - (l_end - org_id)
-                dest_inner = sudo_dest + lt_outer_end
+                pseudo_dest = step - (l_end - org_id)
+                dest_inner = pseudo_dest + lt_outer_end
         elif lt_outer_end >= org_id >= lt_outer_start:
-            if lt_outer_end >= sudo_dest >= lt_outer_start:
-                dest_outer = sudo_dest
+            if lt_outer_end >= pseudo_dest >= lt_outer_start:
+                dest_outer = pseudo_dest
             else:
                 # remain step for outer
-                sudo_dest = step - (lt_outer_end - org_id)
-                dest_outer = sudo_dest + t_start - 1
+                pseudo_dest = step - (lt_outer_end - org_id)
+                dest_outer = pseudo_dest + t_start - 1
         elif t_start > org_id > lt_outer_end:
-            dest_outer = sudo_dest
+            dest_outer = pseudo_dest
         else: # org_id >= t_start
-            dest_outer = sudo_dest
+            dest_outer = pseudo_dest
 
     else: #is_forward = 0
-        pass
+        if t_end >= org_id >= t_start:
+            if t_end >= pseudo_dest >= t_start:
+                dest_outer = pseudo_dest
+            else:
+                cp_pseudo_dest = pseudo_dest
+                #remain step for outer
+                pseudo_dest = step - (org_id - t_start)
+                dest_outer = lt_outer_end - pseudo_dest + 1
+                if pseudo_dest <= t_start - (lt_outer_end + 1):
+                    dest_inner = cp_pseudo_dest
+                else:
+                    pseudo_dest -= t_start - (lt_outer_end + 1)
+                    dest_inner = lt_outer_start - pseudo_dest
+        elif t_start > org_id > lt_outer_end:
+            if t_start > pseudo_dest > lt_outer_end:
+                dest_outer = pseudo_dest
+            else:
+                #remain step
+                pseudo_dest = step - (org_id - (lt_outer_end + 1))
+                if pseudo_dest > l_end - l_start + 1:
+                    dest_inner = l_end - pseudo_dest + 1
+                    pseudo_dest -= l_end - l_start + 1
+                    dest_outer = lb_outer_end - pseudo_dest + 1
+                else:
+                    dest_outer = l_end - pseudo_dest + 1
+        elif lt_outer_end >= org_id >= lt_outer_start:
+            if pseudo_dest < l_start:
+                #remain step
+                pseudo_dest = step - (org_id - l_start)
+                dest_inner = l_start - pseudo_dest
+                dest_outer = lb_outer_end + 1 - pseudo_dest
+            else:
+                dest_outer = pseudo_dest
+        elif l_end >= org_id >= l_start:
+            if l_end >= pseudo_dest >= l_start:
+                dest_outer = pseudo_dest
+            else:
+                #remain step
+                pseudo_dest = step - (org_id - l_start)
+                dest_outer = lb_outer_end + 1 - pseudo_dest
+                if pseudo_dest > l_start -1 - lb_outer_end:
+                    pseudo_dest -= l_start -1 - lb_outer_end
+                    dest_inner = b_end +1 - pseudo_dest
+                else:
+                    dest_inner = l_start - pseudo_dest
+        elif l_start > org_id > lb_outer_end:
+            if l_start > pseudo_dest > lb_outer_end:
+                dest_outer = pseudo_dest
+            else:
+                #remain step
+                pseudo_dest = step - (org_id - (lb_outer_end + 1))
+                dest_outer = b_end - pseudo_dest + 1
+        elif lb_outer_end >= org_id >= lb_outer_start:
+            dest_outer = pseudo_dest
+        elif b_end >= org_id >= b_start:
+            if b_end >= pseudo_dest >= b_start:
+                dest_outer = pseudo_dest
+            else:
+                #remain step
+                pseudo_dest = step - (org_id - b_start)
+                dest_outer = rb_outer_end + 1 - pseudo_dest
+                if pseudo_dest > b_start -1 - rb_outer_end:
+                    pseudo_dest -= b_start -1 - rb_outer_end
+                    dest_inner = r_end + 1 - pseudo_dest
+                else:
+                    dest_inner = b_start - pseudo_dest
+        elif b_start > org_id > rb_outer_end:
+            if b_start > pseudo_dest > rb_outer_end:
+                dest_outer = pseudo_dest
+            else:
+                #remain step
+                pseudo_dest = step - (org_id - (rb_outer_end + 1))
+                dest_outer = r_end - pseudo_dest + 1
+        elif rb_outer_end >= org_id >= rb_outer_start:
+            dest_outer = pseudo_dest
+        else: #elif r_end >= org_id >= r_start:
+            dest_outer = pseudo_dest
         
     return dest_outer, dest_inner
     
