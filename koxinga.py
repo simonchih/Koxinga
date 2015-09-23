@@ -35,23 +35,6 @@ wblock = 61
 #each block width is 60
 hblock = 60
 
-item_size = 30
-map_block_num = 71
-inner_block_num = 3
-r_start = 1
-r_end = 5
-rb_outer_start = 6
-rb_outer_end = 12
-b_start = 16
-b_end = 30
-lb_outer_start = 31
-lb_outer_end = 37
-l_start = 41
-l_end = 43
-lt_outer_start = 44
-lt_outer_end = 50
-t_start = 54
-t_end = map_block_num - 1
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -472,156 +455,11 @@ def generate_map(Surface):
         for i in range(0, map_block_num):
             block_loc[i] = map_loc_to_player_loc(main_map[i].loc, i, p)
         player_data[p].loc = block_loc[:]
+        (player_data[p].x, player_data[p].y) = player_data[p].loc[0]
+        player_data[p].b_id = 0
+        player_data[p].next_id = 0
         
     draw_player_thread.player_data = player_data
-
-def go_dest_id(org_id, step = 0, is_forward = 1):
-    dest_outer = 0
-    dest_inner = None
-    if 1 == is_forward:
-        pseudo_dest = org_id + step
-    else: #is_forward = 0
-        pseudo_dest = org_id - step
-    
-    if pseudo_dest <= 0 or pseudo_dest > t_end:
-        return dest_outer, dest_inner
-    
-    if 1 == is_forward:
-        if (r_end >= org_id >= 0):
-            dest_outer = pseudo_dest
-            if pseudo_dest > r_end:
-                # remain step for inner
-                pseudo_dest = step - (r_end - org_id)
-                dest_inner = pseudo_dest + rb_outer_end
-        elif (rb_outer_end >= org_id >= rb_outer_start):
-            if rb_outer_end >= pseudo_dest >= rb_outer_start:
-                dest_outer = pseudo_dest
-            else:
-                # remain step for outer
-                pseudo_dest = step - (rb_outer_end - org_id)
-                dest_outer = pseudo_dest + b_start - 1
-        elif (b_start > org_id > rb_outer_end):
-            dest_outer = pseudo_dest
-        elif (b_end >= org_id >= b_start):
-            dest_outer = pseudo_dest
-            if pseudo_dest > b_end:
-                # remain step for inner
-                pseudo_dest = step - (b_end - org_id)
-                dest_inner = pseudo_dest + lb_outer_end
-        elif (lb_outer_end >= org_id >= lb_outer_start):
-            if lb_outer_end >= pseudo_dest >= lb_outer_start:
-                dest_outer = pseudo_dest
-            else:
-                # remain step
-                pseudo_dest = step - (lb_outer_end - org_id)
-                dest_outer = pseudo_dest + l_start - 1
-                if pseudo_dest > (l_end - l_start + 1):
-                    pseudo_dest = pseudo_dest - (l_end - l_start + 1)
-                    dest_inner = pseudo_dest + lt_outer_end
-        elif (l_start > org_id > lb_outer_end):
-            dest_outer = pseudo_dest
-            if pseudo_dest > l_end:
-                # remain step for inner
-                pseudo_dest = step - (l_end - org_id)
-                dest_inner = pseudo_dest + lt_outer_end
-        elif (l_end >= org_id >= l_start):
-            dest_outer = pseudo_dest
-            if pseudo_dest > l_end:
-                # remain step for inner
-                pseudo_dest = step - (l_end - org_id)
-                dest_inner = pseudo_dest + lt_outer_end
-        elif lt_outer_end >= org_id >= lt_outer_start:
-            if lt_outer_end >= pseudo_dest >= lt_outer_start:
-                dest_outer = pseudo_dest
-            else:
-                # remain step for outer
-                pseudo_dest = step - (lt_outer_end - org_id)
-                dest_outer = pseudo_dest + t_start - 1
-        elif t_start > org_id > lt_outer_end:
-            dest_outer = pseudo_dest
-        else: # org_id >= t_start
-            dest_outer = pseudo_dest
-
-    else: #is_forward = 0
-        if t_end >= org_id >= t_start:
-            if t_end >= pseudo_dest >= t_start:
-                dest_outer = pseudo_dest
-            else:
-                cp_pseudo_dest = pseudo_dest
-                #remain step for outer
-                pseudo_dest = step - (org_id - t_start)
-                dest_outer = lt_outer_end - pseudo_dest + 1
-                if pseudo_dest <= t_start - (lt_outer_end + 1):
-                    dest_inner = cp_pseudo_dest
-                else:
-                    pseudo_dest -= t_start - (lt_outer_end + 1)
-                    dest_inner = lt_outer_start - pseudo_dest
-        elif t_start > org_id > lt_outer_end:
-            if t_start > pseudo_dest > lt_outer_end:
-                dest_outer = pseudo_dest
-            else:
-                #remain step
-                pseudo_dest = step - (org_id - (lt_outer_end + 1))
-                if pseudo_dest > l_end - l_start + 1:
-                    dest_inner = l_end - pseudo_dest + 1
-                    pseudo_dest -= l_end - l_start + 1
-                    dest_outer = lb_outer_end - pseudo_dest + 1
-                else:
-                    dest_outer = l_end - pseudo_dest + 1
-        elif lt_outer_end >= org_id >= lt_outer_start:
-            if pseudo_dest < l_start:
-                #remain step
-                pseudo_dest = step - (org_id - l_start)
-                dest_inner = l_start - pseudo_dest
-                dest_outer = lb_outer_end + 1 - pseudo_dest
-            else:
-                dest_outer = pseudo_dest
-        elif l_end >= org_id >= l_start:
-            if l_end >= pseudo_dest >= l_start:
-                dest_outer = pseudo_dest
-            else:
-                #remain step
-                pseudo_dest = step - (org_id - l_start)
-                dest_outer = lb_outer_end + 1 - pseudo_dest
-                if pseudo_dest > l_start -1 - lb_outer_end:
-                    pseudo_dest -= l_start -1 - lb_outer_end
-                    dest_inner = b_end +1 - pseudo_dest
-                else:
-                    dest_inner = l_start - pseudo_dest
-        elif l_start > org_id > lb_outer_end:
-            if l_start > pseudo_dest > lb_outer_end:
-                dest_outer = pseudo_dest
-            else:
-                #remain step
-                pseudo_dest = step - (org_id - (lb_outer_end + 1))
-                dest_outer = b_end - pseudo_dest + 1
-        elif lb_outer_end >= org_id >= lb_outer_start:
-            dest_outer = pseudo_dest
-        elif b_end >= org_id >= b_start:
-            if b_end >= pseudo_dest >= b_start:
-                dest_outer = pseudo_dest
-            else:
-                #remain step
-                pseudo_dest = step - (org_id - b_start)
-                dest_outer = rb_outer_end + 1 - pseudo_dest
-                if pseudo_dest > b_start -1 - rb_outer_end:
-                    pseudo_dest -= b_start -1 - rb_outer_end
-                    dest_inner = r_end + 1 - pseudo_dest
-                else:
-                    dest_inner = b_start - pseudo_dest
-        elif b_start > org_id > rb_outer_end:
-            if b_start > pseudo_dest > rb_outer_end:
-                dest_outer = pseudo_dest
-            else:
-                #remain step
-                pseudo_dest = step - (org_id - (rb_outer_end + 1))
-                dest_outer = r_end - pseudo_dest + 1
-        elif rb_outer_end >= org_id >= rb_outer_start:
-            dest_outer = pseudo_dest
-        else: #elif r_end >= org_id >= r_start:
-            dest_outer = pseudo_dest
-        
-    return dest_outer, dest_inner
     
 def draw_dock():
     # player 1~6
@@ -641,6 +479,7 @@ def generate_dock():
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
     
 def main():
+    global draw_player_thread
     generate_map(screen)
     generate_dock()
     draw_player_thread.start()
@@ -650,6 +489,14 @@ def main():
         draw_map(screen)
         draw_player_thread.run()
         pygame.display.update()
+        # test p
+        #pd = draw_player_thread.player_data
+        #if 0 == pd[1].mode:
+        #    pd[1].step = 1
+        #    pd[1].mode = 1
+        #    pd[1].dir = 2
+        #    pd[1].forward = 1
+        # end test p
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

@@ -1,5 +1,7 @@
 class game_player():
-    def __init__(self, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, steps = 0, mode = 0, direction = 0):
+    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, steps = 0, mode = 0, direction = 0, Is_Forward = 1):
+        self.x = x_now
+        self.y = y_now
         self.b_id = block_id
         self.next_id = next_block_id
         self.loc = location
@@ -9,3 +11,4 @@ class game_player():
         self.mode = mode
         # dir 0:nothing, 1:outer, 2:inner
         self.dir = direction
+        self.forward = Is_Forward
