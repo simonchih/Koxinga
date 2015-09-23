@@ -483,6 +483,12 @@ def main():
     generate_map(screen)
     generate_dock()
     draw_player_thread.start()
+    # test p backward
+    #pd = draw_player_thread.player_data
+    #(pd[1].x, pd[1].y) = pd[1].loc[70]
+    #pd[1].b_id = 70
+    #pd[1].next_id = 70
+    # end test p
     while True:
         screen.blit(background, (0,0))
         draw_dock()
@@ -491,11 +497,11 @@ def main():
         pygame.display.update()
         # test p
         #pd = draw_player_thread.player_data
-        #if 0 == pd[1].mode:
+        #if 0 == pd[1].mode:            
         #    pd[1].step = 1
         #    pd[1].mode = 1
-        #    pd[1].dir = 2
-        #    pd[1].forward = 1
+        #    pd[1].dir = 1
+        #    pd[1].forward = 0
         # end test p
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
