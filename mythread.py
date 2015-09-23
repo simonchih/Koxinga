@@ -205,14 +205,14 @@ def go_dest_id(org_id, step = 0, is_forward = 1):
         
     return dest_outer, dest_inner        
         
-class myThread (threading.Thread):
+class mythread (threading.Thread):
     def __init__(self, threadID, surface, player_data):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.surface = surface
         self.player_data = player_data
     
-    def run(self):    
+    def run(self):
         for p in range(0, player_num):
             if 2 == self.player_data[p].mode:
                 break
@@ -221,8 +221,14 @@ class myThread (threading.Thread):
             if 1 == self.player_data[p].mode:
                 if x == self.player_data[p].loc[n_id][0] and y == self.player_data[p].loc[n_id][1]:
                     if self.player_data[p].b_id != self.player_data[p].next_id:
-                        self.player_data[p].b_id = self.player_data[p].next_id
-                        self.player_data[p].step -= 1
+                        if t_end == self.player_data[p].b_id and 0 == self.player_data[p].next_id:
+                            print("goal game")
+                            self.player_data[p].b_id = self.player_data[p].next_id
+                            self.player_data[p].step = 0
+                            self.player_data[p].goal_game = 1
+                        else:
+                            self.player_data[p].b_id = self.player_data[p].next_id
+                            self.player_data[p].step -= 1
                     if 0 == self.player_data[p].step:
                        self.player_data[p].mode = 0
                        self.player_data[p].dir = 0

@@ -20,7 +20,7 @@ block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 
-draw_player_thread = myThread(1, screen, 0)
+draw_player_thread = mythread(1, screen, 0)
 
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
@@ -479,7 +479,7 @@ def generate_dock():
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
     
 def main():
-    global draw_player_thread
+    global draw_player_thread, goal_game
     generate_map(screen)
     generate_dock()
     draw_player_thread.start()
@@ -497,11 +497,11 @@ def main():
         pygame.display.update()
         # test p
         #pd = draw_player_thread.player_data
-        #if 0 == pd[1].mode:            
+        #if 0 == pd[1].mode and 0 == pd[1].goal_game:
         #    pd[1].step = 1
         #    pd[1].mode = 1
         #    pd[1].dir = 1
-        #    pd[1].forward = 0
+        #    pd[1].forward = 1
         # end test p
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
