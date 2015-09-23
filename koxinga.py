@@ -1,8 +1,8 @@
 import random
 import time
-import pygame
 from game_map import *
 from game_player import *
+from mythread import *
 
 background_image_filename = 'Image/Formosa-1863_1600x900.jpg'
 block_image = 'Image/wood_40x27.jpg'
@@ -11,19 +11,6 @@ block_selected_image = 'Image/wood_selected_40x27.jpg'
 block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
-piece0_image = 'Image/pawn2.gif'
-piece1_image = 'Image/pawn3.gif'
-piece2_image = 'Image/pawn4.gif'
-piece3_image = 'Image/pawn5.gif'
-piece4_image = 'Image/pawn6.gif'
-piece5_image = 'Image/pawn8.gif'
-
-screen_width = 1599
-screen_height = 860
-
-pygame.init()
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Koxinga')
 
 background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
@@ -32,12 +19,8 @@ block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
-piece0 = pygame.image.load(piece0_image).convert()
-piece1 = pygame.image.load(piece1_image).convert()
-piece2 = pygame.image.load(piece2_image).convert()
-piece3 = pygame.image.load(piece3_image).convert()
-piece4 = pygame.image.load(piece4_image).convert()
-piece5 = pygame.image.load(piece5_image).convert()
+
+draw_player_thread = myThread(1, screen, 0)
 
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
@@ -52,7 +35,6 @@ wblock = 61
 #each block width is 60
 hblock = 60
 
-player_num = 6
 item_size = 30
 map_block_num = 71
 inner_block_num = 3
@@ -490,20 +472,8 @@ def generate_map(Surface):
         for i in range(0, map_block_num):
             block_loc[i] = map_loc_to_player_loc(main_map[i].loc, i, p)
         player_data[p].loc = block_loc[:]
-
-def player_id_to_image(pid):
-    if 0 == pid:
-        return piece0
-    elif 1 == pid:
-        return piece1
-    elif 2 == pid:
-        return piece2
-    elif 3 == pid:
-        return piece3
-    elif 4 == pid:
-        return piece4
-    elif 5 == pid:
-        return piece5
+        
+    draw_player_thread.player_data = player_data
 
 def go_dest_id(org_id, step = 0, is_forward = 1):
     dest_outer = 0
@@ -673,10 +643,12 @@ def generate_dock():
 def main():
     generate_map(screen)
     generate_dock()
+    draw_player_thread.start()
     while True:
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
+        draw_player_thread.run()
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
