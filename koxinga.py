@@ -12,6 +12,31 @@ block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
 
+dice_1_2 = 'Image/die-1+2.gif'
+dice_1_3 = 'Image/die-1+3.gif'
+dice_1_4 = 'Image/die-1+4.gif'
+dice_1_5 = 'Image/die-1+5.gif'
+dice_2_1 = 'Image/die-2+1.gif'
+dice_2_3 = 'Image/die-2+3.gif'
+dice_2_4 = 'Image/die-2+4.gif'
+dice_2_6 = 'Image/die-2+6.gif'
+dice_3_1 = 'Image/die-3+1.gif'
+dice_3_2 = 'Image/die-3+2.gif'
+dice_3_5 = 'Image/die-3+5.gif'
+dice_3_6 = 'Image/die-3+6.gif'
+dice_4_1 = 'Image/die-4+1.gif'
+dice_4_2 = 'Image/die-4+2.gif'
+dice_4_5 = 'Image/die-4+5.gif'
+dice_4_6 = 'Image/die-4+6.gif'
+dice_5_1 = 'Image/die-5+1.gif'
+dice_5_3 = 'Image/die-5+3.gif'
+dice_5_4 = 'Image/die-5+4.gif'
+dice_5_6 = 'Image/die-5+6.gif'
+dice_6_2 = 'Image/die-6+2.gif'
+dice_6_3 = 'Image/die-6+3.gif'
+dice_6_4 = 'Image/die-6+4.gif'
+dice_6_5 = 'Image/die-6+5.gif'
+
 background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
 block2 = pygame.image.load(block2_image).convert()
@@ -19,6 +44,30 @@ block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
+di_1_2 = pygame.image.load(dice_1_2).convert()
+di_1_3 = pygame.image.load(dice_1_3).convert()
+di_1_4 = pygame.image.load(dice_1_4).convert()
+di_1_5 = pygame.image.load(dice_1_5).convert()
+di_2_1 = pygame.image.load(dice_2_1).convert()
+di_2_3 = pygame.image.load(dice_2_3).convert()
+di_2_4 = pygame.image.load(dice_2_4).convert()
+di_2_6 = pygame.image.load(dice_2_6).convert()
+di_3_1 = pygame.image.load(dice_3_1).convert()
+di_3_2 = pygame.image.load(dice_3_2).convert()
+di_3_5 = pygame.image.load(dice_3_5).convert()
+di_3_6 = pygame.image.load(dice_3_6).convert()
+di_4_1 = pygame.image.load(dice_4_1).convert()
+di_4_2 = pygame.image.load(dice_4_2).convert()
+di_4_5 = pygame.image.load(dice_4_5).convert()
+di_4_6 = pygame.image.load(dice_4_6).convert()
+di_5_1 = pygame.image.load(dice_5_1).convert()
+di_5_3 = pygame.image.load(dice_5_3).convert()
+di_5_4 = pygame.image.load(dice_5_4).convert()
+di_5_6 = pygame.image.load(dice_5_6).convert()
+di_6_2 = pygame.image.load(dice_6_2).convert()
+di_6_3 = pygame.image.load(dice_6_3).convert()
+di_6_4 = pygame.image.load(dice_6_4).convert()
+di_6_5 = pygame.image.load(dice_6_5).convert()
 
 draw_player_thread = mythread(1, screen, 0)
 
@@ -44,11 +93,66 @@ player_3_4_block_start_h = 0
 player_4_6_block_start_w = screen_width - player1_start_w - 5*block.get_width()
 player_5_block_start_w = screen_width - block2.get_width()
 
+dice_value1 = -1
+dice_value2 = -1
+
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
 
 main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
 player_data = [0] * player_num
+
+def index_to_image_dice(index):
+    if 0 == index:
+        return di_1_2
+    elif 1 == index:
+        return di_1_3
+    elif 2 == index:
+        return di_1_4
+    elif 3 == index:
+        return di_1_5
+    elif 4 == index:
+        return di_2_1
+    elif 5 == index:
+        return di_2_3
+    elif 6 == index:
+        return di_2_4
+    elif 7 == index:
+        return di_2_6
+    elif 8 == index:
+        return di_3_1
+    elif 9 == index:
+        return di_3_2
+    elif 10 == index:
+        return di_3_5
+    elif 11 == index:
+        return di_3_6
+    elif 12 == index:
+        return di_4_1
+    elif 13 == index:
+        return di_4_2
+    elif 14 == index:
+        return di_4_5
+    elif 15 == index:
+        return di_4_6
+    elif 16 == index:
+        return di_5_1
+    elif 17 == index:
+        return di_5_3
+    elif 18 == index:
+        return di_5_4
+    elif 19 == index:
+        return di_5_6
+    elif 20 == index:
+        return di_6_2
+    elif 21 == index:
+        return di_6_3
+    elif 22 == index:
+        return di_6_4
+    elif 23 == index:
+        return di_6_5
+    
+    return None
 
 def draw_item(Surface, type, value, pos):
     (x, y) = pos
@@ -281,7 +385,7 @@ def map_loc_to_player_loc(map_loc, block_id, player):
 # inner block: 51 ~ 53
 
 # top block: 54 ~ 70   
-def generate_map(Surface):
+def generate_map():
     global main_map
     global map_mark
     
@@ -477,10 +581,22 @@ def generate_dock():
     generate_five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
     generate_five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
+
+def draw_inner_item(Surface):
+    global dice_value1, dice_value2
+    inner_gap = 5
+    
+    index1 = index_to_image_dice(dice_value1)
+    index2 = index_to_image_dice(dice_value2)
+    if None != index1:
+        Surface.blit(index1, (margin+big_block+inner_gap, margin+big_block+inner_gap))
+    if None != index2:
+        Surface.blit(index2, (margin+big_block+inner_gap+di_1_2.get_width()+inner_gap, margin+big_block+inner_gap)) 
     
 def main():
-    global draw_player_thread, goal_game
-    generate_map(screen)
+    global draw_player_thread
+    
+    generate_map()
     generate_dock()
     draw_player_thread.start()
     # test p backward
@@ -493,6 +609,7 @@ def main():
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
+        draw_inner_item(screen)
         draw_player_thread.run()
         pygame.display.update()
         # test p
