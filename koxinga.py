@@ -11,6 +11,7 @@ block_selected_image = 'Image/wood_selected_40x27.jpg'
 block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
+button1_image = 'Image/button1_100x50.gif'
 
 dice_1_2 = 'Image/die-1+2.gif'
 dice_1_3 = 'Image/die-1+3.gif'
@@ -44,6 +45,7 @@ block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
+button1 = pygame.image.load(button1_image).convert()
 di_1_2 = pygame.image.load(dice_1_2).convert()
 di_1_3 = pygame.image.load(dice_1_3).convert()
 di_1_4 = pygame.image.load(dice_1_4).convert()
@@ -582,16 +584,31 @@ def generate_dock():
     generate_five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
 
+def draw_button(Surface, loc, str, color, size, mode = 0):
+    if 0 == mode:
+        fontx = loc[0]+40
+        fonty = loc[1]+15
+    Surface.blit(button1, loc)
+    Surface.blit(write(str, color, size), (fontx, fonty))
+    
 def draw_inner_item(Surface):
     global dice_value1, dice_value2
     inner_gap = 5
     
+    #TEST only
+    #dice_value1 = 1
+    #dice_value2 = 2
+    #END TEST
+    
     index1 = index_to_image_dice(dice_value1)
     index2 = index_to_image_dice(dice_value2)
+    
     if None != index1:
         Surface.blit(index1, (margin+big_block+inner_gap, margin+big_block+inner_gap))
     if None != index2:
-        Surface.blit(index2, (margin+big_block+inner_gap+di_1_2.get_width()+inner_gap, margin+big_block+inner_gap)) 
+        Surface.blit(index2, (margin+big_block+inner_gap+di_1_2.get_width()+inner_gap, margin+big_block+inner_gap))
+
+    draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK, 14)
     
 def main():
     global draw_player_thread
