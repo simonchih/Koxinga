@@ -584,11 +584,10 @@ def generate_dock():
     generate_five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
 
-def draw_button(Surface, loc, str, color, size, mode = 0):
-    if 0 == mode:
-        fontx = loc[0]+40
-        fonty = loc[1]+15
-    Surface.blit(button1, loc)
+def draw_button(Surface, loc, str, color, size, image = button1):
+    fontx = loc[0]+ 50 - int(len(str)/2*6)
+    fonty = loc[1]+15
+    Surface.blit(image, loc)
     Surface.blit(write(str, color, size), (fontx, fonty))
     
 def draw_inner_item(Surface):
