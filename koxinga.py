@@ -86,6 +86,9 @@ wblock = 61
 #each block width is 60
 hblock = 60
 
+turn_id = 0
+start_p = 0
+inner_gap = 5
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -585,14 +588,18 @@ def generate_dock():
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
 
 def draw_button(Surface, loc, str, color, size = 14, image = button1):
+    (mouseX, mouseY) = pygame.mouse.get_pos()
     fontx = loc[0]+ 50 - int(len(str)/2*6)
     fonty = loc[1]+15
     Surface.blit(image, loc)
-    Surface.blit(write(str, color, size), (fontx, fonty))
+    if loc[0] <= mouseX <= loc[0]+image.get_width() and loc[1] <= mouseY <= loc[1]+image.get_height():
+        Surface.blit(write(str, RED, size), (fontx, fonty))
+    else:
+        Surface.blit(write(str, color, size), (fontx, fonty))
+    
     
 def draw_inner_item(Surface):
-    global dice_value1, dice_value2
-    inner_gap = 5
+    global dice_value1, dice_value2, turn_id, inner_gap
     
     #TEST only
     #dice_value1 = 1
@@ -607,10 +614,14 @@ def draw_inner_item(Surface):
     if None != index2:
         Surface.blit(index2, (margin+big_block+inner_gap+di_1_2.get_width()+inner_gap, margin+big_block+inner_gap))
 
-    draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
+    if 0 == player_data[turn_id].IsAI:
+        if 3 == player_data[turn_id].mode:
+            draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
+        elif 4 == player_data[turn_id].mode:
+            draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Swap", BLACK)
     
 def main():
-    global draw_player_thread
+    global draw_player_thread, player_data, dice_value1, dice_value2
     
     generate_map()
     generate_dock()
@@ -628,6 +639,9 @@ def main():
         draw_inner_item(screen)
         draw_player_thread.run()
         pygame.display.update()
+        if 0 == player_data[turn_id].IsAI:
+            if start_p == turn_id and 0 == player_data[turn_id].mode:
+                player_data[turn_id].mode = 3        
         # test p
         #pd = draw_player_thread.player_data
         #if 0 == pd[1].mode and 0 == pd[1].goal_game:
@@ -640,6 +654,21 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            elif 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                (mouseX, mouseY) = pygame.mouse.get_pos()
+                (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
+                if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
+                    dice1 = random.randint(0, 23)
+                    dice2 = random.randint(0, 23)
+                    dice_value1 = dice1
+                    dice_value2 = dice2
+                    player_data[turn_id].mode = 4
+            elif 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                (mouseX, mouseY) = pygame.mouse.get_pos()
+                (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
+                if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
+                    (dice_value1, dice_value2) = (dice_value2, dice_value1)
+            
     pygame.quit()
     quit()
 
