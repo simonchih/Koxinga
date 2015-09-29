@@ -12,6 +12,17 @@ block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
 button1_image = 'Image/button1_100x50.gif'
+# card
+move2 = 'Image/move_move_100x50.jpg'
+move_cannon = 'Image/move_cannon_100x50.jpg'
+cannon_move = 'Image/cannon_move_100x50.jpg'
+back_move = 'Image/back_move_100x50.jpg'
+move_back = 'Image/move_back_100x50.jpg'
+n1_food = 'Image/-1_food_100x50.jpg'
+n2_gold = 'Image/-2_gold_100x50.jpg'
+food_n2 = 'Image/food_-2_100x50.jpg'
+gold_n1 = 'Image/gold_-1_100x50.jpg'
+food_gold = 'Image/food_gold_100x50.jpg'
 
 dice_1_2 = 'Image/die-1+2.gif'
 dice_1_3 = 'Image/die-1+3.gif'
@@ -46,6 +57,19 @@ block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
+
+# card
+mv2       = pygame.image.load(move2).convert()
+mv_cannon = pygame.image.load(move_cannon).convert()
+cannon_mv = pygame.image.load(cannon_move).convert()
+back_mv   = pygame.image.load(back_move).convert()
+mv_back   = pygame.image.load(move_back).convert()
+m1_food   = pygame.image.load(n1_food).convert()
+m2_gold   = pygame.image.load(n2_gold).convert()
+food_m2   = pygame.image.load(food_n2).convert()
+gold_m1   = pygame.image.load(gold_n1).convert()
+fd_gd     = pygame.image.load(food_gold).convert()
+
 di_1_2 = pygame.image.load(dice_1_2).convert()
 di_1_3 = pygame.image.load(dice_1_3).convert()
 di_1_4 = pygame.image.load(dice_1_4).convert()
@@ -106,6 +130,63 @@ player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [
 main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
 player_data = [0] * player_num
+
+def card_id_to_image(cid, Is_Small = 0):
+    if 0 == Is_Small:
+        if 0 == cid:
+            return mv2
+        elif 1 == cid:
+            return mv_cannon
+        elif 2 == cid:
+            return cannon_mv
+        elif 3 == cid:
+            return back_mv
+        elif 4 == cid:
+            return mv_back
+        elif 5 == cid:
+            return m1_food
+        elif 6 == cid:
+            return m2_gold
+        elif 7 == cid:
+            return food_m2
+        elif 8 == cid:
+            return gold_m1
+        elif 9 == cid:
+            return fd_gd
+    else:
+        if 0 == cid:
+            return mv2_s
+        elif 1 == cid:
+            return mv_cannon_s
+        elif 2 == cid:
+            return cannon_mv_s
+        elif 3 == cid:
+            return back_mv__s
+        elif 4 == cid:
+            return mv_back_s
+        elif 5 == cid:
+            return m1_food_s
+        elif 6 == cid:
+            return m2_gold_s
+        elif 7 == cid:
+            return food_m2_s
+        elif 8 == cid:
+            return gold_m1_s
+        elif 9 == cid:
+            return fd_gd_s
+    
+
+# return 0 based
+def pick_up_one_card(player_id):
+    global player_data
+    index = random.randint(1, player_data[player_id].remain_card_num)
+    for i in range(0, total_card_num):
+        if 0 == player_data[player_id].marked_card[i]:
+            index -= 1
+        if 0 == index:
+           player_data[player_id].marked_card[i] = 2
+           player_data[player_id].remain_card_num -= 1
+           return i
 
 def index_to_image_dice(index):
     if 0 == index:
@@ -569,6 +650,17 @@ def generate_map():
         player_data[p].next_id = 0
         
     draw_player_thread.player_data = player_data
+
+def generate_player_card():
+    global player_data
+    # ini needed
+    for i in range(0, player_num):
+        player_data[i].marked_card = [0] * total_card_num
+    
+    for i in range(0, player_num):
+        pick_up_one_card(i)
+        pick_up_one_card(i)
+        pick_up_one_card(i)
     
 def draw_dock():
     # player 1~6
@@ -609,6 +701,9 @@ def draw_inner_item(Surface):
     index1 = index_to_image_dice(dice_value1)
     index2 = index_to_image_dice(dice_value2)
     
+    card_x =  margin+big_block+inner_gap
+    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
+    
     if None != index1:
         Surface.blit(index1, (margin+big_block+inner_gap, margin+big_block+inner_gap))
     if None != index2:
@@ -619,12 +714,18 @@ def draw_inner_item(Surface):
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
         elif 4 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Swap", BLACK)
+        for i in range(0, total_card_num):
+            if 2 == player_data[turn_id].marked_card[i]:
+                Surface.blit(card_id_to_image(i), (card_x, card_y))
+                card_y += mv2.get_height() + inner_gap
+            
     
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2
     
     generate_map()
     generate_dock()
+    generate_player_card()
     draw_player_thread.start()
     # test p backward
     #pd = draw_player_thread.player_data
