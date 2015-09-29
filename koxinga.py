@@ -131,50 +131,27 @@ main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
 player_data = [0] * player_num
 
-def card_id_to_image(cid, Is_Small = 0):
-    if 0 == Is_Small:
-        if 0 == cid:
-            return mv2
-        elif 1 == cid:
-            return mv_cannon
-        elif 2 == cid:
-            return cannon_mv
-        elif 3 == cid:
-            return back_mv
-        elif 4 == cid:
-            return mv_back
-        elif 5 == cid:
-            return m1_food
-        elif 6 == cid:
-            return m2_gold
-        elif 7 == cid:
-            return food_m2
-        elif 8 == cid:
-            return gold_m1
-        elif 9 == cid:
-            return fd_gd
-    else:
-        if 0 == cid:
-            return mv2_s
-        elif 1 == cid:
-            return mv_cannon_s
-        elif 2 == cid:
-            return cannon_mv_s
-        elif 3 == cid:
-            return back_mv__s
-        elif 4 == cid:
-            return mv_back_s
-        elif 5 == cid:
-            return m1_food_s
-        elif 6 == cid:
-            return m2_gold_s
-        elif 7 == cid:
-            return food_m2_s
-        elif 8 == cid:
-            return gold_m1_s
-        elif 9 == cid:
-            return fd_gd_s
-    
+def card_id_to_image(cid):
+    if 0 == cid:
+        return mv2
+    elif 1 == cid:
+        return mv_cannon
+    elif 2 == cid:
+        return cannon_mv
+    elif 3 == cid:
+        return back_mv
+    elif 4 == cid:
+        return mv_back
+    elif 5 == cid:
+        return m1_food
+    elif 6 == cid:
+        return m2_gold
+    elif 7 == cid:
+        return food_m2
+    elif 8 == cid:
+        return gold_m1
+    elif 9 == cid:
+        return fd_gd    
 
 # return 0 based
 def pick_up_one_card(player_id):
