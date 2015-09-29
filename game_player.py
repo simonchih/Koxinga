@@ -17,5 +17,5 @@ class game_player():
         self.goal_game = goal_game
         self.selected_card_value = selected_card_value
         # 0: unused, 1: showed card, 2:own card
-        self.marked_card = marked_card
+        self.marked_card = marked_card[:]
         self.remain_card_num = remain_card_num

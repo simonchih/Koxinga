@@ -653,9 +653,6 @@ def generate_map():
 
 def generate_player_card():
     global player_data
-    # ini needed
-    for i in range(0, player_num):
-        player_data[i].marked_card = [0] * total_card_num
     
     for i in range(0, player_num):
         pick_up_one_card(i)
