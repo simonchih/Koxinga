@@ -1,7 +1,7 @@
 total_card_num = 10
 
 class game_player():
-    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, steps = 0, mode = 0, direction = 0, Is_Forward = 1, goal_game = 0, selected_card_value = -1, marked_card = [0] * total_card_num, remain_card_num = total_card_num):
+    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, steps = 0, mode = 0, direction = 0, Is_Forward = 1, goal_game = 0, selected_card_value = None, marked_card = [0] * total_card_num, remain_card_num = total_card_num):
         self.x = x_now
         self.y = y_now
         self.b_id = block_id
