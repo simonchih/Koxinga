@@ -667,6 +667,7 @@ def draw_button(Surface, loc, str, color, size = 14, image = button1):
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
     
+    rect_width = 2
     #TEST only
     #dice_value1 = 1
     #dice_value2 = 2
@@ -688,10 +689,14 @@ def draw_inner_item(Surface):
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
         elif 4 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Swap", BLACK)
-        for i in range(0, total_card_num):
-            if 2 == player_data[turn_id].marked_card[i]:
-                Surface.blit(card_id_to_image(i), (card_x, card_y))
-                card_y += mv2.get_height() + inner_gap
+            for i in range(0, total_card_num):
+                if 2 == player_data[turn_id].marked_card[i]:
+                    Surface.blit(card_id_to_image(i), (card_x, card_y))
+                    (MouseX, MouseY) = pygame.mouse.get_pos()
+                    if card_x <= MouseX <= card_x + mv2.get_width() and card_y <= MouseY <= card_y + mv2.get_height():
+                        pygame.draw.rect(Surface, RED, (card_x, card_y, mv2.get_width(), mv2.get_height()), rect_width)
+                    card_y += mv2.get_height() + inner_gap
+        
             
     
 def main():
