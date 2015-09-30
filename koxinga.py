@@ -696,6 +696,8 @@ def draw_inner_item(Surface):
                     if card_x <= MouseX <= card_x + mv2.get_width() and card_y <= MouseY <= card_y + mv2.get_height():
                         pygame.draw.rect(Surface, RED, (card_x, card_y, mv2.get_width(), mv2.get_height()), rect_width)
                     card_y += mv2.get_height() + inner_gap
+            if None != player_data[turn_id].selected_card_value:
+                draw_button(Surface, (card_x, card_y), "Finish", BLACK)
         
             
     
@@ -746,8 +748,21 @@ def main():
             elif 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                 (mouseX, mouseY) = pygame.mouse.get_pos()
                 (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
+                card_x =  margin+big_block+inner_gap
+                card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
                 if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
                     (dice_value1, dice_value2) = (dice_value2, dice_value1)
+                for i in range(0, total_card_num):
+                    if 2 == player_data[turn_id].marked_card[i]:        
+                        if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
+                            if None == player_data[turn_id].selected_card_value:
+                                player_data[turn_id].selected_card_value = i
+                                player_data[turn_id].marked_card[i] = 1
+                            else:
+                                player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
+                                player_data[turn_id].selected_card_value = i
+                                player_data[turn_id].marked_card[i] = 1
+                        card_y += mv2.get_height() + inner_gap
             
     pygame.quit()
     quit()
