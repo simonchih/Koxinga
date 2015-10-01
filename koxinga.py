@@ -112,14 +112,15 @@ hblock = 60
 
 turn_id = 0
 start_p = 0
+dock_num = 5
 inner_gap = 5
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
 player_2_block_start_w = 0
-player_2_5_block_start_h = int((screen_height - 5*block2.get_height())/2)
+player_2_5_block_start_h = int((screen_height - dock_num*block2.get_height())/2)
 player_3_4_block_start_h = 0
-player_4_6_block_start_w = screen_width - player1_start_w - 5*block.get_width()
+player_4_6_block_start_w = screen_width - player1_start_w - dock_num*block.get_width()
 player_5_block_start_w = screen_width - block2.get_width()
 
 dice_value1 = -1
@@ -246,22 +247,22 @@ def draw_item(Surface, type, value, pos):
             pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
 def five_block_w(start_w, start_h, b_image):
-    for i in range(0, 5):
+    for i in range(0, dock_num):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
       
 def five_block_h(start_w, start_h, b_image):
-    for i in range(0, 5):
+    for i in range(0, dock_num):
         screen.blit(b_image, (start_w, start_h + i*b_image.get_height()))
 
 #player is 1 base, but player_image_pos is 0 base
 def generate_five_block_w(start_w, start_h, b_image, player):
-    for i in range(0, 5):
+    for i in range(0, dock_num):
         player_image_pos[player-1][i][0] = start_w + i*b_image.get_width()
         player_image_pos[player-1][i][1] = start_h
 
 #player is 1 base, but player_image_pos is 0 base        
 def generate_five_block_h(start_w, start_h, b_image, player):
-    for i in range(0, 5):
+    for i in range(0, dock_num):
         player_image_pos[player-1][i][0] = start_w
         player_image_pos[player-1][i][1] = start_h + i*b_image.get_height()        
         
@@ -699,7 +700,20 @@ def draw_inner_item(Surface):
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
         
-            
+def resource_ai(die1, die2):
+    pass
+    
+def forward_ai(die1, die2):
+    pass
+    
+def ai():
+    global  dice_value1, dice_value2
+    if start_p == turn_id and 0 == player_data[turn_id].mode:
+        dice_value1 = random.randint(0, 23)
+        dice_value2 = random.randint(0, 23)
+        player_data[turn_id].mode = 4
+        pygame.display.update()
+        time.sleep(1)
     
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2
