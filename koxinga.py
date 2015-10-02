@@ -12,6 +12,13 @@ block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
 button1_image = 'Image/button1_100x50.gif'
+
+# resource
+food_image = 'Image/food_25x25.jpg'
+gold_image = 'Image/gold_25x25.jpg'
+cannon_image = 'Image/cannon_25x25.gif'
+
+
 # card
 move2 = 'Image/move_move_100x50.jpg'
 move_cannon = 'Image/move_cannon_100x50.jpg'
@@ -58,6 +65,11 @@ coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
 
+# resource
+food = pygame.image.load(food_image).convert()
+gold = pygame.image.load(gold_image).convert()
+cannon = pygame.image.load(cannon_image).convert()
+
 # card
 mv2       = pygame.image.load(move2).convert()
 mv_cannon = pygame.image.load(move_cannon).convert()
@@ -100,6 +112,7 @@ draw_player_thread = mythread(1, screen, 0)
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
+GREEN1 = (15, 96, 25)
 
 big_block = 160
 margin = 60
@@ -112,7 +125,6 @@ hblock = 60
 
 turn_id = 0
 start_p = 0
-dock_num = 5
 inner_gap = 5
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
@@ -246,6 +258,47 @@ def draw_item(Surface, type, value, pos):
             pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
             pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
+def five_block_item_w(start_w, start_h, p_id):
+    item_gap = 1
+    font_size = 22
+    #player 3, 4
+    if 2 == p_id or 3 == p_id:
+        font_gap_x = 0
+        font_gap_y = block.get_height()+1
+    #player 1, 6
+    else:
+        font_gap_x = 0
+        font_gap_y = 0-block.get_height()-1
+    
+    for i in range(0, dock_num):
+        b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
+        if None != b_image:
+            value = player_data[p_id].dvalue[i]
+            x = start_w + i*b_image.get_width()
+            y = start_h
+            screen.blit(b_image, (x+item_gap, y+item_gap))
+            screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
+      
+def five_block_item_h(start_w, start_h, p_id):
+    item_gap = 1
+    font_size = 22
+    #player 2
+    if 1 == p_id:
+        font_gap_x = block2.get_width()+1
+        font_gap_y = 0
+    #player 5
+    else:
+        font_gap_x = 0-block2.get_width()-1
+        font_gap_y = 0
+    for i in range(0, dock_num):
+        b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
+        if None != b_image:
+            value = player_data[p_id].dvalue[i]
+            x = start_w
+            y = start_h + i*b_image.get_height()
+            screen.blit(b_image, (x+item_gap, y+item_gap))
+            screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
+            
 def five_block_w(start_w, start_h, b_image):
     for i in range(0, dock_num):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
@@ -636,7 +689,15 @@ def generate_player_card():
         pick_up_one_card(i)
         pick_up_one_card(i)
         pick_up_one_card(i)
-    
+
+def dock_type_id_to_image(type_id):
+    if 1 == type_id:
+        return food
+    elif 2 == type_id:
+        return gold
+    elif 3 == type_id:
+        return cannon
+        
 def draw_dock():
     # player 1~6
     five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
@@ -645,14 +706,29 @@ def draw_dock():
     five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block)
     five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2)
     five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block)
-
+    
+    # draw_dock_item:
+    # player 1~6
+    five_block_item_w(player_1_3_block_start_w, player_1_6_block_start_h, 0)
+    five_block_item_h(player_2_block_start_w, player_2_5_block_start_h, 1)
+    five_block_item_w(player_1_3_block_start_w, player_3_4_block_start_h, 2)
+    five_block_item_w(player_4_6_block_start_w, player_3_4_block_start_h, 3)
+    five_block_item_h(player_5_block_start_w, player_2_5_block_start_h, 4)
+    five_block_item_w(player_4_6_block_start_w, player_1_6_block_start_h, 5)
+    
 def generate_dock():
+    global player_data 
     generate_five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
     generate_five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2, 2)
     generate_five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block, 3)
     generate_five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block, 4)
     generate_five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2, 5)
     generate_five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block, 6)
+    for i in range(0, player_num):
+        player_data[i].dtype[0] = 1
+        player_data[i].dvalue[0] = 3
+        player_data[i].dtype[1] = 2
+        player_data[i].dvalue[1] = 3    
 
 def draw_button(Surface, loc, str, color, size = 14, image = button1):
     (mouseX, mouseY) = pygame.mouse.get_pos()
