@@ -274,7 +274,7 @@ def five_block_item_w(start_w, start_h, p_id):
         b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
         if None != b_image:
             value = player_data[p_id].dvalue[i]
-            x = start_w + i*b_image.get_width()
+            x = start_w + int((block.get_width()-b_image.get_width())/2) + i*block.get_width()
             y = start_h
             screen.blit(b_image, (x+item_gap, y+item_gap))
             screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
@@ -295,7 +295,7 @@ def five_block_item_h(start_w, start_h, p_id):
         if None != b_image:
             value = player_data[p_id].dvalue[i]
             x = start_w
-            y = start_h + i*b_image.get_height()
+            y = start_h + int((block2.get_height()-b_image.get_height())/2) + i*block2.get_height()
             screen.blit(b_image, (x+item_gap, y+item_gap))
             screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
             

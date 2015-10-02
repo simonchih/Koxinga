@@ -265,8 +265,7 @@ class mythread (threading.Thread):
                     self.player_data[p].x -= 1
                 if y > self.player_data[p].loc[n_id][1]:
                     self.player_data[p].y -= 1
-                    
-                    
+                                        
         for p in range(0, player_num):
                 (x, y) = (self.player_data[p].x, self.player_data[p].y)
                 self.surface.blit(player_id_to_image(p), (x, y))
