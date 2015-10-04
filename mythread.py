@@ -57,9 +57,16 @@ def player_id_to_image(pid):
     elif 5 == pid:
         return piece5
 
-def go_dest_id(org_id, step = 0, is_forward = 1):
+# step allow positive value and negative value        
+def go_dest_id(org_id, step = 0):
     dest_outer = 0
     dest_inner = None
+    is_forward = 1
+    
+    if step < 0:
+        is_forward = 0
+        step = abs(step)
+    
     if 1 == is_forward:
         pseudo_dest = org_id + step
     else: #is_forward = 0
@@ -234,7 +241,11 @@ class mythread (threading.Thread):
                        self.player_data[p].dir = 0
                     elif 1 == self.player_data[p].IsAI:
                         # move 1 step
-                        outer, inner = go_dest_id(self.player_data[p].b_id, 1, self.player_data[p].forward)
+                        if 1 == self.player_data[p].forward:
+                            outer, inner = go_dest_id(self.player_data[p].b_id, 1)
+                        else:
+                            outer, inner = go_dest_id(self.player_data[p].b_id, -1)
+                        
                         if None == inner:
                             self.player_data[p].next_id = outer
                         elif 1 == self.player_data[p].dir:

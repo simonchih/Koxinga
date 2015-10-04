@@ -10,7 +10,7 @@ class game_player():
         self.loc = location
         self.IsAI = IsAI
         self.step = steps
-        # mode 0:nothing, 1:moving 2:suspend, 3:roll, 4:swap, 5: finish step, 6: fight, 7: end fight(take/pay) 8: end take/pay
+        # mode 0:nothing, 1:moving 2:suspend, 3:roll, 4:swap, 5: finish step, 6: handle step 7: fight, 8: end fight(take/pay) 9: end turn
         self.mode = mode
         # dir 0:nothing, 1:outer, 2:inner
         self.dir = direction
