@@ -740,6 +740,27 @@ def draw_button(Surface, loc, str, color, size = 14, image = button1):
     else:
         Surface.blit(write(str, color, size), (fontx, fonty))
     
+def draw_show_card(p_id):
+    
+    gap = 20
+    show_card_image = card_id_to_image(player_data[p_id].selected_card_value)
+    if 1 == p_id or 4 == p_id:
+        show_card_image = pygame.transform.rotate(show_card_image, 270)
+    
+    if 0 == p_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width(), screen_height - show_card_image.get_height())
+    elif 1 == p_id:
+        (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h-gap-show_card_image.get_height())
+    elif 2 == p_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width(), player_3_4_block_start_h)
+    elif 3 == p_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width(), player_3_4_block_start_h)
+    elif 4 == p_id:
+        (start_w, start_h) = (screen_width - show_card_image.get_width(), player_2_5_block_start_h-gap-show_card_image.get_height())
+    elif 5 == p_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width(), screen_height - show_card_image.get_height())
+    
+    screen.blit(show_card_image, (start_w, start_h))
     
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
@@ -775,6 +796,8 @@ def draw_inner_item(Surface):
                     card_y += mv2.get_height() + inner_gap
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
+                # draw player0 show card
+                draw_show_card(turn_id)
         
 def resource_ai(die1, die2):
     pass
