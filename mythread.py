@@ -261,7 +261,11 @@ class mythread (threading.Thread):
                             break
                         else:
                             # move 1 step
-                            outer, inner = go_dest_id(self.player_data[p].b_id, 1, self.player_data[p].forward)
+                            if 1 == self.player_data[p].forward:
+                                outer, inner = go_dest_id(self.player_data[p].b_id, 1)
+                            else:
+                                outer, inner = go_dest_id(self.player_data[p].b_id, -1)
+                            
                             if None == inner:
                                 self.player_data[p].next_id = outer
                             elif 1 == self.player_data[p].dir:

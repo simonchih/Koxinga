@@ -823,9 +823,10 @@ def main():
     draw_player_thread.start()
     # test p backward
     #pd = draw_player_thread.player_data
-    #(pd[1].x, pd[1].y) = pd[1].loc[70]
-    #pd[1].b_id = 70
-    #pd[1].next_id = 70
+    #pd[0].step = 6
+    #pd[0].mode = 1
+    #pd[0].dir = 1
+    #pd[0].forward = 1
     # end test p
     while True:
         screen.blit(background, (0,0))
@@ -837,14 +838,7 @@ def main():
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
                 player_data[turn_id].mode = 3        
-        # test p
-        #pd = draw_player_thread.player_data
-        #if 0 == pd[1].mode and 0 == pd[1].goal_game:
-        #    pd[1].step = 1
-        #    pd[1].mode = 1
-        #    pd[1].dir = 1
-        #    pd[1].forward = 1
-        # end test p
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
