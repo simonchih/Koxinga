@@ -68,44 +68,59 @@ left_arrow2.set_alpha(arrow_alpha)
 down_arrow2.set_alpha(arrow_alpha)
 right_arrow2.set_alpha(arrow_alpha)
 
-def bid_to_arrow_image_and_pos(bid):
-    # (x1, y1) outer, (x2, y2) inner
+def bid_to_arrow_pos(bid):
+        # (x1, y1) outer, (x2, y2) inner
     if bid ==  r_end:
         x1 = screen_width - margin - int(big_block/4) - int(down_arrow.get_width()/2)
         y1 = screen_height - margin - big_block - 2*hblock - int(down_arrow.get_height()/2)
         x2 = x1 - int(big_block/2)
         y2 = y1
-        return down_arrow, down_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
     elif bid == b_end:
         x1 = margin + big_block + 2*wblock - int(left_arrow.get_width()/2)
         y1 = screen_height - margin - int(big_block/4) - int(left_arrow.get_height()/2)
         x2 = x1
         y2 = y1 - int(big_block/2)
-        return left_arrow, left_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
     elif bid == l_end:
         x1 = margin + int(big_block/4) - int(up_arrow.get_width()/2)
         y1 = margin + big_block + 2*hblock - int(up_arrow.get_height()/2)
         x2 = x1 + int(big_block/2)
         y2 = y1
-        return up_arrow, up_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
     elif bid == t_start:
         x1 = margin + big_block + 2*wblock - int(left_arrow.get_height()/2)
         y1 = margin + int(big_block/4) - int(left_arrow.get_height()/2)
         x2 = x1
         y2 = y1 + int(big_block/2)
-        return left_arrow, left_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
     elif bid == l_start:
         x1 = margin + int(big_block/4) - int(down_arrow.get_width()/2)
         y1 = screen_height - margin - big_block - 2*hblock - int(down_arrow.get_height()/2)
         x2 = x1 + int(big_block/2)
         y2 = y1
-        return down_arrow, down_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
     elif bid == b_start:
         x1 = screen_width - margin - big_block - 2*wblock - int(right_arrow.get_width()/2)
         y1 = screen_height - margin - int(big_block/4) - int(right_arrow.get_height()/2)
         x2 = x1
         y2 = y1 - int(big_block/2)
-        return right_arrow, right_arrow2, (x1, y1), (x2, y2)
+        return (x1, y1), (x2, y2)
+
+def bid_to_arrow_image_and_pos(bid):
+    # (x1, y1) outer, (x2, y2) inner
+    if bid ==  r_end:
+        return down_arrow, down_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
+    elif bid == b_end:
+        return left_arrow, left_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
+    elif bid == l_end:
+        return up_arrow, up_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
+    elif bid == t_start:
+        return left_arrow, left_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
+    elif bid == l_start:
+        return down_arrow, down_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
+    elif bid == b_start:
+        return right_arrow, right_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
 
 def player_id_to_image(pid):
     if 0 == pid:
