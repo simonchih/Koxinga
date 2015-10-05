@@ -69,7 +69,7 @@ down_arrow2.set_alpha(arrow_alpha)
 right_arrow2.set_alpha(arrow_alpha)
 
 def bid_to_arrow_pos(bid):
-        # (x1, y1) outer, (x2, y2) inner
+    # (x1, y1) outer, (x2, y2) inner
     if bid ==  r_end:
         x1 = screen_width - margin - int(big_block/4) - int(down_arrow.get_width()/2)
         y1 = screen_height - margin - big_block - 2*hblock - int(down_arrow.get_height()/2)
@@ -108,7 +108,6 @@ def bid_to_arrow_pos(bid):
         return (x1, y1), (x2, y2)
 
 def bid_to_arrow_image_and_pos(bid):
-    # (x1, y1) outer, (x2, y2) inner
     if bid ==  r_end:
         return down_arrow, down_arrow2, bid_to_arrow_pos(bid)[0], bid_to_arrow_pos(bid)[1]
     elif bid == b_end:

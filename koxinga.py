@@ -861,6 +861,24 @@ def main():
                                 player_data[turn_id].selected_card_value = i
                                 player_data[turn_id].marked_card[i] = 1
                         card_y += mv2.get_height() + inner_gap
+            elif 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                (mouseX, mouseY) = pygame.mouse.get_pos()
+                aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
+                (x1, y1) = loc1
+                (x2, y2) = loc2
+                if 1 == player_data[turn_id].forward:
+                    outer, inner = go_dest_id(player_data[turn_id].b_id, 1)
+                else:
+                    outer, inner = go_dest_id(player_data[turn_id].b_id, -1)
+                                
+                if x1 < mouseX < x1 + aimg.get_width() and y1 < mouseY < y1 + aimg.get_height():
+                    player_data[turn_id].next_id = outer
+                    player_data[turn_id].dir = 1
+                    player_data[turn_id].mode = 1
+                elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
+                    player_data[turn_id].next_id = inner
+                    player_data[turn_id].dir = 2
+                    player_data[turn_id].mode = 1
             
     pygame.quit()
     quit()
