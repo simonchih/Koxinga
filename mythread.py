@@ -8,6 +8,15 @@ pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Koxinga')
 
+big_block = 160
+margin = 60
+
+#each block width is 61
+wblock = 61
+
+#each block width is 60
+hblock = 60
+
 player_num = 6
 item_size = 30
 map_block_num = 71
@@ -26,9 +35,11 @@ lt_outer_start = 44
 lt_outer_end = 50
 t_start = 54
 t_end = map_block_num - 1
+arrow_alpha = 100
 forward_suspend = [r_end, b_end, l_end]
 backward_suspend = [t_start, l_start, b_start]
 
+up_arrow_image = 'Image/arrow_30x30.gif'
 piece0_image = 'Image/pawn2.gif'
 piece1_image = 'Image/pawn3.gif'
 piece2_image = 'Image/pawn4.gif'
@@ -36,12 +47,44 @@ piece3_image = 'Image/pawn5.gif'
 piece4_image = 'Image/pawn6.gif'
 piece5_image = 'Image/pawn8.gif'
 
+up_arrow = pygame.image.load(up_arrow_image).convert()
 piece0 = pygame.image.load(piece0_image).convert()
 piece1 = pygame.image.load(piece1_image).convert()
 piece2 = pygame.image.load(piece2_image).convert()
 piece3 = pygame.image.load(piece3_image).convert()
 piece4 = pygame.image.load(piece4_image).convert()
 piece5 = pygame.image.load(piece5_image).convert()
+
+left_arrow = pygame.transform.rotate(up_arrow, 90)
+down_arrow = pygame.transform.rotate(up_arrow, 180)
+right_arrow = pygame.transform.rotate(up_arrow, 270)
+up_arrow2 = pygame.image.load(up_arrow_image).convert()
+left_arrow2 = pygame.transform.rotate(up_arrow, 90)
+down_arrow2 = pygame.transform.rotate(up_arrow, 180)
+right_arrow2 = pygame.transform.rotate(up_arrow, 270)
+
+up_arrow2.set_alpha(arrow_alpha)
+left_arrow2.set_alpha(arrow_alpha)
+down_arrow2.set_alpha(arrow_alpha)
+right_arrow2.set_alpha(arrow_alpha)
+
+def bid_to_arrow_image_and_pos(bid):
+    if bid ==  r_end:
+        x1 = screen_width - margin - int(3*big_block/4) - int(down_arrow.get_width()/2)
+        y1 = screen_height - margin - big_block - 2*wblock - int(down_arrow.get_height()/2)
+        x2 = x1 + int(big_block/2)
+        y2 = y1
+        return down_arrow, down_arrow2, (x1, y1), (x2, y2)
+    elif bid == b_end:
+        return left_arrow, left_arrow2, (x1, y1), (x2, y2)
+    elif bid == l_end:
+        return up_arrow, up_arrow2, (x1, y1), (x2, y2)
+    elif bid == t_start:
+        return left_arrow, left_arrow2, (x1, y1), (x2, y2)
+    elif bid == l_start:
+        return down_arrow, down_arrow2, (x1, y1), (x2, y2)
+    elif bid == b_start:
+        return right_arrow, right_arrow2, (x1, y1), (x2, y2)
 
 def player_id_to_image(pid):
     if 0 == pid:
@@ -222,6 +265,19 @@ class mythread (threading.Thread):
     def run(self):
         for p in range(0, player_num):
             if 2 == self.player_data[p].mode:
+                (mouseX, mouseY) = pygame.mouse.get_pos()
+                aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(self.player_data[p].b_id)
+                (x1, y1) = loc1
+                (x2, y2) = loc2
+                if x1 < mouseX < x1 + aimg.get_width() and y1 < mouseY < y1 + aimg.get_height():
+                    self.surface.blit(aimg, loc1)
+                    self.surface.blit(aimg_alpha, loc2)
+                elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
+                    self.surface.blit(aimg_alpha, loc1)
+                    self.surface.blit(aimg, loc2)
+                else:
+                    self.surface.blit(aimg_alpha, loc1)
+                    self.surface.blit(aimg_alpha, loc2)
                 break
             (x, y) = (self.player_data[p].x, self.player_data[p].y)
             n_id = self.player_data[p].next_id

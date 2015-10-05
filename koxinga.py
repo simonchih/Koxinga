@@ -114,15 +114,6 @@ BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
-big_block = 160
-margin = 60
-
-#each block width is 61
-wblock = 61
-
-#each block width is 60
-hblock = 60
-
 turn_id = 0
 start_p = 0
 inner_gap = 5
