@@ -807,15 +807,16 @@ def spend_dock_resource(type, value):
     
     # handle spend
     for i in range(0, dock_num):
-        if type == player_data[turn_id].dock_type[i] and player_data[turn_id].dock_value[i] > 0:
-            if player_data[turn_id].dock_value[i] >= (value - spent_value_total):
-               player_data[turn_id].dock_value[i] -= (value - spent_value_total) 
+        sv = sorted_value[i]
+        if type == player_data[turn_id].dock_type[sv[0]] and sv[1] > 0:
+            if sv[1] >= (value - spent_value_total):
+               player_data[turn_id].dock_value[sv[0]] -= (value - spent_value_total) 
                # spent_value_total = value
                return 0
             else:
-               spent_value_total += player_data[turn_id].dock_value[i]
-               player_data[turn_id].dock_value[i] = 0
-               player_data[turn_id].dock_type[i] = 0
+               spent_value_total += player_data[turn_id].dock_value[sv[0]]
+               player_data[turn_id].dock_value[sv[0]] = 0
+               player_data[turn_id].dock_type[sv[0]] = 0
             
     return 1
 
