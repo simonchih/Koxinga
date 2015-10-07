@@ -803,7 +803,7 @@ def spend_dock_resource(type, value):
     for i in range(0, dock_num):
         dvalue[i] = (i, player_data[turn_id].dock_value[i])
         
-    sorted_value = sorted(dvalue.items(), key=operator.itemgetter(1))
+    sorted_value = sorted(dvalue, key=lambda l:l[1])
     
     # handle spend
     for i in range(0, dock_num):
