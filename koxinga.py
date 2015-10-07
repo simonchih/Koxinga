@@ -1,5 +1,6 @@
 import random
 import time
+import operator
 from game_map import *
 from game_player import *
 from mythread import *
@@ -789,7 +790,38 @@ def draw_inner_item(Surface):
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
                 # draw player0 show card
                 draw_show_card(turn_id)
+
+# return 0 for OK, and 1 is NOT enough(fail)                
+def spend_dock_resource(type, value):
+    global player_data
+    #type 1:food, 2:gold
+    
+    spent_value_total = 0
+    
+    # dvalue, index is 0 base
+    dvalue = [0] * dock_num
+    for i in range(0, dock_num):
+        dvalue[i] = (i, player_data[turn_id].dock_value[i])
         
+    sorted_value = sorted(dvalue.items(), key=operator.itemgetter(1))
+    
+    # handle spend
+    for i in range(0, dock_num):
+        if type == player_data[turn_id].dock_type[i] and player_data[turn_id].dock_value[i] > 0:
+            if player_data[turn_id].dock_value[i] >= (value - spent_value_total):
+               player_data[turn_id].dock_value[i] -= (value - spent_value_total) 
+               # spent_value_total = value
+               return 0
+            else:
+               spent_value_total += player_data[turn_id].dock_value[i]
+               player_data[turn_id].dock_value[i] = 0
+               player_data[turn_id].dock_type[i] = 0
+            
+    return 1
+
+def handle_step():
+    global  dice_value1, dice_value2
+    
 def resource_ai(die1, die2):
     pass
     
@@ -820,6 +852,9 @@ def main():
     #pd[0].forward = 1
     # end test p
     while True:
+        if 6 == player_data[turn_id].mode:
+            handle_step()
+    
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
