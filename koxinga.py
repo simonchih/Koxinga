@@ -820,8 +820,30 @@ def spend_dock_resource(type, value):
             
     return 1
 
-def handle_step():
-    global  dice_value1, dice_value2
+def prepare_move(steps, dir, fwd=1):
+    global player_data
+    player_data[turn_id].step = steps
+    player_data[turn_id].mode = 1
+    player_data[turn_id].forward = fwd
+    player_data[turn_id].dir = dir
+    
+def handle_step(night, dir1=1, dir2=1):
+    global  player_data, dice_value1, dice_value2
+    dice_val = dice_value1
+    sid = player_data[turn_id].selected_card_value
+    if 0 == night:
+        if 0 == sid:
+            prepare_move(dice_val, dir1)
+        elif 1 == sid:
+            prepare_move(dice_val, dir1)
+    else: # 1 == night
+        dice_val = dice_value2
+        
+        if 0 == sid:
+            prepare_move(dice_val, dir2)
+        elif 1 == sid:
+            #get cannon
+            pass
     
 def resource_ai(die1, die2):
     pass
@@ -831,12 +853,16 @@ def forward_ai(die1, die2):
     
 def ai():
     global  dice_value1, dice_value2
+    dir1 = 1
+    dir2 = 1
     if start_p == turn_id and 0 == player_data[turn_id].mode:
         dice_value1 = random.randint(0, 23)
         dice_value2 = random.randint(0, 23)
         player_data[turn_id].mode = 4
         pygame.display.update()
         time.sleep(1)
+    
+    return dir1, dir2
     
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2
@@ -917,6 +943,7 @@ def main():
                     player_data[turn_id].mode = 1
         if (turn_id + 1)%player_num == strat_p:
             if 0 == is_night:
+                turn_id = start_p
                 is_night = 1
             else: # is_night == 1
                 start_p = (turn_id + 1)%player_num
@@ -924,6 +951,8 @@ def main():
                 is_night = 0
                 for i in range(0, player_num):
                     player_data[i].mode = 0
+        else:
+            turn_id = (turn_id + 1)%player_num
             
     pygame.quit()
     quit()
