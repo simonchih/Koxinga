@@ -1,6 +1,5 @@
 import random
 import time
-import operator
 from game_map import *
 from game_player import *
 from mythread import *
@@ -117,6 +116,7 @@ GREEN1 = (15, 96, 25)
 
 turn_id = 0
 start_p = 0
+is_night = 0
 inner_gap = 5
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
@@ -915,6 +915,15 @@ def main():
                     player_data[turn_id].next_id = inner
                     player_data[turn_id].dir = 2
                     player_data[turn_id].mode = 1
+        if (turn_id + 1)%player_num == strat_p:
+            if 0 == is_night:
+                is_night = 1
+            else: # is_night == 1
+                start_p = (turn_id + 1)%player_num
+                turn_id = start_p
+                is_night = 0
+                for i in range(0, player_num):
+                    player_data[i].mode = 0
             
     pygame.quit()
     quit()
