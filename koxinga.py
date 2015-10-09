@@ -864,6 +864,7 @@ def handle_step(night, dir):
 
 # return type(0:move, 1:food, 2:gold, 3:cannon), dice_val(0~6), forward (1:forward, 0:back, None)
 def card_action(night):
+    global player_data, turn_id, dice_value1, dice_value2
     # dice_val 1~6
     dice_val = int(dice_value1/4)+1
     sid = player_data[turn_id].selected_card_value
@@ -946,7 +947,7 @@ def ai():
     return dir1, dir2
     
 def main():
-    global draw_player_thread, player_data, dice_value1, dice_value2
+    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, is_night
     
     dir1 = 1
     dir2 = 1
@@ -1030,18 +1031,18 @@ def main():
                     player_data[turn_id].next_id = inner
                     player_data[turn_id].dir = 2
                     player_data[turn_id].mode = 1
-        if (turn_id + 1)%player_num == strat_p:
-            if 0 == is_night:
-                turn_id = start_p
-                is_night = 1
-            else: # is_night == 1
-                start_p = (turn_id + 1)%player_num
-                turn_id = start_p
-                is_night = 0
-                for i in range(0, player_num):
-                    player_data[i].mode = 0
-        else:
-            turn_id = (turn_id + 1)%player_num
+        #if (turn_id + 1)%player_num == start_p:
+        #    if 0 == is_night:
+        #        turn_id = start_p
+        #        is_night = 1
+        #    else: # is_night == 1
+        #        start_p = (turn_id + 1)%player_num
+        #        turn_id = start_p
+        #        is_night = 0
+        #        for i in range(0, player_num):
+        #            player_data[i].mode = 0
+        #else:
+        #    turn_id = (turn_id + 1)%player_num
             
     pygame.quit()
     quit()
