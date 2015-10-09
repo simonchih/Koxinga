@@ -9,6 +9,7 @@ class game_player():
         self.next_id = next_block_id
         self.loc = location
         self.IsAI = IsAI
+        # step is positive value only
         self.step = steps
         # mode 0:nothing, 1:moving 2:suspend, 3:roll, 4:swap, 5: finish step, 6: handle step 7: fight, 8: end fight(take/pay) 9: end turn
         self.mode = mode

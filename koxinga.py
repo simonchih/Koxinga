@@ -820,6 +820,33 @@ def spend_dock_resource(type, value):
             
     return 1
 
+def get_dock_resource(type, value):
+    global player_data
+    
+    # dvalue, index is 0 base
+    dvalue = [0] * dock_num
+    
+    for i in range(0, dock_num):
+        if 0 == player_data[turn_id].dock_type[i]:
+            player_data[turn_id].dock_type[i] = type
+            player_data[turn_id].dock_value[i] = value
+            # dock NOT full
+            return
+        dvalue[i] = (i, player_data[turn_id].dock_value[i])
+    
+    # dock full
+    sorted_value = sorted(dvalue, key=lambda l:l[1])
+    
+    for i in range(0, dock_num):
+        sv = sorted_value[i]
+        if type != player_data[turn_id].dock_type[sv[0]]:
+            player_data[turn_id].dock_type[sv[0]] = type
+            player_data[turn_id].dock_value[sv[0]] = value
+            return
+    
+    # added fail
+
+# steps is positive only, but fwd = 0 for back    
 def prepare_move(steps, dir, fwd=1):
     global player_data
     player_data[turn_id].step = steps
@@ -827,23 +854,70 @@ def prepare_move(steps, dir, fwd=1):
     player_data[turn_id].forward = fwd
     player_data[turn_id].dir = dir
     
-def handle_step(night, dir1=1, dir2=1):
+def handle_step(night, dir):
     global  player_data, dice_value1, dice_value2
     dice_val = dice_value1
     sid = player_data[turn_id].selected_card_value
     if 0 == night:
         if 0 == sid:
-            prepare_move(dice_val, dir1)
+            prepare_move(dice_val, dir)
         elif 1 == sid:
-            prepare_move(dice_val, dir1)
+            prepare_move(dice_val, dir)
+        elif 2 == sid:
+            #get cannon
+            get_dock_resource(3, dice_val)
+        elif 3 == sid:
+            prepare_move(dice_val, dir, 0)
+        elif 4 == sid:
+            prepare_move(dice_val, dir)
+        elif 5 == sid:
+            if dice_val - 1 > 0:
+                prepare_move(dice_val-1, dir)
+        elif 6 == sid:
+            if dice_val - 2 > 0:
+                prepare_move(dice_val-2, dir)
+            elif dice_val - 2 < 0:
+               prepare_move(dice_val-2, dir, 0) 
+        elif 7 == sid:
+            #get food
+            get_dock_resource(1, dice_val)
+        elif 8 == sid:
+            #get gold
+            get_dock_resource(2, dice_val)
+        elif 9 == sid:
+            #get food
+            get_dock_resource(1, dice_val)
     else: # 1 == night
         dice_val = dice_value2
         
         if 0 == sid:
-            prepare_move(dice_val, dir2)
+            prepare_move(dice_val, dir)
         elif 1 == sid:
             #get cannon
-            pass
+            get_dock_resource(3, dice_val)
+        elif 2 == sid:
+            prepare_move(dice_val, dir)
+        elif 3 == sid:
+            prepare_move(dice_val, dir)
+        elif 4 == sid:
+            prepare_move(dice_val, dir, 0)
+        elif 5 == sid:
+            #get food
+            get_dock_resource(1, dice_val)
+        elif 6 == sid:
+            #get gold
+            get_dock_resource(2, dice_val)
+        elif 7 == sid:
+            if dice_val - 2 > 0:
+                prepare_move(dice_val-2, dir)
+            elif dice_val - 2 < 0:
+               prepare_move(dice_val-2, dir, 0) 
+        elif 8 == sid:
+            if dice_val - 1 > 0:
+                prepare_move(dice_val-1, dir)
+        elif 9 == sid:
+            #get gold
+            get_dock_resource(2, dice_val)
     
 def resource_ai(die1, die2):
     pass
@@ -867,6 +941,9 @@ def ai():
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2
     
+    dir1 = 1
+    dir2 = 1
+    
     generate_map()
     generate_dock()
     generate_player_card()
@@ -880,8 +957,13 @@ def main():
     # end test p
     while True:
         if 6 == player_data[turn_id].mode:
-            handle_step()
-    
+            if 0 == is_night:
+                player_data[turn_id].dir = dir1
+                handle_step(is_night, dir1)
+            else:
+                player_data[turn_id].dir = dir2
+                handle_step(is_night, dir2)
+                
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
