@@ -951,6 +951,10 @@ def card_action(night):
             return  2, dice_val, None
             
 def resource_ai(die1, die2):
+    dir1 = 0
+    dir2 = 0
+    sdir1 = 1
+    sdir2 = 1
     resource_max = 0
     total_food = 0
     total_gold = 0
@@ -1001,16 +1005,20 @@ def resource_ai(die1, die2):
                 elif food2 < 0 or gold2 < 0:
                     r_sum, total_food, total_gold = res1, food1, gold1
                     dest = outer
+                    dir1 = 1
                 elif food1 < 0 or gold1 < 0:
                     r_sum, total_food, total_gold = res2, food2, gold2
                     dest = inner
+                    dir1 = 2
                 else:
                     if res2 > res1:
                         r_sum, total_food, total_gold = res2, food2, gold2
                         dest = inner
+                        dir1 = 2
                     else:
                         r_sum, total_food, total_gold = res1, food1, gold1
                         dest = outer
+                        dir1 = 1
             
             if 1 == type2:
                 r_sum += dv2
@@ -1031,23 +1039,29 @@ def resource_ai(die1, die2):
                     continue
                 elif food2 < 0 or gold2 < 0:
                     r_sum, total_food, total_gold = res1, food1, gold1
+                    dir2 = 1
                     #dest = outer
                 elif food1 < 0 or gold1 < 0:
                     r_sum, total_food, total_gold = res2, food2, gold2
+                    dir2 = 2
                     #dest = inner
                 else:
                     if res2 > res1:
                         r_sum, total_food, total_gold = res2, food2, gold2
+                        dir2 = 2
                         #dest = inner
                     else:
                         r_sum, total_food, total_gold = res1, food1, gold1
+                        dir2 = 1
                         #dest = outer    
             
             if r_sum > resource_max:
                 resource_max = r_sum
                 s_card = c
+                sdir1 = dir1
+                sdir2 = dir2
         r_sum = 0
-    return s_card
+    return s_card, sdir1, sdir2
     
 def forward_ai(die1, die2):
     pass
