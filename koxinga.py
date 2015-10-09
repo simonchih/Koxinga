@@ -928,7 +928,92 @@ def card_action(night):
             return  2, dice_val, None
             
 def resource_ai(die1, die2):
-    pass
+    resource_max = 0
+    total_food = 0
+    total_gold = 0
+    r_sum = 0
+    s_card = 0
+    first = 1
+    org_food = 0
+    org_gold = 0
+    type1, dv1, fwd1 = 0, 0, 0
+    type2, dv2, fwd2 = 0, 0, 0
+    for i in range(0, dock_num):
+        if 1 == player_data[turn_id].dock_type:
+            org_food += player_data[turn_id].dock_value
+        elif 2 == player_data[turn_id].dock_type:
+            org_gold += player_data[turn_id].dock_value
+    
+    for c in range(0, total_card_num):
+        if 2 == player_data[turn_id].marked_card[c]:
+            if 1 == first:
+                s_card = c
+                first = 0
+                
+            total_food = org_food
+            total_gold = org_gold
+            dest = player_data[turn_id].b_id
+            
+            # 0 == night
+            type1, dv1, fwd1 = card_action(0)
+            # 1 == night
+            type2, dv2, fwd2 = card_action(1)
+            if 1 == type1:
+                r_sum += dv1
+                total_food += dv1
+            elif 2 == type1:
+                r_sum += dv1
+                total_gold += dv1
+            elif 3 == type1:
+                r_sum += dv1
+            else:
+                if 0 == fwd1:
+                    dv1 = (-1) * dv1
+                dest = go_dest_id(player_data[turn_id].b_id, dv1)
+                if 1 == main_map[dest].type:
+                    r_sum += 7
+                elif 2 == main_map[dest].type:
+                    r_sum -= main_map[dest].value
+                    total_gold -= main_map[dest].value
+                    
+                elif 3 == main_map[dest].type:
+                    r_sum -= main_map[dest].value
+                    total_food -= main_map[dest].value
+            
+            if total_food < 0 or total_gold < 0:
+                # fail
+                continue
+            
+            if 1 == type2:
+                r_sum += dv2
+                total_food += dv2
+            elif 2 == type2:
+                r_sum += dv2
+                total_gold += dv2
+            elif 3 == type2:
+                r_sum += dv2
+            else:
+                if 0 == fwd2:
+                    dv2 = (-1) * dv2
+                dest2 = go_dest_id(dest, dv2)
+                if 1 == main_map[dest2].type:
+                    r_sum += 7
+                elif 2 == main_map[dest2].type:
+                    r_sum -= main_map[dest2].value
+                    total_gold -= main_map[dest2].value
+                    
+                elif 3 == main_map[dest2].type:
+                    r_sum -= main_map[dest2].value
+                    total_food -= main_map[dest2].value
+                    
+            if total_food < 0 or total_gold < 0:
+                # fail
+                continue
+            if r_sum > resource_max:
+                resource_max = r_sum
+                s_card = c
+        r_sum = 0
+    return s_card
     
 def forward_ai(die1, die2):
     pass
@@ -1031,18 +1116,19 @@ def main():
                     player_data[turn_id].next_id = inner
                     player_data[turn_id].dir = 2
                     player_data[turn_id].mode = 1
-        #if (turn_id + 1)%player_num == start_p:
-        #    if 0 == is_night:
-        #        turn_id = start_p
-        #        is_night = 1
-        #    else: # is_night == 1
-        #        start_p = (turn_id + 1)%player_num
-        #        turn_id = start_p
-        #        is_night = 0
-        #        for i in range(0, player_num):
-        #            player_data[i].mode = 0
-        #else:
-        #    turn_id = (turn_id + 1)%player_num
+        if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:
+            if (turn_id + 1)%player_num == start_p:
+                if 0 == is_night:
+                    turn_id = start_p
+                    is_night = 1
+                else: # is_night == 1
+                    start_p = (turn_id + 1)%player_num
+                    turn_id = start_p
+                    is_night = 0
+                    for i in range(0, player_num):
+                        player_data[i].mode = 0
+            else:
+                turn_id = (turn_id + 1)%player_num
             
     pygame.quit()
     quit()
