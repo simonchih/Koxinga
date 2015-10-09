@@ -853,6 +853,29 @@ def prepare_move(steps, dir, fwd=1):
     player_data[turn_id].mode = 1
     player_data[turn_id].forward = fwd
     player_data[turn_id].dir = dir
+
+def resource_dest(dest, res, food, gold):
+    global main_map
+    
+    r_sum = res
+    total_food = food
+    total_gold = gold
+    
+    if None == dest:
+        # -1 for fail
+        return -1, -1, -1
+    
+    if 1 == main_map[dest].type:
+        #treasure
+        r_sum += 7
+    elif 2 == main_map[dest].type:
+        r_sum -= main_map[dest].value
+        total_gold -= main_map[dest].value
+    elif 3 == main_map[dest].type:
+        r_sum -= main_map[dest].value
+        total_food -= main_map[dest].value
+    
+    return r_sum, total_food, total_gold
     
 def handle_step(night, dir):
     type, dice_point, forward = card_action(night)
@@ -969,20 +992,25 @@ def resource_ai(die1, die2):
             else:
                 if 0 == fwd1:
                     dv1 = (-1) * dv1
-                dest = go_dest_id(player_data[turn_id].b_id, dv1)
-                if 1 == main_map[dest].type:
-                    r_sum += 7
-                elif 2 == main_map[dest].type:
-                    r_sum -= main_map[dest].value
-                    total_gold -= main_map[dest].value
-                    
-                elif 3 == main_map[dest].type:
-                    r_sum -= main_map[dest].value
-                    total_food -= main_map[dest].value
-            
-            if total_food < 0 or total_gold < 0:
-                # fail
-                continue
+                outer, inner = go_dest_id(player_data[turn_id].b_id, dv1)
+                res1, food1, gold1 = resource_dest(outer, r_sum, total_food, total_gold)
+                res2, food2, gold2 = resource_dest(inner, r_sum, total_food, total_gold)
+                if (food1 < 0 or gold1 < 0) and (food2 < 0 or gold2 < 0):
+                    # fail
+                    continue
+                elif food2 < 0 or gold2 < 0:
+                    r_sum, total_food, total_gold = res1, food1, gold1
+                    dest = outer
+                elif food1 < 0 or gold1 < 0:
+                    r_sum, total_food, total_gold = res2, food2, gold2
+                    dest = inner
+                else:
+                    if res2 > res1:
+                        r_sum, total_food, total_gold = res2, food2, gold2
+                        dest = inner
+                    else:
+                        r_sum, total_food, total_gold = res1, food1, gold1
+                        dest = outer
             
             if 1 == type2:
                 r_sum += dv2
@@ -995,20 +1023,26 @@ def resource_ai(die1, die2):
             else:
                 if 0 == fwd2:
                     dv2 = (-1) * dv2
-                dest2 = go_dest_id(dest, dv2)
-                if 1 == main_map[dest2].type:
-                    r_sum += 7
-                elif 2 == main_map[dest2].type:
-                    r_sum -= main_map[dest2].value
-                    total_gold -= main_map[dest2].value
-                    
-                elif 3 == main_map[dest2].type:
-                    r_sum -= main_map[dest2].value
-                    total_food -= main_map[dest2].value
-                    
-            if total_food < 0 or total_gold < 0:
-                # fail
-                continue
+                outer, inner = go_dest_id(dest, dv2)
+                res1, food1, gold1 = resource_dest(outer, r_sum, total_food, total_gold)
+                res2, food2, gold2 = resource_dest(inner, r_sum, total_food, total_gold)
+                if (food1 < 0 or gold1 < 0) and (food2 < 0 or gold2 < 0):
+                    # fail
+                    continue
+                elif food2 < 0 or gold2 < 0:
+                    r_sum, total_food, total_gold = res1, food1, gold1
+                    #dest = outer
+                elif food1 < 0 or gold1 < 0:
+                    r_sum, total_food, total_gold = res2, food2, gold2
+                    #dest = inner
+                else:
+                    if res2 > res1:
+                        r_sum, total_food, total_gold = res2, food2, gold2
+                        #dest = inner
+                    else:
+                        r_sum, total_food, total_gold = res1, food1, gold1
+                        #dest = outer    
+            
             if r_sum > resource_max:
                 resource_max = r_sum
                 s_card = c
