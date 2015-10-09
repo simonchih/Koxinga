@@ -855,70 +855,77 @@ def prepare_move(steps, dir, fwd=1):
     player_data[turn_id].dir = dir
     
 def handle_step(night, dir):
-    global  player_data, dice_value1, dice_value2
-    dice_val = dice_value1
+    type, dice_point, forward = card_action(night)
+    if 0 != dice_point:
+        if 0 == type:
+            prepare_move(dice_point, dir, forward)
+        else:
+            get_dock_resource(type, dice_point)
+
+# return type(0:move, 1:food, 2:gold, 3:cannon), dice_val(0~6), forward (1:forward, 0:back, None)
+def card_action(night):
+    # dice_val 1~6
+    dice_val = int(dice_value1/4)+1
     sid = player_data[turn_id].selected_card_value
     if 0 == night:
         if 0 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 1 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 2 == sid:
             #get cannon
-            get_dock_resource(3, dice_val)
+            return 3, dice_val, None
         elif 3 == sid:
-            prepare_move(dice_val, dir, 0)
+            return 0, dice_val, 0
         elif 4 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 5 == sid:
-            if dice_val - 1 > 0:
-                prepare_move(dice_val-1, dir)
+            return 0, dice_val-1, 1
         elif 6 == sid:
-            if dice_val - 2 > 0:
-                prepare_move(dice_val-2, dir)
+            if dice_val - 2 >= 0:
+                return 0, dice_val-2, 1
             elif dice_val - 2 < 0:
-               prepare_move(dice_val-2, dir, 0) 
+                return 0, abs(dice_val-2), 0
         elif 7 == sid:
             #get food
-            get_dock_resource(1, dice_val)
+            return  1, dice_val, None
         elif 8 == sid:
             #get gold
-            get_dock_resource(2, dice_val)
+            return  2, dice_val, None
         elif 9 == sid:
             #get food
-            get_dock_resource(1, dice_val)
+            return  1, dice_val, None
     else: # 1 == night
-        dice_val = dice_value2
+        dice_val = int(dice_value2/4)+1
         
         if 0 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 1 == sid:
             #get cannon
-            get_dock_resource(3, dice_val)
+            return  3, dice_val, None
         elif 2 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 3 == sid:
-            prepare_move(dice_val, dir)
+            return 0, dice_val, 1
         elif 4 == sid:
-            prepare_move(dice_val, dir, 0)
+            return 0, dice_val, 0
         elif 5 == sid:
             #get food
-            get_dock_resource(1, dice_val)
+            return  1, dice_val, None
         elif 6 == sid:
             #get gold
-            get_dock_resource(2, dice_val)
+            return  2, dice_val, None
         elif 7 == sid:
-            if dice_val - 2 > 0:
-                prepare_move(dice_val-2, dir)
+            if dice_val - 2 >= 0:
+                return 0, dice_val - 2, 1
             elif dice_val - 2 < 0:
-               prepare_move(dice_val-2, dir, 0) 
+                return 0, abs(dice_val - 2), 0 
         elif 8 == sid:
-            if dice_val - 1 > 0:
-                prepare_move(dice_val-1, dir)
+            return 0, dice_val - 1, 1
         elif 9 == sid:
             #get gold
-            get_dock_resource(2, dice_val)
-    
+            return  2, dice_val, None
+            
 def resource_ai(die1, die2):
     pass
     
