@@ -116,7 +116,6 @@ GREEN1 = (15, 96, 25)
 
 turn_id = 0
 start_p = 0
-is_night = 0
 inner_gap = 5
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
@@ -852,7 +851,7 @@ def prepare_move(steps, dir, fwd=1):
     player_data[turn_id].step = steps
     player_data[turn_id].mode = 1
     player_data[turn_id].forward = fwd
-    player_data[turn_id].dir = dir
+    player_data[turn_id].dir[is_night] = dir
 
 def resource_dest(dest, res, food, gold):
     global main_map
@@ -950,7 +949,7 @@ def card_action(night):
             #get gold
             return  2, dice_val, None
             
-def resource_ai(die1, die2):
+def resource_ai():
     dir1 = 0
     dir2 = 0
     sdir1 = 1
@@ -1061,13 +1060,102 @@ def resource_ai(die1, die2):
                 sdir1 = dir1
                 sdir2 = dir2
         r_sum = 0
-    return s_card, sdir1, sdir2
+    return s_card, sdir1, sdir2, resource_max
     
-def forward_ai(die1, die2):
-    pass
+def forward_ai():
+    dir1 = 0
+    dir2 = 0
+    sdir1 = 1
+    sdir2 = 1
+    step_max = 0
+    total_food = 0
+    total_gold = 0
+    r_sum = 0
+    s_card = -1
+    first = 1
+    org_food = 0
+    org_gold = 0
+    type1, dv1, fwd1 = 0, 0, 0
+    type2, dv2, fwd2 = 0, 0, 0
+    for i in range(0, dock_num):
+        if 1 == player_data[turn_id].dock_type:
+            org_food += player_data[turn_id].dock_value
+        elif 2 == player_data[turn_id].dock_type:
+            org_gold += player_data[turn_id].dock_value
+    
+    for c in range(0, total_card_num):
+        if 2 == player_data[turn_id].marked_card[c]:
+            if 1 == first:
+                s_card = c
+                first = 0
+                
+            total_food = org_food
+            total_gold = org_gold
+            dest = player_data[turn_id].b_id
+            
+            # 0 == night
+            type1, dv1, fwd1 = card_action(0)
+            # 1 == night
+            type2, dv2, fwd2 = card_action(1)
+            if 1 == type1:
+                r_sum += dv1
+                total_food += dv1
+            elif 2 == type1:
+                r_sum += dv1
+                total_gold += dv1
+            #elif 3 == type1:
+            #    r_sum += dv1
+            else:
+                if 0 == fwd1:
+                    dv1 = (-1) * dv1
+                outer, inner = go_dest_id(player_data[turn_id].b_id, dv1)
+                res1, food1, gold1 = resource_dest(outer, r_sum, total_food, total_gold)
+                res2, food2, gold2 = resource_dest(inner, r_sum, total_food, total_gold)
+                if (food1 < 0 or gold1 < 0) and (food2 < 0 or gold2 < 0):
+                    # fail
+                    continue
+                elif food2 < 0 or gold2 < 0:
+                    dir1 = 1
+                elif food1 < 0 or gold1 < 0:
+                    dir1 = 2
+                else:
+                    dir1 = 2
+            
+            if 1 == type2:
+                r_sum += dv2
+                total_food += dv2
+            elif 2 == type2:
+                r_sum += dv2
+                total_gold += dv2
+            #elif 3 == type2:
+            #    r_sum += dv2
+            else:
+                if 0 == fwd2:
+                    dv2 = (-1) * dv2
+                outer, inner = go_dest_id(dest, dv2)
+                res1, food1, gold1 = resource_dest(outer, r_sum, total_food, total_gold)
+                res2, food2, gold2 = resource_dest(inner, r_sum, total_food, total_gold)
+                if (food1 < 0 or gold1 < 0) and (food2 < 0 or gold2 < 0):
+                    # fail
+                    continue
+                elif food2 < 0 or gold2 < 0:
+                    dir2 = 1
+                elif food1 < 0 or gold1 < 0:
+                    dir2 = 2
+                else:
+                    dir2 = 2   
+            
+            if dv1 + dv2 > step_max:
+                step_max = dv1 + dv2
+                s_card = c
+                sdir1 = dir1
+                sdir2 = dir2
+        r_sum = 0
+    return s_card, sdir1, sdir2, step_max
     
 def ai():
-    global  dice_value1, dice_value2
+    global  player_data, dice_value1, dice_value2
+    s_card = 0
     dir1 = 1
     dir2 = 1
     if start_p == turn_id and 0 == player_data[turn_id].mode:
@@ -1076,6 +1164,44 @@ def ai():
         player_data[turn_id].mode = 4
         pygame.display.update()
         time.sleep(1)
+        r = random.randint(0, 2)
+        if 0 == r:
+            card1, d1, d2, max1 = forward_ai()
+            dice_value1, dice_value2 = dice_value2, dice_value1
+            card2, sd1, sd2, max2 = forward_ai()
+            if max1 > max2: # back to original
+                s_card = card1
+                dir1 = d1
+                dir2 = d2
+                dice_value1, dice_value2 = dice_value2, dice_value1
+            else: # swap dice
+                s_card = card2
+                dir1 = sd1
+                dir2 = sd2
+        else: # 1, 2 == r
+            card1, d1, d2, max1 = resource_ai()
+            dice_value1, dice_value2 = dice_value2, dice_value1
+            card2, sd1, sd2, max2 = resource_ai()
+            if max1 > max2: # back to original
+                s_card = card1
+                dir1 = d1
+                dir2 = d2
+                dice_value1, dice_value2 = dice_value2, dice_value1
+            else: # swap dice
+                s_card = card2
+                dir1 = sd1
+                dir2 = sd2
+        player_data[turn_id].selected_card_value = s_card
+        player_data[turn_id].marked_card = 1
+        pygame.display.update()
+    elif 0 == player_data[turn_id].mode:
+        r = random.randint(0, 2)
+        if 0 == r:
+            s_card, dir1, dir2, max1 = forward_ai()
+        else: # 1, 2 == r
+            s_card, dir1, dir2, max1 = resource_ai()
+        player_data[turn_id].selected_card_value = s_card
+        player_data[turn_id].marked_card = 1
     
     return dir1, dir2
     
@@ -1093,16 +1219,15 @@ def main():
     #pd = draw_player_thread.player_data
     #pd[0].step = 6
     #pd[0].mode = 1
-    #pd[0].dir = 1
     #pd[0].forward = 1
     # end test p
     while True:
         if 6 == player_data[turn_id].mode:
             if 0 == is_night:
-                player_data[turn_id].dir = dir1
+                player_data[turn_id].dir[is_night] = dir1
                 handle_step(is_night, dir1)
             else:
-                player_data[turn_id].dir = dir2
+                player_data[turn_id].dir[is_night] = dir2
                 handle_step(is_night, dir2)
                 
         screen.blit(background, (0,0))
@@ -1158,11 +1283,11 @@ def main():
                                 
                 if x1 < mouseX < x1 + aimg.get_width() and y1 < mouseY < y1 + aimg.get_height():
                     player_data[turn_id].next_id = outer
-                    player_data[turn_id].dir = 1
+                    player_data[turn_id].dir[is_night] = 1
                     player_data[turn_id].mode = 1
                 elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
                     player_data[turn_id].next_id = inner
-                    player_data[turn_id].dir = 2
+                    player_data[turn_id].dir[is_night] = 2
                     player_data[turn_id].mode = 1
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:
             if (turn_id + 1)%player_num == start_p:
