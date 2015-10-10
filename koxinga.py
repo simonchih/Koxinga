@@ -146,6 +146,7 @@ player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [
 main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
 player_data = [0] * player_num
+treasure_card = [0] * treasure_num
 
 def turn_id_to_image(tid):
     if 0 == tid:
@@ -1247,10 +1248,10 @@ def main():
     generate_player_card()
     draw_player_thread.start()
     # test p backward
-    pd = draw_player_thread.player_data
-    pd[0].step = 6
-    pd[0].mode = 1
-    pd[0].forward = 1
+    #pd = draw_player_thread.player_data
+    #pd[0].step = 6
+    #pd[0].mode = 1
+    #pd[0].forward = 1
     # end test p
     while True:
         if 6 == player_data[turn_id].mode:

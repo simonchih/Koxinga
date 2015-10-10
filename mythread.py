@@ -328,8 +328,8 @@ class mythread (threading.Thread):
                         else:
                             self.player_data[p].b_id = self.player_data[p].next_id
                             self.player_data[p].step -= 1
-                    if 0 == self.player_data[p].step:
-                       self.player_data[p].mode = 0
+                    if 0 == self.player_data[p].step:# 1 == self.player_data[p].mode
+                       #self.player_data[p].mode = 0
                        self.player_data[p].dir[self.is_night] = 0
                     elif 1 == self.player_data[p].IsAI:
                         # move 1 step
