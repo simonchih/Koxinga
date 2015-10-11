@@ -841,6 +841,23 @@ def draw_show_card(p_id, showc=1):
         (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width(), screen_height - show_card_image.get_height())
     
     screen.blit(show_card_image, (start_w, start_h))
+
+def draw_selected_card(t_id, start, mode=6):
+    global player_num
+    
+    if mode > 6 or mode < 5:
+        return
+    
+    showc = 1
+    
+    if 5 == mode:
+        showc = 0
+    
+    for i in range(0, player_num):
+        s = (start+i)%player_num
+        draw_show_card(t_id, showc)
+        
+    pygame.display.update()
     
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
@@ -865,7 +882,7 @@ def draw_inner_item(Surface):
     if 0 == player_data[turn_id].IsAI:
         if 3 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
-        elif 4 == player_data[turn_id].mode:
+        elif 4 == player_data[turn_id].mode or 5 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Swap", BLACK)
             for i in range(0, total_card_num):
                 if 2 == player_data[turn_id].marked_card[i]:
@@ -889,22 +906,22 @@ def spend_dock_resource(type, value):
     # dvalue, index is 0 base
     dvalue = [0] * dock_num
     for i in range(0, dock_num):
-        dvalue[i] = (i, player_data[turn_id].dock_value[i])
+        dvalue[i] = (i, player_data[turn_id].dvalue[i])
         
     sorted_value = sorted(dvalue, key=lambda l:l[1])
     
     # handle spend
     for i in range(0, dock_num):
         sv = sorted_value[i]
-        if type == player_data[turn_id].dock_type[sv[0]] and sv[1] > 0:
+        if type == player_data[turn_id].dtype[sv[0]] and sv[1] > 0:
             if sv[1] >= (value - spent_value_total):
-               player_data[turn_id].dock_value[sv[0]] -= (value - spent_value_total) 
+               player_data[turn_id].dvalue[sv[0]] -= (value - spent_value_total) 
                # spent_value_total = value
                return 0
             else:
-               spent_value_total += player_data[turn_id].dock_value[sv[0]]
-               player_data[turn_id].dock_value[sv[0]] = 0
-               player_data[turn_id].dock_type[sv[0]] = 0
+               spent_value_total += player_data[turn_id].dvalue[sv[0]]
+               player_data[turn_id].dvalue[sv[0]] = 0
+               player_data[turn_id].dtype[sv[0]] = 0
             
     return 1
 
@@ -915,21 +932,21 @@ def get_dock_resource(type, value):
     dvalue = [0] * dock_num
     
     for i in range(0, dock_num):
-        if 0 == player_data[turn_id].dock_type[i]:
-            player_data[turn_id].dock_type[i] = type
-            player_data[turn_id].dock_value[i] = value
+        if 0 == player_data[turn_id].dtype[i]:
+            player_data[turn_id].dtype[i] = type
+            player_data[turn_id].dvalue[i] = value
             # dock NOT full
             return
-        dvalue[i] = (i, player_data[turn_id].dock_value[i])
+        dvalue[i] = (i, player_data[turn_id].dvalue[i])
     
     # dock full
     sorted_value = sorted(dvalue, key=lambda l:l[1])
     
     for i in range(0, dock_num):
         sv = sorted_value[i]
-        if type != player_data[turn_id].dock_type[sv[0]]:
-            player_data[turn_id].dock_type[sv[0]] = type
-            player_data[turn_id].dock_value[sv[0]] = value
+        if type != player_data[turn_id].dtype[sv[0]]:
+            player_data[turn_id].dtype[sv[0]] = type
+            player_data[turn_id].dvalue[sv[0]] = value
             return
     
     # added fail
@@ -966,7 +983,7 @@ def resource_dest(dest, res, food, gold):
     return r_sum, total_food, total_gold
     
 def handle_step(night, dir):
-    type, dice_point, forward = card_action(night)
+    type, dice_point, forward = card_action(night, player_data[turn_id].selected_card_value)
     if 0 != dice_point:
         if 0 == type:
             prepare_move(dice_point, dir, forward)
@@ -974,11 +991,11 @@ def handle_step(night, dir):
             get_dock_resource(type, dice_point)
 
 # return type(0:move, 1:food, 2:gold, 3:cannon), dice_val(0~6), forward (1:forward, 0:back, None)
-def card_action(night):
+def card_action(night, s_card):
     global player_data, turn_id, dice_value1, dice_value2
     # dice_val 1~6
     dice_val = int(dice_value1/4)+1
-    sid = player_data[turn_id].selected_card_value
+    sid = s_card
     if 0 == night:
         if 0 == sid:
             return 0, dice_val, 1
@@ -1054,10 +1071,10 @@ def resource_ai():
     type1, dv1, fwd1 = 0, 0, 0
     type2, dv2, fwd2 = 0, 0, 0
     for i in range(0, dock_num):
-        if 1 == player_data[turn_id].dock_type:
-            org_food += player_data[turn_id].dock_value
-        elif 2 == player_data[turn_id].dock_type:
-            org_gold += player_data[turn_id].dock_value
+        if 1 == player_data[turn_id].dtype:
+            org_food += player_data[turn_id].dvalue
+        elif 2 == player_data[turn_id].dtype:
+            org_gold += player_data[turn_id].dvalue
     
     for c in range(0, total_card_num):
         if 2 == player_data[turn_id].marked_card[c]:
@@ -1070,9 +1087,9 @@ def resource_ai():
             dest = player_data[turn_id].b_id
             
             # 0 == night
-            type1, dv1, fwd1 = card_action(0)
+            type1, dv1, fwd1 = card_action(0, c)
             # 1 == night
-            type2, dv2, fwd2 = card_action(1)
+            type2, dv2, fwd2 = card_action(1, c)
             if 1 == type1:
                 r_sum += dv1
                 total_food += dv1
@@ -1167,10 +1184,10 @@ def forward_ai():
     type1, dv1, fwd1 = 0, 0, 0
     type2, dv2, fwd2 = 0, 0, 0
     for i in range(0, dock_num):
-        if 1 == player_data[turn_id].dock_type:
-            org_food += player_data[turn_id].dock_value
-        elif 2 == player_data[turn_id].dock_type:
-            org_gold += player_data[turn_id].dock_value
+        if 1 == player_data[turn_id].dtype:
+            org_food += player_data[turn_id].dvalue
+        elif 2 == player_data[turn_id].dtype:
+            org_gold += player_data[turn_id].dvalue
     
     for c in range(0, total_card_num):
         if 2 == player_data[turn_id].marked_card[c]:
@@ -1183,9 +1200,9 @@ def forward_ai():
             dest = player_data[turn_id].b_id
             
             # 0 == night
-            type1, dv1, fwd1 = card_action(0)
+            type1, dv1, fwd1 = card_action(0, c)
             # 1 == night
-            type2, dv2, fwd2 = card_action(1)
+            type2, dv2, fwd2 = card_action(1, c)
             if 1 == type1:
                 r_sum += dv1
                 total_food += dv1
@@ -1281,7 +1298,7 @@ def ai():
                 dir2 = sd2
         player_data[turn_id].selected_card_value = s_card
         player_data[turn_id].marked_card = 1
-        player_data[turn_id].mode = 4
+        player_data[turn_id].mode = 5
         pygame.display.update()
     elif 0 == player_data[turn_id].mode:
         r = random.randint(0, 2)
@@ -1356,15 +1373,7 @@ def main():
     #pd[0].mode = 1
     #pd[0].forward = 1
     # end test p
-    while True:
-        if 6 == player_data[turn_id].mode:
-            if 0 == draw_player_thread.is_night:
-                player_data[turn_id].dir[draw_player_thread.is_night] = dir1
-                handle_step(draw_player_thread.is_night, dir1)
-            else:
-                player_data[turn_id].dir[draw_player_thread.is_night] = dir2
-                handle_step(draw_player_thread.is_night, dir2)
-                
+    while True:        
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
@@ -1373,57 +1382,91 @@ def main():
         pygame.display.update()
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
-                player_data[turn_id].mode = 3        
+                player_data[turn_id].mode = 3
+            elif 0 == player_data[turn_id].mode:
+                player_data[turn_id].mode = 5
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            elif 0 == player_data[turn_id].IsAI and 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                (mouseX, mouseY) = pygame.mouse.get_pos()
-                (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
-                if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
-                    dice1 = random.randint(0, 23)
-                    dice2 = random.randint(0, 23)
-                    dice_value1 = dice1
-                    dice_value2 = dice2
-                    player_data[turn_id].mode = 4
-            elif 0 == player_data[turn_id].IsAI and 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                (mouseX, mouseY) = pygame.mouse.get_pos()
-                (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
-                card_x =  margin+big_block+inner_gap
-                card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
-                if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
-                    (dice_value1, dice_value2) = (dice_value2, dice_value1)
-                for i in range(0, total_card_num):
-                    if 2 == player_data[turn_id].marked_card[i]:        
-                        if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
-                            if None == player_data[turn_id].selected_card_value:
-                                player_data[turn_id].selected_card_value = i
-                                player_data[turn_id].marked_card[i] = 1
-                            else:
-                                player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
-                                player_data[turn_id].selected_card_value = i
-                                player_data[turn_id].marked_card[i] = 1
-                        card_y += mv2.get_height() + inner_gap
-            elif 0 == player_data[turn_id].IsAI and 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                (mouseX, mouseY) = pygame.mouse.get_pos()
-                aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
-                (x1, y1) = loc1
-                (x2, y2) = loc2
-                if 1 == player_data[turn_id].forward:
-                    outer, inner = go_dest_id(player_data[turn_id].b_id, 1)
-                else:
-                    outer, inner = go_dest_id(player_data[turn_id].b_id, -1)
-                                
-                if x1 < mouseX < x1 + aimg.get_width() and y1 < mouseY < y1 + aimg.get_height():
-                    player_data[turn_id].next_id = outer
-                    player_data[turn_id].dir[draw_player_thread.is_night] = 1
-                    player_data[turn_id].mode = 1
-                elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
-                    player_data[turn_id].next_id = inner
-                    player_data[turn_id].dir[draw_player_thread.is_night] = 2
-                    player_data[turn_id].mode = 1
+            elif 0 == player_data[turn_id].IsAI:
+                if 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
+                    if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
+                        dice1 = random.randint(0, 23)
+                        dice2 = random.randint(0, 23)
+                        dice_value1 = dice1
+                        dice_value2 = dice2
+                        player_data[turn_id].mode = 4
+                if 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
+                    card_x =  margin+big_block+inner_gap
+                    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
+                    if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
+                        (dice_value1, dice_value2) = (dice_value2, dice_value1)
+                    for i in range(0, total_card_num):
+                        if 2 == player_data[turn_id].marked_card[i]:        
+                            if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
+                                if None == player_data[turn_id].selected_card_value:
+                                    player_data[turn_id].selected_card_value = i
+                                    player_data[turn_id].marked_card[i] = 1
+                                else:
+                                    player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
+                                    player_data[turn_id].selected_card_value = i
+                                    player_data[turn_id].marked_card[i] = 1
+                            card_y += mv2.get_height() + inner_gap
+                    if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
+                        player_data[turn_id].mode = 6
+                        turn_id = (turn_id + 1)%player_num
+                if 5 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    card_x =  margin+big_block+inner_gap
+                    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
+                    for i in range(0, total_card_num):
+                        if 2 == player_data[turn_id].marked_card[i]:        
+                            if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
+                                if None == player_data[turn_id].selected_card_value:
+                                    player_data[turn_id].selected_card_value = i
+                                    player_data[turn_id].marked_card[i] = 1
+                                else:
+                                    player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
+                                    player_data[turn_id].selected_card_value = i
+                                    player_data[turn_id].marked_card[i] = 1
+                            card_y += mv2.get_height() + inner_gap
+                    if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
+                        player_data[turn_id].mode = 6
+                        turn_id = (turn_id + 1)%player_num
+                if 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
+                    (x1, y1) = loc1
+                    (x2, y2) = loc2
+                    if 1 == player_data[turn_id].forward:
+                        outer, inner = go_dest_id(player_data[turn_id].b_id, 1)
+                    else:
+                        outer, inner = go_dest_id(player_data[turn_id].b_id, -1)
+                                    
+                    if x1 < mouseX < x1 + aimg.get_width() and y1 < mouseY < y1 + aimg.get_height():
+                        player_data[turn_id].next_id = outer
+                        player_data[turn_id].dir[draw_player_thread.is_night] = 1
+                        player_data[turn_id].mode = 1
+                    elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
+                        player_data[turn_id].next_id = inner
+                        player_data[turn_id].dir[draw_player_thread.is_night] = 2
+                        player_data[turn_id].mode = 1
+                
+        
+        if 1 == player_data[turn_id].IsAI:
+            ai()
+            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+        
+        if 6 == player_data[turn_id].mode:
+            handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
+            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+        
         if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
             step_done(turn_id, player_data[turn_id].b_id)
