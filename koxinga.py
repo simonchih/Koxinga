@@ -11,6 +11,8 @@ block_selected_image = 'Image/wood_selected_40x27.jpg'
 block2_selected_image = 'Image/wood_selected_27x40.jpg'
 coin_image = 'Image/gold_coin_14x14.gif'
 treasure_image = 'Image/treasure_30x30.gif'
+small_own_treasure_image = 'Image/treasure_25x25.gif'
+own_treasure_image = 'Image/treasure_50x50.gif'
 button1_image = 'Image/button1_100x50.gif'
 
 # resource
@@ -69,6 +71,8 @@ block_sel = pygame.image.load(block_selected_image).convert()
 block2_sel = pygame.image.load(block_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
+treasure_s = pygame.image.load(small_own_treasure_image).convert()
+treasure_b = pygame.image.load(own_treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
 
 # resource
@@ -317,7 +321,53 @@ def five_block_item_h(start_w, start_h, p_id):
             y = start_h + int((block2.get_height()-b_image.get_height())/2) + i*block2.get_height()
             screen.blit(b_image, (x+item_gap, y+item_gap))
             screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
-            
+
+def num_of_treasure_own(t_id):
+    global treasure_num
+    sum = 0
+    for i in range(2, treasure_num):
+        if 1 == player_data[t_id].treasure[i]:
+            sum += 1
+    return sum
+    
+def draw_treasure_w(start_w, start_h, bk_image, t_image, t_id):
+    font_size = 22
+    #player 3, 4
+    if 2 == t_id or 3 == t_id:
+        font_gap_x = 0
+        font_gap_y = bk_image.get_height()+1
+    #player 1, 6
+    else:
+        font_gap_x = 0
+        font_gap_y = 0-bk_image.get_height()-1
+        
+    w = start_w + dock_num*bk_image.get_width() + inner_gap + 1
+    h = start_h + 1
+    sum_t = num_of_treasure_own(t_id)
+    
+    if 0 != sum_t:
+        screen.blit(t_image, (w, h))
+        screen.blit(write(str(sum_t)+"x", RED, font_size), (w+font_gap_x, h+font_gap_y))
+
+def draw_treasure_h(start_w, start_h, bk_image, t_image, t_id):
+    font_size = 22
+    #player 2
+    if 1 == t_id:
+        font_gap_x = bk_image.get_width()+1
+        font_gap_y = 0
+    #player 5
+    else:
+        font_gap_x = 0-bk_image.get_width()-1
+        font_gap_y = 0
+        
+    w = start_w + 1
+    h = start_h + dock_num*bk_image.get_height() + inner_gap + 1
+    sum_t = num_of_treasure_own(t_id)
+    
+    if 0 != sum_t:
+        screen.blit(t_image, (w, h))
+        screen.blit(write(str(sum_t)+"x", RED, font_size), (w+font_gap_x, h+font_gap_y))
+    
 def five_block_w(start_w, start_h, b_image):
     for i in range(0, dock_num):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
@@ -734,6 +784,14 @@ def draw_dock():
     five_block_item_w(player_4_6_block_start_w, player_3_4_block_start_h, 3)
     five_block_item_h(player_5_block_start_w, player_2_5_block_start_h, 4)
     five_block_item_w(player_4_6_block_start_w, player_1_6_block_start_h, 5)
+    
+    # draw treasure for player 1~6
+    draw_treasure_w(player_1_3_block_start_w, player_1_6_block_start_h, block, treasure_s, 0)
+    draw_treasure_h(player_2_block_start_w, player_2_5_block_start_h, block2, treasure_s, 1)
+    draw_treasure_w(player_1_3_block_start_w, player_3_4_block_start_h, block, treasure_s, 2)
+    draw_treasure_w(player_4_6_block_start_w, player_3_4_block_start_h, block, treasure_s, 3)
+    draw_treasure_h(player_5_block_start_w, player_2_5_block_start_h, block2, treasure_s, 4)
+    draw_treasure_w(player_4_6_block_start_w, player_1_6_block_start_h, block, treasure_s, 5)
     
 def generate_dock():
     global player_data 
@@ -1233,9 +1291,54 @@ def ai():
             s_card, dir1, dir2, max1 = resource_ai()
         player_data[turn_id].selected_card_value = s_card
         player_data[turn_id].marked_card = 1
-        player_data[turn_id].mode = 4
+        player_data[turn_id].mode = 5
     
     return dir1, dir2
+
+def remain_treasure_card():
+    global treasure_card
+    sum = 0
+    for i in range(0, treasure_num):
+        if 0 == treasure_card[i]:
+            sum += 1
+    return sum
+    
+def get_treasure(t_id, b_id):
+    global player_data, treasure_card, main_map
+    index = 0
+    remain_tc = remain_treasure_card()
+    if remain_tc > 0:
+        tc = random.randint(1, remain_tc)
+        while tc > 0:
+            if 0 == treasure_card[index]:
+                tc -= 1
+            if tc > 0:
+                index += 1
+        
+        treasure_card[index] = 1
+        player_data[t_id].treasure[index] = 1
+    main_map[b_id].type = 0
+    player_data[t_id].mode = 6
+    
+def step_done(t_id, b_id):
+    global player_data, main_map
+    #type:0 = nothing,1 = treasure, 2 = gold coin, 3 = food
+    type  = main_map[b_id].type
+    value = main_map[b_id].value
+    fail = 0
+    
+    if 1 == type:
+        get_treasure(t_id, b_id)
+    elif 2 == type:
+        fail = spend_dock_resource(2, value)
+    elif 3 == type:
+        fail = spend_dock_resource(1, value)
+    else: # 0 == type
+        player_data[t_id].mode = 6
+        
+    if 1 == fail:
+        player_data[t_id].step = 1
+        player_data[t_id].forward = 0
     
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
@@ -1321,11 +1424,11 @@ def main():
                     player_data[turn_id].next_id = inner
                     player_data[turn_id].dir[draw_player_thread.is_night] = 2
                     player_data[turn_id].mode = 1
-        if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:
-            if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
-                # do spend_dock_resource or get_treasure 
-                pass
-                
+        if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
+            # do spend_dock_resource or get_treasure 
+            step_done(turn_id, player_data[turn_id].b_id)
+            
+        if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:    
             if (turn_id + 1)%player_num == start_p:
                 if 0 == draw_player_thread.is_night:
                     turn_id = start_p

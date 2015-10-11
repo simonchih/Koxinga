@@ -25,4 +25,6 @@ class game_player():
         # 0: unused, 1:food, 2:gold, 3: cannon
         self.dtype = dock_type[:]
         self.dvalue = dock_value[:]
+        # index: 0:food, 1:gold, 2~9: 2~9 points
+        # value: 0: unused, 1: own
         self.treasure = treasure_own[:]
