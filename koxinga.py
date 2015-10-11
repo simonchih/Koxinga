@@ -852,6 +852,8 @@ def draw_show_card(p_id, showc=1):
 def draw_selected_card(t_id, start, mode=6):
     global player_num
     
+    back = 0
+    
     if 0 == mode:
         return
     
@@ -862,11 +864,13 @@ def draw_selected_card(t_id, start, mode=6):
     
     for i in range(0, player_num):
         s = (start+i)%player_num
+        if 1 == back and 5 != mode:
+            # draw back card
+            draw_show_card(s, 0)
+            continue
         draw_show_card(s, showc)
         if s == t_id:
-            break    
-        
-    pygame.display.update()
+            back = 1
     
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
@@ -1390,16 +1394,16 @@ def main():
         draw_dock()
         draw_map(screen)
         draw_inner_item(screen)
+        
         draw_player_thread.run()
+        if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
+            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
         pygame.display.update()
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
                 player_data[turn_id].mode = 3
             elif 0 == player_data[turn_id].mode:
                 player_data[turn_id].mode = 5
-
-        if 1 == player_data[turn_id].IsAI and 0 != player_data[turn_id].mode:
-            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
                 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1477,7 +1481,7 @@ def main():
         if 1 == player_data[turn_id].IsAI:
             ai()
             if 5 == player_data[turn_id].mode:
-                draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+                #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
                 if (turn_id + 1)%player_num == start_p:
                     for i in range(0, player_num):
                         # human mode also mode = 6
@@ -1486,7 +1490,7 @@ def main():
         
         if 6 == player_data[turn_id].mode:
             handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
-            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+            #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
             print("[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
         
         if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
