@@ -915,13 +915,15 @@ def spend_dock_resource(type, value):
         sv = sorted_value[i]
         if type == player_data[turn_id].dtype[sv[0]] and sv[1] > 0:
             if sv[1] >= (value - spent_value_total):
-               player_data[turn_id].dvalue[sv[0]] -= (value - spent_value_total) 
-               # spent_value_total = value
-               return 0
+                player_data[turn_id].dvalue[sv[0]] -= (value - spent_value_total) 
+                if 0 == player_data[turn_id].dvalue[sv[0]]:
+                    player_data[turn_id].dtype[sv[0]] = 0
+                # spent_value_total = value
+                return 0
             else:
-               spent_value_total += player_data[turn_id].dvalue[sv[0]]
-               player_data[turn_id].dvalue[sv[0]] = 0
-               player_data[turn_id].dtype[sv[0]] = 0
+                spent_value_total += player_data[turn_id].dvalue[sv[0]]
+                player_data[turn_id].dvalue[sv[0]] = 0
+                player_data[turn_id].dtype[sv[0]] = 0
             
     return 1
 
@@ -1352,6 +1354,7 @@ def step_done(t_id, b_id):
         fail = spend_dock_resource(1, value)
     else: # 0 == type
         player_data[t_id].mode = 6
+        print("step=%d"%player_data[t_id].step)
         
     if 1 == fail:
         player_data[t_id].step = 1
@@ -1461,11 +1464,32 @@ def main():
         
         if 1 == player_data[turn_id].IsAI:
             ai()
-            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+            if 5 == player_data[turn_id].mode:
+                draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+                if (turn_id + 1)%player_num == start_p:
+                    for i in range(0, player_num):
+                        s = (start_p+i)%player_num
+                        # human mode also mode = 6
+                        player_data[s].mode = 6
+            print("5[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
         
         if 6 == player_data[turn_id].mode:
             handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
             draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+            print("[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
+            if 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
+                if (turn_id + 1)%player_num == start_p:
+                    if 0 == draw_player_thread.is_night:
+                        turn_id = start_p
+                        draw_player_thread.is_night = 1
+                    else: # draw_player_thread.is_night == 1
+                        start_p = (turn_id + 1)%player_num
+                        turn_id = start_p
+                        draw_player_thread.is_night = 0
+                        for i in range(0, player_num):
+                            player_data[i].mode = 0
+                else:
+                    turn_id = (turn_id + 1)%player_num
         
         if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
