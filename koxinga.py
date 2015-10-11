@@ -845,7 +845,7 @@ def draw_show_card(p_id, showc=1):
 def draw_selected_card(t_id, start, mode=6):
     global player_num
     
-    if mode > 6 or mode < 5:
+    if 0 == mode:
         return
     
     showc = 1
