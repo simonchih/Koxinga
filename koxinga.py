@@ -188,10 +188,17 @@ def card_id_to_image(cid):
         return gold_m1
     elif 9 == cid:
         return fd_gd    
-
+      
 # return 0 based
 def pick_up_one_card(player_id):
     global player_data
+    
+    if 0 == player_data[player_id].remain_card_num:
+        for i in range(0, total_card_num):
+            if 1 == player_data[player_id].marked_card[i]:
+                player_data[player_id].remain_card_num += 1
+                player_data[player_id].marked_card[i] = 0
+                
     index = random.randint(1, player_data[player_id].remain_card_num)
     for i in range(0, total_card_num):
         if 0 == player_data[player_id].marked_card[i]:
@@ -1299,7 +1306,7 @@ def ai():
                 dir1 = sd1
                 dir2 = sd2
         player_data[turn_id].selected_card_value = s_card
-        player_data[turn_id].marked_card = 1
+        player_data[turn_id].marked_card[s_card] = 1
         player_data[turn_id].mode = 5
         pygame.display.update()
     elif 0 == player_data[turn_id].mode:
@@ -1309,7 +1316,7 @@ def ai():
         else: # 1, 2 == r
             s_card, dir1, dir2, max1 = resource_ai()
         player_data[turn_id].selected_card_value = s_card
-        player_data[turn_id].marked_card = 1
+        player_data[turn_id].marked_card[s_card] = 1
         player_data[turn_id].mode = 5
     
     return dir1, dir2
@@ -1468,28 +1475,14 @@ def main():
                 draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
                 if (turn_id + 1)%player_num == start_p:
                     for i in range(0, player_num):
-                        s = (start_p+i)%player_num
                         # human mode also mode = 6
-                        player_data[s].mode = 6
+                        player_data[i].mode = 6
             print("5[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
         
         if 6 == player_data[turn_id].mode:
             handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
             draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
             print("[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
-            if 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
-                if (turn_id + 1)%player_num == start_p:
-                    if 0 == draw_player_thread.is_night:
-                        turn_id = start_p
-                        draw_player_thread.is_night = 1
-                    else: # draw_player_thread.is_night == 1
-                        start_p = (turn_id + 1)%player_num
-                        turn_id = start_p
-                        draw_player_thread.is_night = 0
-                        for i in range(0, player_num):
-                            player_data[i].mode = 0
-                else:
-                    turn_id = (turn_id + 1)%player_num
         
         if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
@@ -1506,6 +1499,21 @@ def main():
                     draw_player_thread.is_night = 0
                     for i in range(0, player_num):
                         player_data[i].mode = 0
+                        pick_up_one_card(i)
+            else:
+                turn_id = (turn_id + 1)%player_num
+        elif 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
+            if (turn_id + 1)%player_num == start_p:
+                if 0 == draw_player_thread.is_night:
+                    turn_id = start_p
+                    draw_player_thread.is_night = 1
+                else: # draw_player_thread.is_night == 1
+                    start_p = (turn_id + 1)%player_num
+                    turn_id = start_p
+                    draw_player_thread.is_night = 0
+                    for i in range(0, player_num):
+                        player_data[i].mode = 0
+                        pick_up_one_card(i)
             else:
                 turn_id = (turn_id + 1)%player_num
             
