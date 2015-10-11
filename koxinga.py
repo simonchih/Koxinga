@@ -862,7 +862,9 @@ def draw_selected_card(t_id, start, mode=6):
     
     for i in range(0, player_num):
         s = (start+i)%player_num
-        draw_show_card(t_id, showc)
+        draw_show_card(s, showc)
+        if s == t_id:
+            break    
         
     pygame.display.update()
     
@@ -1396,6 +1398,9 @@ def main():
             elif 0 == player_data[turn_id].mode:
                 player_data[turn_id].mode = 5
 
+        if 1 == player_data[turn_id].IsAI and 0 != player_data[turn_id].mode:
+            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+                
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
