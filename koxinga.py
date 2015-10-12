@@ -32,6 +32,8 @@ n2_gold = 'Image/-2_gold_100x50.jpg'
 food_n2 = 'Image/food_-2_100x50.jpg'
 gold_n1 = 'Image/gold_-1_100x50.jpg'
 food_gold = 'Image/food_gold_100x50.jpg'
+gold_food = 'Image/gold_food_100x50.jpg'
+cannon_cannon = 'Image/cannon_cannon_100x50.jpg'
 back_card0 = 'Image/back0.gif'
 back_card1 = 'Image/back1.gif'
 back_card2 = 'Image/back2.gif'
@@ -91,6 +93,8 @@ m2_gold   = pygame.image.load(n2_gold).convert()
 food_m2   = pygame.image.load(food_n2).convert()
 gold_m1   = pygame.image.load(gold_n1).convert()
 fd_gd     = pygame.image.load(food_gold).convert()
+gd_fd     = pygame.image.load(gold_food).convert()
+ca_ca     = pygame.image.load(cannon_cannon).convert()
 back0     = pygame.image.load(back_card0).convert()
 back1     = pygame.image.load(back_card1).convert()
 back2     = pygame.image.load(back_card2).convert()
@@ -187,7 +191,11 @@ def card_id_to_image(cid):
     elif 8 == cid:
         return gold_m1
     elif 9 == cid:
-        return fd_gd    
+        return fd_gd
+    elif 10 == cid:
+        return gd_fd
+    elif 11 == cid:
+        return ca_ca
       
 # return 0 based
 def pick_up_one_card(player_id):
@@ -1039,6 +1047,12 @@ def card_action(night, s_card):
         elif 9 == sid:
             #get food
             return  1, dice_val, None
+        elif 10 == sid:
+            #get gold
+            return 2, dice_val, None
+        elif 11 == sid:
+            #get cannon
+            return 3, dice_val, None
     else: # 1 == night
         dice_val = int(dice_value2/4)+1
         
@@ -1069,6 +1083,12 @@ def card_action(night, s_card):
         elif 9 == sid:
             #get gold
             return  2, dice_val, None
+        elif 10 == sid:
+            #get food
+            return 1, dice_val, None
+        elif 11 == sid:
+            #get cannon
+            return 3, dice_val, None
             
 def resource_ai():
     dir1 = 0
@@ -1374,6 +1394,17 @@ def step_done(t_id, b_id):
         player_data[t_id].forward = 0
         player_data[t_id].dir[draw_player_thread.is_night] = 1
     
+def end_turn():
+    global player_data, start_p
+    
+    for i in range(0, player_num):
+        player_data[i].mode = 0
+        player_data[i].handle_done = [0, 0]
+        player_data[i].selected_card_value = None
+        pick_up_one_card(i)
+    
+    start_p = (start_p+1)%player_num
+                        
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
     
@@ -1488,7 +1519,6 @@ def main():
                     for i in range(0, player_num):
                         # human mode also mode = 6
                         player_data[i].mode = 6
-            print("5[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
         if 6 == player_data[turn_id].mode:
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
@@ -1516,11 +1546,7 @@ def main():
                     start_p = (turn_id + 1)%player_num
                     turn_id = start_p
                     draw_player_thread.is_night = 0
-                    for i in range(0, player_num):
-                        player_data[i].mode = 0
-                        player_data[i].handle_done = [0, 0]
-                        player_data[i].selected_card_value = None
-                        pick_up_one_card(i)
+                    end_turn()
             else:
                 turn_id = (turn_id + 1)%player_num
             print("AI turn_id=%d"%turn_id)
@@ -1533,11 +1559,7 @@ def main():
                     start_p = (turn_id + 1)%player_num
                     turn_id = start_p
                     draw_player_thread.is_night = 0
-                    for i in range(0, player_num):
-                        player_data[i].mode = 0
-                        player_data[i].handle_done = [0, 0]
-                        player_data[i].selected_card_value = None
-                        pick_up_one_card(i)
+                    end_turn()
             else:
                 turn_id = (turn_id + 1)%player_num
             print("human turn_id=%d"%turn_id)
