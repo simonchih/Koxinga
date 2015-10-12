@@ -329,8 +329,7 @@ class mythread (threading.Thread):
                             self.player_data[p].b_id = self.player_data[p].next_id
                             self.player_data[p].step -= 1
                     if 0 == self.player_data[p].step:# 1 == self.player_data[p].mode
-                       #self.player_data[p].mode = 0
-                       self.player_data[p].dir[self.is_night] = 0
+                       self.player_data[p].mode = 6
                     elif 1 == self.player_data[p].IsAI:
                         # move 1 step
                         if 1 == self.player_data[p].forward:
@@ -344,6 +343,10 @@ class mythread (threading.Thread):
                             self.player_data[p].next_id = outer
                         elif 2 == self.player_data[p].dir[self.is_night]:
                             self.player_data[p].next_id = inner
+                        if 0 == self.player_data[p].b_id and 0 == self.player_data[p].next_id:
+                            self.player_data[p].step = 0
+                            self.player_data[p].mode = 6
+                            self.player_data[p].forward = 1
                     elif 0 == self.player_data[p].IsAI:
                         if 1 == self.player_data[p].forward and (self.player_data[p].b_id in forward_suspend):
                             self.player_data[p].mode = 2
@@ -364,6 +367,10 @@ class mythread (threading.Thread):
                                 self.player_data[p].next_id = outer
                             elif 2 == self.player_data[p].dir[self.is_night]:
                                 self.player_data[p].next_id = inner
+                            if 0 == self.player_data[p].b_id and 0 == self.player_data[p].next_id:
+                                self.player_data[p].step = 0
+                                self.player_data[p].mode = 6
+                                self.player_data[p].forward = 1
                 if x < self.player_data[p].loc[n_id][0]:
                     self.player_data[p].x += 1
                 if y < self.player_data[p].loc[n_id][1]:

@@ -968,7 +968,7 @@ def get_dock_resource(type, value):
 
 # steps is positive only, but fwd = 0 for back    
 def prepare_move(steps, dir, fwd=1):
-    global player_data
+    global player_data, turn_id, draw_player_thread
     player_data[turn_id].step = steps
     player_data[turn_id].mode = 1
     player_data[turn_id].forward = fwd
@@ -1353,7 +1353,7 @@ def get_treasure(t_id, b_id):
     player_data[t_id].mode = 6
     
 def step_done(t_id, b_id):
-    global player_data, main_map
+    global player_data, main_map, draw_player_thread
     #type:0 = nothing,1 = treasure, 2 = gold coin, 3 = food
     type  = main_map[b_id].type
     value = main_map[b_id].value
@@ -1372,6 +1372,7 @@ def step_done(t_id, b_id):
     if 1 == fail:
         player_data[t_id].step = 1
         player_data[t_id].forward = 0
+        player_data[t_id].dir[draw_player_thread.is_night] = 1
     
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
@@ -1393,12 +1394,12 @@ def main():
         screen.blit(background, (0,0))
         draw_dock()
         draw_map(screen)
-        draw_inner_item(screen)
-        
+        draw_inner_item(screen)        
         draw_player_thread.run()
         if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
             draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
         pygame.display.update()
+        
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
                 player_data[turn_id].mode = 3
@@ -1479,23 +1480,25 @@ def main():
                 
         
         if 1 == player_data[turn_id].IsAI:
-            ai()
+            player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai()
             if 5 == player_data[turn_id].mode:
                 #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
                 if (turn_id + 1)%player_num == start_p:
+                    turn_id = (turn_id + 1)%player_num
                     for i in range(0, player_num):
                         # human mode also mode = 6
                         player_data[i].mode = 6
-            print("5[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
+            print("5[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
         if 6 == player_data[turn_id].mode:
             handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
             #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
-            print("[%d].mode=%d"%(turn_id, player_data[turn_id].mode))
+            print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
         if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
             step_done(turn_id, player_data[turn_id].b_id)
+            print("step = %d,done, fwd=%d"%(player_data[turn_id].step, player_data[turn_id].forward))
             
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:    
             if (turn_id + 1)%player_num == start_p:
@@ -1511,6 +1514,7 @@ def main():
                         pick_up_one_card(i)
             else:
                 turn_id = (turn_id + 1)%player_num
+            print("AI turn_id=%d"%turn_id)
         elif 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
             if (turn_id + 1)%player_num == start_p:
                 if 0 == draw_player_thread.is_night:
@@ -1525,6 +1529,7 @@ def main():
                         pick_up_one_card(i)
             else:
                 turn_id = (turn_id + 1)%player_num
+            print("human turn_id=%d"%turn_id)
             
     pygame.quit()
     quit()
