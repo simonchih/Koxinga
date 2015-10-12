@@ -1494,6 +1494,11 @@ def main():
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
                 player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
+            elif 1 == player_data[turn_id].handle_done[draw_player_thread.is_night] and 0 == player_data[turn_id].step:
+                step_done(turn_id, player_data[turn_id].b_id)
+            
+            if player_data[turn_id].step > 0:
+                player_data[turn_id].mode = 1
             #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
             print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
