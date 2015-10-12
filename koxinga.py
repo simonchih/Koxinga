@@ -1491,7 +1491,9 @@ def main():
             print("5[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
         if 6 == player_data[turn_id].mode:
-            handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
+            if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
+                handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
+                player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
             #draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
             print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
         
@@ -1511,6 +1513,8 @@ def main():
                     draw_player_thread.is_night = 0
                     for i in range(0, player_num):
                         player_data[i].mode = 0
+                        player_data[i].handle_done = [0, 0]
+                        player_data[i].selected_card_value = None
                         pick_up_one_card(i)
             else:
                 turn_id = (turn_id + 1)%player_num
@@ -1526,6 +1530,8 @@ def main():
                     draw_player_thread.is_night = 0
                     for i in range(0, player_num):
                         player_data[i].mode = 0
+                        player_data[i].handle_done = [0, 0]
+                        player_data[i].selected_card_value = None
                         pick_up_one_card(i)
             else:
                 turn_id = (turn_id + 1)%player_num
