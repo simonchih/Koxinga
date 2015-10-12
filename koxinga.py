@@ -903,8 +903,20 @@ def draw_inner_item(Surface):
     if 0 == player_data[turn_id].IsAI:
         if 3 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Roll", BLACK)
-        elif 4 == player_data[turn_id].mode or 5 == player_data[turn_id].mode:
+        elif 4 == player_data[turn_id].mode:
             draw_button(Surface, (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height()), "Swap", BLACK)
+            for i in range(0, total_card_num):
+                if 2 == player_data[turn_id].marked_card[i]:
+                    Surface.blit(card_id_to_image(i), (card_x, card_y))
+                    (MouseX, MouseY) = pygame.mouse.get_pos()
+                    if card_x <= MouseX <= card_x + mv2.get_width() and card_y <= MouseY <= card_y + mv2.get_height():
+                        pygame.draw.rect(Surface, RED, (card_x, card_y, mv2.get_width(), mv2.get_height()), rect_width)
+                    card_y += mv2.get_height() + inner_gap
+            if None != player_data[turn_id].selected_card_value:
+                draw_button(Surface, (card_x, card_y), "Finish", BLACK)
+                # draw player0 show card
+                draw_show_card(turn_id)
+        elif 5 == player_data[turn_id].mode:
             for i in range(0, total_card_num):
                 if 2 == player_data[turn_id].marked_card[i]:
                     Surface.blit(card_id_to_image(i), (card_x, card_y))
@@ -1395,7 +1407,7 @@ def step_done(t_id, b_id):
         player_data[t_id].dir[draw_player_thread.is_night] = 1
     
 def end_turn():
-    global player_data, start_p
+    global player_data, start_p, turn_id
     
     for i in range(0, player_num):
         player_data[i].mode = 0
@@ -1404,6 +1416,7 @@ def end_turn():
         pick_up_one_card(i)
     
     start_p = (start_p+1)%player_num
+    turn_id = start_p
                         
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
