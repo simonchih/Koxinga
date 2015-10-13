@@ -1407,7 +1407,7 @@ def step_done(t_id, b_id):
         player_data[t_id].dir[draw_player_thread.is_night] = 1
     
 def end_turn():
-    global player_data, start_p, turn_id
+    global player_data, start_p, turn_id, draw_player_thread
     
     for i in range(0, player_num):
         player_data[i].mode = 0
@@ -1415,9 +1415,30 @@ def end_turn():
         player_data[i].selected_card_value = None
         pick_up_one_card(i)
     
+    draw_player_thread.is_night = 0
     start_p = (start_p+1)%player_num
     turn_id = start_p
-                        
+
+def handle_card(mouse_loc):
+    global player_data, turn_id
+    (mouseX, mouseY) = mouse_loc
+    card_x =  margin+big_block+inner_gap
+    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
+    for i in range(0, total_card_num):
+        if 2 == player_data[turn_id].marked_card[i]:        
+            if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
+                if None == player_data[turn_id].selected_card_value:
+                    player_data[turn_id].selected_card_value = i
+                    player_data[turn_id].marked_card[i] = 1
+                else:
+                    player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
+                    player_data[turn_id].selected_card_value = i
+                    player_data[turn_id].marked_card[i] = 1
+            card_y += mv2.get_height() + inner_gap
+    if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
+        player_data[turn_id].mode = 6
+        turn_id = (turn_id + 1)%player_num
+    
 def main():
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
     
@@ -1467,42 +1488,12 @@ def main():
                 if 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
-                    card_x =  margin+big_block+inner_gap
-                    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
                     if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
                         (dice_value1, dice_value2) = (dice_value2, dice_value1)
-                    for i in range(0, total_card_num):
-                        if 2 == player_data[turn_id].marked_card[i]:        
-                            if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
-                                if None == player_data[turn_id].selected_card_value:
-                                    player_data[turn_id].selected_card_value = i
-                                    player_data[turn_id].marked_card[i] = 1
-                                else:
-                                    player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
-                                    player_data[turn_id].selected_card_value = i
-                                    player_data[turn_id].marked_card[i] = 1
-                            card_y += mv2.get_height() + inner_gap
-                    if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
-                        player_data[turn_id].mode = 6
-                        turn_id = (turn_id + 1)%player_num
+                    handle_card((mouseX, mouseY))
                 if 5 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
-                    card_x =  margin+big_block+inner_gap
-                    card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
-                    for i in range(0, total_card_num):
-                        if 2 == player_data[turn_id].marked_card[i]:        
-                            if card_x <= mouseX <= card_x + mv2.get_width() and card_y <= mouseY <= card_y + mv2.get_height():
-                                if None == player_data[turn_id].selected_card_value:
-                                    player_data[turn_id].selected_card_value = i
-                                    player_data[turn_id].marked_card[i] = 1
-                                else:
-                                    player_data[turn_id].marked_card[player_data[turn_id].selected_card_value] = 2
-                                    player_data[turn_id].selected_card_value = i
-                                    player_data[turn_id].marked_card[i] = 1
-                            card_y += mv2.get_height() + inner_gap
-                    if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
-                        player_data[turn_id].mode = 6
-                        turn_id = (turn_id + 1)%player_num
+                    handle_card((mouseX, mouseY))
                 if 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
@@ -1556,9 +1547,6 @@ def main():
                     turn_id = start_p
                     draw_player_thread.is_night = 1
                 else: # draw_player_thread.is_night == 1
-                    start_p = (turn_id + 1)%player_num
-                    turn_id = start_p
-                    draw_player_thread.is_night = 0
                     end_turn()
             else:
                 turn_id = (turn_id + 1)%player_num
@@ -1569,9 +1557,6 @@ def main():
                     turn_id = start_p
                     draw_player_thread.is_night = 1
                 else: # draw_player_thread.is_night == 1
-                    start_p = (turn_id + 1)%player_num
-                    turn_id = start_p
-                    draw_player_thread.is_night = 0
                     end_turn()
             else:
                 turn_id = (turn_id + 1)%player_num
