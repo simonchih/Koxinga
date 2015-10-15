@@ -14,19 +14,18 @@ treasure_image = 'Image/treasure_30x30.gif'
 small_own_treasure_image = 'Image/treasure_25x25.gif'
 own_treasure_image = 'Image/treasure_50x50.gif'
 button1_image = 'Image/button1_100x50.gif'
+start_image = 'Image/start_50x50.gif'
+turn_image = 'Image/turn_50x50.gif'
 
 # resource
 food_image = 'Image/food_25x25.jpg'
 gold_image = 'Image/gold_25x25.jpg'
 cannon_image = 'Image/cannon_25x25.gif'
 
-
 # card
 move2 = 'Image/move_move_100x50.jpg'
 move_cannon = 'Image/move_cannon_100x50.jpg'
 cannon_move = 'Image/cannon_move_100x50.jpg'
-back_move = 'Image/back_move_100x50.jpg'
-move_back = 'Image/move_back_100x50.jpg'
 n1_food = 'Image/-1_food_100x50.jpg'
 n2_gold = 'Image/-2_gold_100x50.jpg'
 food_n2 = 'Image/food_-2_100x50.jpg'
@@ -34,6 +33,8 @@ gold_n1 = 'Image/gold_-1_100x50.jpg'
 food_gold = 'Image/food_gold_100x50.jpg'
 gold_food = 'Image/gold_food_100x50.jpg'
 cannon_cannon = 'Image/cannon_cannon_100x50.jpg'
+back_move = 'Image/back_move_100x50.jpg'
+move_back = 'Image/move_back_100x50.jpg'
 back_card0 = 'Image/back0.gif'
 back_card1 = 'Image/back1.gif'
 back_card2 = 'Image/back2.gif'
@@ -76,6 +77,8 @@ treasure = pygame.image.load(treasure_image).convert()
 treasure_s = pygame.image.load(small_own_treasure_image).convert()
 treasure_b = pygame.image.load(own_treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
+start_player = pygame.image.load(start_image).convert()
+turn = pygame.image.load(turn_image).convert()
 
 # resource
 food = pygame.image.load(food_image).convert()
@@ -86,8 +89,6 @@ cannon = pygame.image.load(cannon_image).convert()
 mv2       = pygame.image.load(move2).convert()
 mv_cannon = pygame.image.load(move_cannon).convert()
 cannon_mv = pygame.image.load(cannon_move).convert()
-back_mv   = pygame.image.load(back_move).convert()
-mv_back   = pygame.image.load(move_back).convert()
 m1_food   = pygame.image.load(n1_food).convert()
 m2_gold   = pygame.image.load(n2_gold).convert()
 food_m2   = pygame.image.load(food_n2).convert()
@@ -95,6 +96,8 @@ gold_m1   = pygame.image.load(gold_n1).convert()
 fd_gd     = pygame.image.load(food_gold).convert()
 gd_fd     = pygame.image.load(gold_food).convert()
 ca_ca     = pygame.image.load(cannon_cannon).convert()
+back_mv   = pygame.image.load(back_move).convert()
+mv_back   = pygame.image.load(move_back).convert()
 back0     = pygame.image.load(back_card0).convert()
 back1     = pygame.image.load(back_card1).convert()
 back2     = pygame.image.load(back_card2).convert()
@@ -179,23 +182,23 @@ def card_id_to_image(cid):
     elif 2 == cid:
         return cannon_mv
     elif 3 == cid:
-        return back_mv
-    elif 4 == cid:
-        return mv_back
-    elif 5 == cid:
         return m1_food
-    elif 6 == cid:
+    elif 4 == cid:
         return m2_gold
-    elif 7 == cid:
+    elif 5 == cid:
         return food_m2
-    elif 8 == cid:
+    elif 6 == cid:
         return gold_m1
-    elif 9 == cid:
+    elif 7 == cid:
         return fd_gd
-    elif 10 == cid:
+    elif 8 == cid:
         return gd_fd
-    elif 11 == cid:
+    elif 9 == cid:
         return ca_ca
+    #elif 10 == cid:
+    #    return back_mv
+    #elif 11 == cid:
+    #    return mv_back
       
 # return 0 based
 def pick_up_one_card(player_id):
@@ -872,14 +875,89 @@ def draw_selected_card(t_id, start, mode=6):
     
     for i in range(0, player_num):
         s = (start+i)%player_num
-        if 1 == back and 5 != mode:
+        if 1 == back and 5 != mode and 0 == draw_player_thread.is_night:
             # draw back card
             draw_show_card(s, 0)
             continue
         draw_show_card(s, showc)
         if s == t_id:
             back = 1
+
+def draw_all():            
+    screen.blit(background, (0,0))
+    draw_dock()
+    draw_map(screen)
+    draw_inner_item(screen)        
+    draw_player_thread.run()
+    draw_start_and_turn(start_p, turn_id)
+    if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
+        draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+    pygame.display.update()
     
+def next_turn():
+    global turn_id, start_p, draw_player_thread
+    
+    draw_all()
+    time.sleep(2)
+    
+    if (turn_id + 1)%player_num == start_p:
+        if 0 == draw_player_thread.is_night:
+            turn_id = start_p
+            draw_player_thread.is_night = 1
+        else: # draw_player_thread.is_night == 1
+            end_turn()
+    else:
+        turn_id = (turn_id + 1)%player_num
+    
+def draw_start_and_turn(sp_id, t_id):
+    s_image = start_player
+    t_image = turn
+    gap = 20
+    show_card_image = turn_id_to_image(t_id)
+        
+    if 1 == t_id or 4 == t_id:
+        show_card_image = pygame.transform.rotate(show_card_image, 270)
+    
+    if 0 == t_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+        (x, y) = (start_w-gap-t_image.get_width(), start_h)
+    elif 1 == t_id:
+        (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
+        (x, y) = (start_w, start_h-gap-t_image.get_height())
+    elif 2 == t_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+        (x, y) = (start_w-gap-t_image.get_width(), start_h)
+    elif 3 == t_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+        (x, y) = (start_w-gap-t_image.get_width(), start_h)
+    elif 4 == t_id:
+        (start_w, start_h) = (screen_width - s_image.get_width(), player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
+        (x, y) = (start_w, start_h-gap-t_image.get_height())
+    elif 5 == t_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+        (x, y) = (start_w-gap-t_image.get_width(), start_h)
+    
+    show_card_image2 = turn_id_to_image(sp_id)
+    
+    if 1 == sp_id or 4 == sp_id:
+        show_card_image2 = pygame.transform.rotate(show_card_image2, 270)
+    
+    if 0 == sp_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+    elif 1 == sp_id:
+        (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h-gap-show_card_image2.get_height()-gap-s_image.get_height())
+    elif 2 == sp_id:
+        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+    elif 3 == sp_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+    elif 4 == sp_id:
+        (start_w, start_h) = (screen_width - s_image.get_width(), player_2_5_block_start_h-gap-show_card_image2.get_height()-gap-s_image.get_height())
+    elif 5 == sp_id:
+        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+    
+    screen.blit(s_image, (start_w, start_h))
+    screen.blit(t_image, (x, y))
+            
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
     
@@ -1040,31 +1118,31 @@ def card_action(night, s_card):
             #get cannon
             return 3, dice_val, None
         elif 3 == sid:
-            return 0, dice_val, 0
-        elif 4 == sid:
-            return 0, dice_val, 1
-        elif 5 == sid:
             return 0, dice_val-1, 1
-        elif 6 == sid:
+        elif 4 == sid:
             if dice_val - 2 >= 0:
                 return 0, dice_val-2, 1
             elif dice_val - 2 < 0:
                 return 0, abs(dice_val-2), 0
+        elif 5 == sid:
+            #get food
+            return  1, dice_val, None
+        elif 6 == sid:
+            #get gold
+            return  2, dice_val, None
         elif 7 == sid:
             #get food
             return  1, dice_val, None
         elif 8 == sid:
             #get gold
-            return  2, dice_val, None
-        elif 9 == sid:
-            #get food
-            return  1, dice_val, None
-        elif 10 == sid:
-            #get gold
             return 2, dice_val, None
-        elif 11 == sid:
+        elif 9 == sid:
             #get cannon
             return 3, dice_val, None
+        #elif 10 == sid:
+        #    return 0, dice_val, 0
+        #elif 11 == sid:
+        #    return 0, dice_val, 1
     else: # 1 == night
         dice_val = int(dice_value2/4)+1
         
@@ -1076,35 +1154,35 @@ def card_action(night, s_card):
         elif 2 == sid:
             return 0, dice_val, 1
         elif 3 == sid:
-            return 0, dice_val, 1
-        elif 4 == sid:
-            return 0, dice_val, 0
-        elif 5 == sid:
             #get food
             return  1, dice_val, None
-        elif 6 == sid:
+        elif 4 == sid:
             #get gold
             return  2, dice_val, None
-        elif 7 == sid:
+        elif 5 == sid:
             if dice_val - 2 >= 0:
                 return 0, dice_val - 2, 1
             elif dice_val - 2 < 0:
                 return 0, abs(dice_val - 2), 0 
-        elif 8 == sid:
+        elif 6 == sid:
             return 0, dice_val - 1, 1
-        elif 9 == sid:
+        elif 7 == sid:
             #get gold
             return  2, dice_val, None
-        elif 10 == sid:
+        elif 8 == sid:
             #get food
             return 1, dice_val, None
-        elif 11 == sid:
+        elif 9 == sid:
             #get cannon
             return 3, dice_val, None
+        #elif 10 == sid:
+        #    return 0, dice_val, 1
+        #elif 11 == sid:
+        #    return 0, dice_val, 0
             
 def resource_ai():
-    dir1 = 0
-    dir2 = 0
+    dir1 = 2
+    dir2 = 2
     sdir1 = 1
     sdir2 = 1
     resource_max = 0
@@ -1216,8 +1294,8 @@ def resource_ai():
     return s_card, sdir1, sdir2, resource_max
     
 def forward_ai():
-    dir1 = 0
-    dir2 = 0
+    dir1 = 2
+    dir2 = 2
     sdir1 = 1
     sdir2 = 1
     step_max = 0
@@ -1273,6 +1351,7 @@ def forward_ai():
                     dir1 = 2
                 else:
                     dir1 = 2
+                    print("dir1=%d"%dir1)
             
             if 1 == type2:
                 r_sum += dv2
@@ -1296,13 +1375,17 @@ def forward_ai():
                 elif food1 < 0 or gold1 < 0:
                     dir2 = 2
                 else:
-                    dir2 = 2   
+                    dir2 = 2
+                    print("dir2=%d"%dir2)
             
             if dv1 + dv2 > step_max:
                 step_max = dv1 + dv2
                 s_card = c
                 sdir1 = dir1
                 sdir2 = dir2
+                print("sdir1=%d"%sdir1)
+                print("sdir2=%d"%sdir2)
+                print("step_max=%d"%step_max)
         r_sum = 0
     return s_card, sdir1, sdir2, step_max
     
@@ -1456,14 +1539,7 @@ def main():
     #pd[0].forward = 1
     # end test p
     while True:        
-        screen.blit(background, (0,0))
-        draw_dock()
-        draw_map(screen)
-        draw_inner_item(screen)        
-        draw_player_thread.run()
-        if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
-            draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
-        pygame.display.update()
+        draw_all()
         
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
@@ -1542,24 +1618,10 @@ def main():
             print("step = %d,done, fwd=%d"%(player_data[turn_id].step, player_data[turn_id].forward))
             
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:    
-            if (turn_id + 1)%player_num == start_p:
-                if 0 == draw_player_thread.is_night:
-                    turn_id = start_p
-                    draw_player_thread.is_night = 1
-                else: # draw_player_thread.is_night == 1
-                    end_turn()
-            else:
-                turn_id = (turn_id + 1)%player_num
+            next_turn()
             print("AI turn_id=%d"%turn_id)
         elif 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
-            if (turn_id + 1)%player_num == start_p:
-                if 0 == draw_player_thread.is_night:
-                    turn_id = start_p
-                    draw_player_thread.is_night = 1
-                else: # draw_player_thread.is_night == 1
-                    end_turn()
-            else:
-                turn_id = (turn_id + 1)%player_num
+            next_turn()
             print("human turn_id=%d"%turn_id)
             
     pygame.quit()

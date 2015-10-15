@@ -1,4 +1,4 @@
-total_card_num = 12
+total_card_num = 10
 dock_num = 5
 treasure_num = 10
 
