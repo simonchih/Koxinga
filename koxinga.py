@@ -861,7 +861,7 @@ def draw_show_card(p_id, showc=1):
     screen.blit(show_card_image, (start_w, start_h))
 
 def draw_selected_card(t_id, start, mode=6):
-    global player_num
+    global player_num, player_data
     
     back = 0
     
@@ -873,15 +873,25 @@ def draw_selected_card(t_id, start, mode=6):
     if 5 == mode:
         showc = 0
     
-    for i in range(0, player_num):
-        s = (start+i)%player_num
-        if 1 == back and 5 != mode and 0 == draw_player_thread.is_night:
+    if 5 == mode:
+        for i in range(0, player_num):
+            s = (start+i)%player_num
+            if s == t_id and 0 == player_data[s].IsAI:
+                break
             # draw back card
-            draw_show_card(s, 0)
-            continue
-        draw_show_card(s, showc)
-        if s == t_id:
-            back = 1
+            draw_show_card(s, showc)
+            if s == t_id:
+                break
+    else:
+        for i in range(0, player_num):
+            s = (start+i)%player_num
+            if 1 == back and 0 == draw_player_thread.is_night:
+                # draw back card
+                draw_show_card(s, 0)
+                continue
+            draw_show_card(s, showc)
+            if s == t_id:
+                back = 1
 
 def draw_all():            
     screen.blit(background, (0,0))
@@ -890,7 +900,7 @@ def draw_all():
     draw_inner_item(screen)        
     draw_player_thread.run()
     draw_start_and_turn(start_p, turn_id)
-    if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
+    if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode:
         draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
     pygame.display.update()
     
