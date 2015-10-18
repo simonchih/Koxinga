@@ -873,7 +873,15 @@ def draw_selected_card(t_id, start, mode=6):
     if 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
         showc = 0
     
-    if 1 == draw_player_thread.is_night:
+    # human mode 3, 4, 5
+    if 0 == player_data[t_id].IsAI and player_data[t_id].mode in [3, 4, 5]:
+        for i in range(0, player_num):
+            s = (start+i)%player_num
+            if s == t_id:
+                break
+            #show card
+            draw_show_card(s, 0)
+    elif 1 == draw_player_thread.is_night:
         for i in range(0, player_num):
             s = (start+i)%player_num
             #show card
@@ -903,8 +911,7 @@ def draw_all():
     draw_inner_item(screen)        
     draw_player_thread.run()
     draw_start_and_turn(start_p, turn_id)
-    if 3 != player_data[turn_id].mode and 4 != player_data[turn_id].mode and 5 != player_data[turn_id].mode:
-        draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+    draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
     pygame.display.update()
     
 def next_turn():
