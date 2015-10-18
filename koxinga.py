@@ -1517,8 +1517,7 @@ def step_done(t_id, b_id):
         player_data[t_id].dir[draw_player_thread.is_night] = 1
     else:
         player_data[t_id].mode = 6
-    
-    next_turn()
+        next_turn()
     
 def end_turn():
     global player_data, start_p, turn_id, draw_player_thread
@@ -1632,21 +1631,22 @@ def main():
             next_turn()
         
         #if 6 == player_data[turn_id].mode:
-        if 1 == all_player_mode6():
+        if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
                 player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
             elif 1 == player_data[turn_id].handle_done[draw_player_thread.is_night] and 0 == player_data[turn_id].step:
-                step_done(turn_id, player_data[turn_id].b_id)
+            #    step_done(turn_id, player_data[turn_id].b_id)
+                print("turn=%d, mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward)) 
+                next_turn()
             
             if player_data[turn_id].step > 0:
                 player_data[turn_id].mode = 1
-            print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))
-        
-        if 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
+            print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))        
+        elif 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
             step_done(turn_id, player_data[turn_id].b_id)
-            print("step = %d,done, fwd=%d"%(player_data[turn_id].step, player_data[turn_id].forward))
+            print("t_id=%d, step = %d,done, fwd=%d"%(turn_id, player_data[turn_id].step, player_data[turn_id].forward))
             
         #if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:    
         #    print("AI turn_id=%d"%turn_id)

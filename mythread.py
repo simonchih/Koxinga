@@ -328,9 +328,9 @@ class mythread (threading.Thread):
                         else:
                             self.player_data[p].b_id = self.player_data[p].next_id
                             self.player_data[p].step -= 1
-                    if 0 == self.player_data[p].step:# 1 == self.player_data[p].mode
-                       self.player_data[p].mode = 6
-                    elif 1 == self.player_data[p].IsAI:
+                    #if 0 == self.player_data[p].step:# 1 == self.player_data[p].mode
+                    #   self.player_data[p].mode = 6
+                    if 1 == self.player_data[p].IsAI:
                         # move 1 step
                         if 1 == self.player_data[p].forward:
                             outer, inner = go_dest_id(self.player_data[p].b_id, 1)
