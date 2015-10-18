@@ -1505,11 +1505,15 @@ def step_done(t_id, b_id):
     if 1 == type:
         get_treasure(t_id, b_id)
     elif 2 == type:
+        #spend gold
         fail = spend_dock_resource(2, value)
     elif 3 == type:
+        #spend food
         fail = spend_dock_resource(1, value)
     #else: # 0 == type
-        
+    
+    print("type=%d, fail=%d"%(type, fail))
+    
     if 1 == fail:
         player_data[t_id].mode = 1
         player_data[t_id].step = 1
@@ -1517,6 +1521,7 @@ def step_done(t_id, b_id):
         player_data[t_id].dir[draw_player_thread.is_night] = 1
     else:
         player_data[t_id].mode = 6
+        player_data[t_id].forward = 1
         next_turn()
     
 def end_turn():
