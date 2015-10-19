@@ -818,7 +818,7 @@ def generate_dock():
         player_data[i].dtype[0] = 1
         player_data[i].dvalue[0] = 3
         player_data[i].dtype[1] = 2
-        player_data[i].dvalue[1] = 3    
+        player_data[i].dvalue[1] = 3
 
 def draw_button(Surface, loc, str, color, size = 14, image = button1):
     (mouseX, mouseY) = pygame.mouse.get_pos()
@@ -1213,10 +1213,10 @@ def resource_ai():
     type1, dv1, fwd1 = 0, 0, 0
     type2, dv2, fwd2 = 0, 0, 0
     for i in range(0, dock_num):
-        if 1 == player_data[turn_id].dtype:
-            org_food += player_data[turn_id].dvalue
-        elif 2 == player_data[turn_id].dtype:
-            org_gold += player_data[turn_id].dvalue
+        if 1 == player_data[turn_id].dtype[i]:
+            org_food += player_data[turn_id].dvalue[i]
+        elif 2 == player_data[turn_id].dtype[i]:
+            org_gold += player_data[turn_id].dvalue[i]
     
     for c in range(0, total_card_num):
         if 2 == player_data[turn_id].marked_card[c]:
@@ -1326,10 +1326,10 @@ def forward_ai():
     type1, dv1, fwd1 = 0, 0, 0
     type2, dv2, fwd2 = 0, 0, 0
     for i in range(0, dock_num):
-        if 1 == player_data[turn_id].dtype:
-            org_food += player_data[turn_id].dvalue
-        elif 2 == player_data[turn_id].dtype:
-            org_gold += player_data[turn_id].dvalue
+        if 1 == player_data[turn_id].dtype[i]:
+            org_food += player_data[turn_id].dvalue[i]
+        elif 2 == player_data[turn_id].dtype[i]:
+            org_gold += player_data[turn_id].dvalue[i]
     
     for c in range(0, total_card_num):
         if 2 == player_data[turn_id].marked_card[c]:
@@ -1348,35 +1348,44 @@ def forward_ai():
             if 1 == type1:
                 r_sum += dv1
                 total_food += dv1
+                dv1 = 0
             elif 2 == type1:
                 r_sum += dv1
                 total_gold += dv1
-            #elif 3 == type1:
-            #    r_sum += dv1
+                dv1 = 0
+            elif 3 == type1:
+                #r_sum += dv1
+                dv1 = 0
             else:
                 if 0 == fwd1:
                     dv1 = (-1) * dv1
-                outer, inner = go_dest_id(player_data[turn_id].b_id, dv1)
+                outer, inner = go_dest_id(dest, dv1)
                 res1, food1, gold1 = resource_dest(outer, r_sum, total_food, total_gold)
                 res2, food2, gold2 = resource_dest(inner, r_sum, total_food, total_gold)
                 if (food1 < 0 or gold1 < 0) and (food2 < 0 or gold2 < 0):
                     # fail
                     continue
                 elif food2 < 0 or gold2 < 0:
+                    dest = outer
                     dir1 = 1
                 elif food1 < 0 or gold1 < 0:
+                    dest = inner
                     dir1 = 2
                 else:
+                    dest = inner
                     dir1 = 2
             
             if 1 == type2:
                 r_sum += dv2
                 total_food += dv2
+                dv2 = 0
             elif 2 == type2:
                 r_sum += dv2
                 total_gold += dv2
-            #elif 3 == type2:
+                dv2 = 0
+            elif 3 == type2:
             #    r_sum += dv2
+                dv2 = 0
             else:
                 if 0 == fwd2:
                     dv2 = (-1) * dv2
@@ -1398,9 +1407,6 @@ def forward_ai():
                 s_card = c
                 sdir1 = dir1
                 sdir2 = dir2
-                #print("sdir1=%d"%sdir1)
-                #print("sdir2=%d"%sdir2)
-                #print("step_max=%d"%step_max)
         r_sum = 0
     return s_card, sdir1, sdir2, step_max
     
