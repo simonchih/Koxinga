@@ -340,6 +340,7 @@ def five_block_item_h(start_w, start_h, p_id):
             screen.blit(b_image, (x+item_gap, y+item_gap))
             screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
 
+# num_of_treasure_own(t_id) won't display 0:food and 1:gold
 def num_of_treasure_own(t_id):
     global treasure_num
     sum = 0
@@ -485,13 +486,7 @@ def draw_map(Surface):
         map_value = main_map[i].value
         map_loc = main_map[i].loc
         if map_type != 0:
-            draw_item(Surface, map_type, map_value, map_loc)
-            
-    # Test pieces only
-    #for p in range(0, player_num):
-    #    for i in range(0, map_block_num):
-    #        Surface.blit(player_id_to_image(p), player_data[p].loc[i]) 
-    # End test pieces        
+            draw_item(Surface, map_type, map_value, map_loc)      
 
 def write(msg="pygame is cool", color= (0,0,0), size = 14):
     myfont = pygame.font.Font("wqy-zenhei.ttf", size)
@@ -870,27 +865,24 @@ def draw_selected_card(t_id, start, mode=6):
     
     showc = 1
     
-    if 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
-        showc = 0
-    
     # human mode 3, 4, 5
     if 0 == player_data[t_id].IsAI and player_data[t_id].mode in [3, 4, 5]:
         for i in range(0, player_num):
             s = (start+i)%player_num
             if s == t_id:
                 break
-            #show card
+            #show back card
             draw_show_card(s, 0)
     elif 1 == draw_player_thread.is_night:
         for i in range(0, player_num):
             s = (start+i)%player_num
             #show card
-            draw_show_card(s, 1)
+            draw_show_card(s, showc)
     elif 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
         for i in range(0, player_num):
             s = (start+i)%player_num
             # draw back card
-            draw_show_card(s, showc)
+            draw_show_card(s, 0)
             if s == t_id:
                 break
     elif 1 == player_data[t_id].handle_done[0]:
@@ -985,10 +977,6 @@ def draw_inner_item(Surface):
     global dice_value1, dice_value2, turn_id, inner_gap
     
     rect_width = 2
-    #TEST only
-    #dice_value1 = 1
-    #dice_value2 = 2
-    #END TEST
     
     index1 = index_to_image_dice(dice_value1)
     index2 = index_to_image_dice(dice_value2)
@@ -1015,7 +1003,7 @@ def draw_inner_item(Surface):
                     card_y += mv2.get_height() + inner_gap
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
-                # draw player0 show card
+                # draw player0(human) show card
                 draw_show_card(turn_id)
         elif 5 == player_data[turn_id].mode:
             for i in range(0, total_card_num):
@@ -1027,7 +1015,7 @@ def draw_inner_item(Surface):
                     card_y += mv2.get_height() + inner_gap
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
-                # draw player0 show card
+                # draw player0(human) show card
                 draw_show_card(turn_id)
 
 # return 0 for OK, and 1 is NOT enough(fail)                
@@ -1380,7 +1368,6 @@ def forward_ai():
                     dir1 = 2
                 else:
                     dir1 = 2
-                    print("dir1=%d"%dir1)
             
             if 1 == type2:
                 r_sum += dv2
@@ -1405,7 +1392,6 @@ def forward_ai():
                     dir2 = 2
                 else:
                     dir2 = 2
-                    print("dir2=%d"%dir2)
             
             if dv1 + dv2 > step_max:
                 step_max = dv1 + dv2
@@ -1512,7 +1498,7 @@ def step_done(t_id, b_id):
         fail = spend_dock_resource(1, value)
     #else: # 0 == type
     
-    print("type=%d, fail=%d"%(type, fail))
+    #print("type=%d, fail=%d"%(type, fail))
     
     if 1 == fail:
         player_data[t_id].mode = 1
@@ -1556,6 +1542,7 @@ def handle_card(mouse_loc):
     if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
         player_data[turn_id].mode = 6
         next_turn()
+        
 #1 for all player mode are 6, 0 for NOT
 def all_player_mode6():
     for i in range(0, player_num):
@@ -1574,10 +1561,7 @@ def main():
     generate_player_card()
     draw_player_thread.start()
     # test p backward
-    #pd = draw_player_thread.player_data
-    #pd[0].step = 6
-    #pd[0].mode = 1
-    #pd[0].forward = 1
+    #player_data[0].IsAI = 1
     # end test p
     while True:        
         draw_all()
@@ -1635,30 +1619,18 @@ def main():
             player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai()
             next_turn()
         
-        #if 6 == player_data[turn_id].mode:
         if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
                 player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
             elif 1 == player_data[turn_id].handle_done[draw_player_thread.is_night] and 0 == player_data[turn_id].step:
-            #    step_done(turn_id, player_data[turn_id].b_id)
-                print("turn=%d, mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward)) 
                 next_turn()
             
             if player_data[turn_id].step > 0:
-                player_data[turn_id].mode = 1
-            print("[%d].mode=%d, step=%d, fwd=%d"%(turn_id, player_data[turn_id].mode, player_data[turn_id].step, player_data[turn_id].forward))        
+                player_data[turn_id].mode = 1       
         elif 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
             # do spend_dock_resource or get_treasure 
             step_done(turn_id, player_data[turn_id].b_id)
-            print("t_id=%d, step = %d,done, fwd=%d"%(turn_id, player_data[turn_id].step, player_data[turn_id].forward))
-            
-        #if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].step:    
-        #    print("AI turn_id=%d"%turn_id)
-        #    next_turn()
-        #elif 0 == player_data[turn_id].IsAI and 6 == player_data[turn_id].mode:
-        #    print("human turn_id=%d"%turn_id)
-        #    next_turn()
             
     pygame.quit()
     quit()
