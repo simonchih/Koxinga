@@ -905,6 +905,16 @@ def draw_all():
     draw_start_and_turn(start_p, turn_id)
     draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
     pygame.display.update()
+
+#return 1:there is at least one goal game, 0:No one goal game
+def any_goal_game():
+    global player_data
+    
+    for i in range(0, player_num):
+        if 1 == player_data[i].goal_game:
+            return 1
+    
+    return 0
     
 def next_turn():
     global turn_id, start_p, draw_player_thread, player_data
@@ -916,13 +926,18 @@ def next_turn():
         if 0 == player_data[turn_id].handle_done[0]:
             turn_id = (turn_id + 1)%player_num
         else:
-            if 0 == draw_player_thread.is_night:
+            if 1 == any_goal_game():
+                calc_score()
+            elif 0 == draw_player_thread.is_night:
                 turn_id = start_p
                 draw_player_thread.is_night = 1
             else: # draw_player_thread.is_night == 1
                 end_turn()
     else:
         turn_id = (turn_id + 1)%player_num
+    
+def calc_score():
+    pass
     
 def draw_start_and_turn(sp_id, t_id):
     s_image = start_player
@@ -1485,6 +1500,13 @@ def get_treasure(t_id, b_id):
         
         treasure_card[index] = 1
         player_data[t_id].treasure[index] = 1
+        
+        if 0 == index: #food
+            #type 1, food
+            get_dock_resource(1, 7)
+        elif 1 == index: #gold
+            #type 2, gold
+            get_dock_resource(2, 7)
     main_map[b_id].type = 0
     
 def step_done(t_id, b_id):
