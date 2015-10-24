@@ -1454,6 +1454,7 @@ def ai():
     if start_p == turn_id and 0 == player_data[turn_id].mode:
         dice_value1 = random.randint(0, 23)
         dice_value2 = random.randint(0, 23)
+        draw_inner_item(screen)
         pygame.display.update()
         time.sleep(1)
         r = random.randint(0, 2)
@@ -1486,6 +1487,7 @@ def ai():
         player_data[turn_id].selected_card_value = s_card
         player_data[turn_id].marked_card[s_card] = 1
         player_data[turn_id].mode = 6
+        draw_inner_item(screen)
         pygame.display.update()
     elif 0 == player_data[turn_id].mode:
         r = random.randint(0, 2)
