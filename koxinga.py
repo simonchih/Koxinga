@@ -67,6 +67,8 @@ dice_6_3 = 'Image/die-6+3.gif'
 dice_6_4 = 'Image/die-6+4.gif'
 dice_6_5 = 'Image/die-6+5.gif'
 
+treasure_alpha = 130
+
 background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
 block2 = pygame.image.load(block2_image).convert()
@@ -79,6 +81,7 @@ treasure_b = pygame.image.load(own_treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
 start_player = pygame.image.load(start_image).convert()
 turn = pygame.image.load(turn_image).convert()
+treasure_b.set_alpha(treasure_alpha)
 
 # resource
 food = pygame.image.load(food_image).convert()
@@ -135,7 +138,7 @@ draw_player_thread = mythread(1, screen, 0)
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
-GREEN1 = (15, 96, 25)
+#GREEN1 = (15, 96, 25)
 
 turn_id = 0
 start_p = 0
@@ -989,7 +992,7 @@ def draw_start_and_turn(sp_id, t_id):
     screen.blit(t_image, (x, y))
             
 def draw_inner_item(Surface):
-    global dice_value1, dice_value2, turn_id, inner_gap
+    global dice_value1, dice_value2, turn_id, inner_gap, treasure_num
     
     rect_width = 2
     
@@ -998,6 +1001,9 @@ def draw_inner_item(Surface):
     
     card_x =  margin+big_block+inner_gap
     card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
+    
+    treasure_x = card_x + 2*(di_1_2.get_width()+inner_gap)
+    treasure_y = margin+big_block+inner_gap
     
     if None != index1:
         Surface.blit(index1, (margin+big_block+inner_gap, margin+big_block+inner_gap))
@@ -1032,7 +1038,22 @@ def draw_inner_item(Surface):
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
                 # draw player0(human) show card
                 draw_show_card(turn_id)
-
+                
+    # draw player0(human) treasure
+    sum = 0
+    (x, y) = (treasure_x, treasure_y)
+    for point in range(2, treasure_num):
+        if 0 == player_data[0].treasure[point]:
+            continue
+        Surface.blit(treasure_b, (x, y))
+        Surface.blit(write(str(point)+"p", RED, 42), (x, y))
+        sum += 1
+        if 4 == sum:
+            x = treasure_x
+            y = treasure_y + treasure_b.get_height() + inner_gap
+        else:
+            x += treasure_b.get_width() + inner_gap
+    
 # return 0 for OK, and 1 is NOT enough(fail)                
 def spend_dock_resource(type, value):
     global player_data
@@ -1590,6 +1611,7 @@ def main():
     draw_player_thread.start()
     # test p backward
     #player_data[0].IsAI = 1
+    #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
     # end test p
     while True:        
         draw_all()
