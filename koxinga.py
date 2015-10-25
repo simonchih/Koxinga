@@ -1536,6 +1536,9 @@ def get_treasure(t_id, b_id):
 def do_fight(t_id, b_id):
     global player_num, player_data
     
+    if 0 == b_id:
+        return 0
+    
     dof = 0
     
     for i in range(0, player_num):
