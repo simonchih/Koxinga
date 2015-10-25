@@ -1531,13 +1531,31 @@ def get_treasure(t_id, b_id):
             #type 2, gold
             get_dock_resource(2, 7)
     main_map[b_id].type = 0
+
+# return 0: NOT fight, 1: fight
+def do_fight(t_id, b_id):
+    global player_num, player_data
+    
+    dof = 0
+    
+    for i in range(0, player_num):
+        if i == turn_id:
+            continue
+        if b_id == player_data[i].b_id:
+            player_data[i].mode = 7
+            dof = 1
+    
+    if 1 == dof:
+        player_data[t_id].mode = 7
+    
+    return dof
     
 def step_done(t_id, b_id):
     global player_data, main_map, draw_player_thread
     #type:0 = nothing,1 = treasure, 2 = gold coin, 3 = food
     type  = main_map[b_id].type
     value = main_map[b_id].value
-    fail = 0
+    fail = 0       
     
     if 1 == type:
         get_treasure(t_id, b_id)
@@ -1602,7 +1620,7 @@ def all_player_mode6():
     return 1
         
 def main():
-    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p
+    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num
     
     dir1 = 1
     dir2 = 1
@@ -1681,7 +1699,19 @@ def main():
             if player_data[turn_id].step > 0:
                 player_data[turn_id].mode = 1       
         elif 1 == player_data[turn_id].mode and 0 == player_data[turn_id].step:
-            # do spend_dock_resource or get_treasure 
+            # if NOT fight
+            if 0 == do_fight(turn_id, player_data[turn_id].b_id):
+                # do spend_dock_resource or get_treasure 
+                step_done(turn_id, player_data[turn_id].b_id)
+        elif 7 == player_data[turn_id].mode and 1 == player_data[turn_id].IsAI:
+            pass
+        elif 9 == player_data[turn_id].mode:
+            # other player back to mode 6
+            for i in range(0, player_num):
+                if i == turn_id:
+                    continue
+                if player_data[turn_id].b_id == player_data[i].b_id:
+                    player_data[i].mode = 6
             step_done(turn_id, player_data[turn_id].b_id)
             
     pygame.quit()
