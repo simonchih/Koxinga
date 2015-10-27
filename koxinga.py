@@ -1080,6 +1080,8 @@ def draw_inner_item(Surface):
             #NOT fight
             if player_data[f].b_id != player_data[turn_id].b_id:
                 continue
+            if f == fight_id:
+                break
             if fight_roll < 11:
                 Surface.blit(roll_fight, (r_x, r_y))
                 fight_message = "      %2d                %2d"%(f+1, fight_roll)
@@ -1088,8 +1090,6 @@ def draw_inner_item(Surface):
                 Surface.blit(fight_win, (r_x, r_y))
             r_y += roll_fight.get_height() + f_gap
             f_y = r_y + 12
-            if f == fight_id:
-                break
     
 # return 0 for OK, and 1 is NOT enough(fail)                
 def spend_dock_resource(type, value):
