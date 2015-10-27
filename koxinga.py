@@ -16,6 +16,8 @@ own_treasure_image = 'Image/treasure_50x50.gif'
 button1_image = 'Image/button1_100x50.gif'
 start_image = 'Image/start_50x50.gif'
 turn_image = 'Image/turn_50x50.gif'
+roll_fight_image = 'Image/Pentagon_50x48.gif'
+fight_win_image = 'Image/win_50x48.gif'
 
 # resource
 food_image = 'Image/food_25x25.jpg'
@@ -81,6 +83,9 @@ treasure_b = pygame.image.load(own_treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
 start_player = pygame.image.load(start_image).convert()
 turn = pygame.image.load(turn_image).convert()
+roll_fight = pygame.image.load(roll_fight_image).convert()
+fight_win = pygame.image.load(fight_win_image).convert()
+
 treasure_b.set_alpha(treasure_alpha)
 
 # resource
@@ -138,8 +143,9 @@ draw_player_thread = mythread(1, screen, 0)
 RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
-#GREEN1 = (15, 96, 25)
+GREEN1 = (15, 96, 25)
 
+fight_id = -1
 turn_id = 0
 start_p = 0
 inner_gap = 5
@@ -992,7 +998,7 @@ def draw_start_and_turn(sp_id, t_id):
     screen.blit(t_image, (x, y))
             
 def draw_inner_item(Surface):
-    global dice_value1, dice_value2, turn_id, inner_gap, treasure_num
+    global dice_value1, dice_value2, turn_id, inner_gap, treasure_num, fight_id
     
     rect_width = 2
     
@@ -1053,6 +1059,37 @@ def draw_inner_item(Surface):
             y = treasure_y + treasure_b.get_height() + inner_gap
         else:
             x += treasure_b.get_width() + inner_gap
+            
+    # draw fight situation
+    if player_data[turn_id].mode in [7, 8, 9]:
+        f_gap = 5
+        font_size = 18
+        f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
+        f_y = treasure_y
+        # test fight roll only
+        fight_roll = random.randint(0, 11)
+        # end test
+        #ID: 1-base
+        top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
+        Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
+        f_y += font_size + int(roll_fight.get_height()/2) - 5
+        r_x = f_x + 112
+        r_y = treasure_y + font_size + f_gap
+        for i in range(0, player_num):
+            f = (turn_id + i)%player_num
+            #NOT fight
+            if player_data[f].b_id != player_data[turn_id].b_id:
+                continue
+            if fight_roll < 11:
+                Surface.blit(roll_fight, (r_x, r_y))
+                fight_message = "      %2d                %2d"%(f+1, fight_roll)
+                Surface.blit(write(str(fight_message), GREEN1, font_size), (f_x, f_y))
+            else:
+                Surface.blit(fight_win, (r_x, r_y))
+            r_y += roll_fight.get_height() + f_gap
+            f_y = r_y + 12
+            if f == fight_id:
+                break
     
 # return 0 for OK, and 1 is NOT enough(fail)                
 def spend_dock_resource(type, value):
@@ -1550,6 +1587,8 @@ def do_fight(t_id, b_id):
     
     if 1 == dof:
         player_data[t_id].mode = 7
+        #assign fight_id
+        fight_id = t_id
     
     return dof
     
@@ -1594,6 +1633,7 @@ def end_turn():
     draw_player_thread.is_night = 0
     start_p = (start_p+1)%player_num
     turn_id = start_p
+    fight_id = -1
 
 def handle_card(mouse_loc):
     global player_data, turn_id
@@ -1635,6 +1675,7 @@ def main():
     # test p backward
     #player_data[0].IsAI = 1
     #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
+    player_data[0].mode = 7
     # end test p
     while True:        
         draw_all()
