@@ -998,7 +998,7 @@ def draw_start_and_turn(sp_id, t_id):
     screen.blit(t_image, (x, y))
             
 def draw_inner_item(Surface):
-    global dice_value1, dice_value2, turn_id, inner_gap, treasure_num, fight_id
+    global dice_value1, dice_value2, player_data, turn_id, inner_gap, treasure_num, fight_id
     
     rect_width = 2
     
@@ -1062,6 +1062,7 @@ def draw_inner_item(Surface):
             
     # draw fight situation
     if player_data[turn_id].mode in [7, 8, 9]:
+        ws  = "                  "
         f_gap = 5
         font_size = 18
         f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
@@ -1080,17 +1081,51 @@ def draw_inner_item(Surface):
             #NOT fight
             if player_data[f].b_id != player_data[turn_id].b_id:
                 continue
+            if 7 == player_data[f].mode:
+                pass
+            # mode == 8, 9
+            else:
+                fight_message = "      %2d"%(f+1)+2*(ws+"  ")+str(player_data[f].fight_cannon)+ws+str(player_data[f].fight_score)
+                fight_roll_dice(Surface, font_size, fight_roll, r_x, r_y)
+                Surface.blit(write(str(fight_message), GREEN1, font_size), (f_x, f_y))
+                #if fight_roll < 11:
+                #    Surface.blit(roll_fight, (r_x, r_y))
+                #    fight_message = "      %2d                %2d"%(f+1, fight_roll)
+                #    Surface.blit(write(str(fight_message), GREEN1, font_size), (f_x, f_y))
+                #else:
+                #    Surface.blit(fight_win, (r_x, r_y))
+                r_y += roll_fight.get_height() + f_gap
+                f_y = r_y + 12
+            
             if f == fight_id:
                 break
-            if fight_roll < 11:
-                Surface.blit(roll_fight, (r_x, r_y))
-                fight_message = "      %2d                %2d"%(f+1, fight_roll)
-                Surface.blit(write(str(fight_message), GREEN1, font_size), (f_x, f_y))
-            else:
-                Surface.blit(fight_win, (r_x, r_y))
-            r_y += roll_fight.get_height() + f_gap
-            f_y = r_y + 12
+# return: None for NOT assign score, 0 for score is assigned
+def calc_fight_score(f_id):
+    global player_data
     
+    if None == player_data[f_id].fight_dice:
+        return
+    elif 11 == player_data[f_id].fight_dice:
+        player_data[f_id].fight_score = "win"
+    else:
+        player_data[f_id].fight_score = player_data[f_id].fight_dice + player_data[f_id].fight_cannon
+    return 0
+    
+def fight_roll_dice(Surface, font_size, f_roll, x, y):
+    f_x = x + 18
+    f_y = y + 15
+    if None == f_roll:
+        return
+    elif 10 == f_roll:
+        Surface.blit(roll_fight, (x, y))
+        Surface.blit(write(str(f_roll), GREEN1, font_size), (f_x, f_y))
+    elif f_roll < 10:
+        Surface.blit(roll_fight, (x, y))
+        Surface.blit(write(str(f_roll), GREEN1, font_size), (f_x+2, f_y))
+    # f_roll == 11
+    else:
+        Surface.blit(fight_win, (x, y))
+                
 # return 0 for OK, and 1 is NOT enough(fail)                
 def spend_dock_resource(type, value):
     global player_data
@@ -1675,7 +1710,10 @@ def main():
     # test p backward
     #player_data[0].IsAI = 1
     #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
-    player_data[0].mode = 7
+    player_data[0].mode = 8
+    player_data[0].fight_dice = 3
+    player_data[0].fight_cannon = 1
+    player_data[0].fight_score = 4
     # end test p
     while True:        
         draw_all()
