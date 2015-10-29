@@ -36,5 +36,5 @@ class game_player():
         self.fight_cannon = fight_cannon
         # None, 0~40, "max"
         self.fight_score = fight_score
-        # Only two string, 1. null string: "", 2. "win"
+        # Only three string, 1. null string: "", 2. "win" 3. "draw"
         self.fight_solution = fight_solution

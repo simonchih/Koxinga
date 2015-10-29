@@ -145,7 +145,7 @@ BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
-fight_id = -1
+fight_id = None
 turn_id = 0
 start_p = 0
 inner_gap = 5
@@ -167,6 +167,8 @@ main_map = [0] * map_block_num
 map_mark = [0] * map_block_num
 player_data = [0] * player_num
 treasure_card = [0] * treasure_num
+# 0-based
+fight_group = []
 
 def turn_id_to_image(tid):
     if 0 == tid:
@@ -1075,12 +1077,7 @@ def draw_inner_item(Surface):
         f_y += font_size + int(roll_fight.get_height()/2) - 5
         r_x = f_x + 112
         r_y = treasure_y + font_size + f_gap
-        for i in range(0, player_num):
-            f = (turn_id + i)%player_num
-            
-            #NOT fight
-            if player_data[f].b_id != player_data[turn_id].b_id:
-                continue
+        for f in fight_group:
             if 7 == player_data[f].mode:
                 fight_message = "      %2d"%(f+1)+2*(ws+sws)+str(player_data[f].fight_cannon)
                 Surface.blit(write(str(fight_message), GREEN1, font_size), (f_x, f_y))
@@ -1568,6 +1565,92 @@ def ai():
     
     return dir1, dir2
 
+def total_dock_item(f_id, type):
+    total = 0
+
+    for i in range(0, dock_num):
+        if type == player_data[f_id].dtype[i]:
+            total += player_data[f_id].dvalue    
+    return total
+    
+def fight_ai(f_id):
+    global player_data, fight_group
+    
+    cannon_total = 0
+    max_cannon_and_dice = 0
+    
+    # calc total cannon
+    cannon_total = total_dock_item(f_id, 3)
+    
+    # attacker
+    if f_id == fight_group[0]:
+        for f in fight_group[1:]:
+            cannon_num = total_dock_item(f, 3)
+            if  cannon_num > max_cannon_and_dice:
+                max_cannon_and_dice = cannon_num
+        
+        # maximum fight dice is 10
+        max_cannon_and_dice += 10
+    else:
+        # defender
+        if "win" == player_data[fight_group[0]].fight_solution:
+            return
+        
+        max_cannon_and_dice = player_data[0].fight_cannon
+        max_cannon_and_dice += player_data[0].fight_dice
+        
+    if cannon_total <= max_cannon_and_dice:
+        spend_dock_resource(3, cannon_total)
+        player_data[f_id].fight_cannon = cannon_total
+    else:
+        spend_dock_resource(3, max_cannon_and_dice+1)
+        player_data[f_id].fight_cannon = max_cannon_and_dice+1
+        
+    # Roll fight dice
+    r = random.randint(0, 11)
+    player_data[f_id].fight_dice = r
+    
+    if 11 == r:
+        player_data[f_id].fight_score = "max"
+        player_data[f_id].fight_solution = "win"
+    elif f_id != fight_group[0]:
+        # r < 11
+        player_data[f_id].fight_score = player_data[f_id].fight_dice + player_data[0].fight_cannon
+        # if attacker roll 11, defender will return early
+        if player_data[f_id].fight_score > player_data[fight_group[0]].fight_score:
+            player_data[f_id].fight_solution = "win"
+        elif player_data[f_id].fight_score == player_data[fight_group[0]].fight_score:
+            player_data[f_id].fight_solution = "draw"
+    else:
+        # f_id == attacker and r < 11
+        player_data[f_id].fight_score = player_data[f_id].fight_dice + player_data[0].fight_cannon
+    
+    # f_id is last    
+    if f_id == fight_group[-1]:
+        last_fight_done()
+
+def last_fight_done():
+    global player_data
+
+    attack_win = 0
+    attack_draw = 0
+    
+    for f in fight_group[1:]:
+        if "draw" == player_data[f].fight_solution:
+            attack_draw += 1
+        # "" means defeated
+        elif "" == player_data[f].fight_solution:
+            attack_win += 1
+    
+    l_f = len(fight_group)
+    l_f -= 1
+    
+    if l_f == attack_draw:
+        player_data[fight_group[0]].fight_solution = "draw"
+    elif l_f == attack_win:
+        player_data[fight_group[0]].fight_solution = "win"
+    
+        
 def remain_treasure_card():
     global treasure_card
     sum = 0
@@ -1601,22 +1684,27 @@ def get_treasure(t_id, b_id):
 
 # return 0: NOT fight, 1: fight
 def do_fight(t_id, b_id):
-    global player_num, player_data
+    global player_num, player_data, fight_group
+    
+    near = []
     
     if 0 == b_id:
         return 0
     
     dof = 0
     
-    for i in range(0, player_num):
-        if i == turn_id:
-            continue
+    for i in range(1, player_num):
+        f = (t_id + i)%player_num
+        
         if b_id == player_data[i].b_id:
-            player_data[i].mode = 7
+            player_data[f].mode = 7
+            near.append(f)
             dof = 1
     
     if 1 == dof:
         player_data[t_id].mode = 7
+        fight_group.append(t_id)
+        fight_group.extend(near)
         #assign fight_id
         fight_id = t_id
     
@@ -1663,7 +1751,6 @@ def end_turn():
     draw_player_thread.is_night = 0
     start_p = (start_p+1)%player_num
     turn_id = start_p
-    fight_id = -1
 
 def handle_card(mouse_loc):
     global player_data, turn_id
@@ -1693,7 +1780,7 @@ def all_player_mode6():
     return 1
         
 def main():
-    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num
+    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group
     
     dir1 = 1
     dir2 = 1
@@ -1705,11 +1792,20 @@ def main():
     # test p backward
     #player_data[0].IsAI = 1
     #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
-    player_data[0].mode = 8
+    for i in range(0, player_num):
+        player_data[i].mode = 7
+        player_data[i].b_id = 1
+        player_data[i].next_id = 1
+        # b_id = 1
+        player_data[i].x = player_data[i].loc[1][0]
+        player_data[i].y = player_data[i].loc[1][1]        
+    
+    #player_data[0].mode = 7
     player_data[0].fight_dice = 3
     player_data[0].fight_cannon = 1
     player_data[0].fight_score = 4
     player_data[0].fight_solution = "win"
+    fight_group = [0, 1, 2, 3, 4, 5]
     # end test p
     while True:        
         draw_all()
@@ -1782,7 +1878,10 @@ def main():
                 # do spend_dock_resource or get_treasure 
                 step_done(turn_id, player_data[turn_id].b_id)
         elif 7 == player_data[turn_id].mode and 1 == player_data[turn_id].IsAI:
-            pass
+            fight_ai(fight_id)
+            fg_index = fight_group.index(fight_id)
+            
+            fight_id = fight_group[(fg_index+1)%len(fight_group)]
         elif 9 == player_data[turn_id].mode:
             # other player back to mode 6
             for i in range(0, player_num):
