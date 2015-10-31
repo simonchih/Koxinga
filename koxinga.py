@@ -911,14 +911,20 @@ def draw_dock():
     elif 8 == player_data[fight_id].mode:
         att = fight_group[0]
         if "win" == player_data[fight_id].fight_solution:
-            draw_fight_text(fight_id, "Put")
-            draw_fight_text(att,  "Tale")
+            if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):
+                draw_fight_text(att, "None")
+            else:
+                draw_fight_text(fight_id, "Put")
+                draw_fight_text(att,  "Tale")
         elif "draw" == player_data[fight_id].fight_solution:
             draw_fight_text(fight_id, "Draw")
             draw_fight_text(att,  "Draw")
         else:
-            draw_fight_text(fight_id, "Take")
-            draw_fight_text(att,  "Put")
+            if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
+                draw_fight_text(fight_id, "None")
+            else:
+                draw_fight_text(fight_id, "Take")
+                draw_fight_text(att,  "Put")
     
 def generate_dock():
     global player_data 
