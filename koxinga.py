@@ -145,10 +145,13 @@ BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
+cannon_not_enough = 1
 fight_id = None
 turn_id = 0
 start_p = 0
 inner_gap = 5
+fight_btn_loc  = (555, 560)
+cannon_btn_loc = (855, 560)
 player1_start_w = 400
 player_1_3_block_start_w = player1_start_w
 player_1_6_block_start_h = screen_height - block.get_height()
@@ -833,7 +836,10 @@ def generate_dock():
 
 def draw_button(Surface, loc, str, color, size = 14, image = button1):
     (mouseX, mouseY) = pygame.mouse.get_pos()
-    fontx = loc[0]+ 50 - int(len(str)/2*6)
+    if len(str) > 8:
+        fontx = loc[0]+ 45 - int(len(str)/2*6)
+    else:
+        fontx = loc[0]+ 50 - int(len(str)/2*6)
     fonty = loc[1]+15
     Surface.blit(image, loc)
     if loc[0] <= mouseX <= loc[0]+image.get_width() and loc[1] <= mouseY <= loc[1]+image.get_height():
@@ -1063,7 +1069,7 @@ def draw_inner_item(Surface):
             x += treasure_b.get_width() + inner_gap
             
     # draw fight situation
-    if player_data[turn_id].mode in [7, 8, 9]:
+    if player_data[fight_id].mode in [7, 8, 9]:
         f_gap = 5
         font_size = 18
         f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
@@ -1081,9 +1087,17 @@ def draw_inner_item(Surface):
             r_y += roll_fight.get_height() + f_gap
             f_y = r_y + 12
             
-            if f == fight_id:
+            if f == fight_id and 7 == player_data[fight_id].mode:
                 break
-
+                
+        # If human
+        if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode:
+            if "win" != player_data[fight_group[0]].fight_solution:
+                draw_button(Surface, fight_btn_loc,  "Fight", BLACK)
+                draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
+            else:
+                draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
+                
 def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248):
         global fight_group
 
@@ -1099,19 +1113,6 @@ def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solut
             Surface.blit(write("%2d"%cannon, GREEN1, font_size), (f_x+240, f_y))
             Surface.blit(write(str(score), GREEN1, font_size), (f_x+350, f_y))
             Surface.blit(write(solution, GREEN1, font_size), (f_x+455, f_y))
-
-                
-# return: None for NOT assign score, 0 for score is assigned
-def calc_fight_score(f_id):
-    global player_data
-    
-    if None == player_data[f_id].fight_dice:
-        return
-    elif 11 == player_data[f_id].fight_dice:
-        player_data[f_id].fight_score = "win"
-    else:
-        player_data[f_id].fight_score = player_data[f_id].fight_dice + player_data[f_id].fight_cannon
-    return 0
     
 def fight_roll_dice(Surface, font_size, f_roll, x, y):
     f_x = x + 16
@@ -1120,13 +1121,13 @@ def fight_roll_dice(Surface, font_size, f_roll, x, y):
         return
     elif f_roll < 11:
         Surface.blit(roll_fight, (x, y))
-        Surface.blit(write("%2d"%f_roll, GREEN1, font_size), (f_x, f_y))
+        Surface.blit(write("%2d"%f_roll, RED, font_size), (f_x, f_y))
     # f_roll == 11
     else:
         Surface.blit(fight_win, (x, y))
                 
 # return 0 for OK, and 1 is NOT enough(fail)                
-def spend_dock_resource(type, value):
+def spend_dock_resource(type, value, t_id = turn_id):
     global player_data
     #type 1:food, 2:gold
     
@@ -1135,24 +1136,24 @@ def spend_dock_resource(type, value):
     # dvalue, index is 0 base
     dvalue = [0] * dock_num
     for i in range(0, dock_num):
-        dvalue[i] = (i, player_data[turn_id].dvalue[i])
+        dvalue[i] = (i, player_data[t_id].dvalue[i])
         
     sorted_value = sorted(dvalue, key=lambda l:l[1])
     
     # handle spend
     for i in range(0, dock_num):
         sv = sorted_value[i]
-        if type == player_data[turn_id].dtype[sv[0]] and sv[1] > 0:
+        if type == player_data[t_id].dtype[sv[0]] and sv[1] > 0:
             if sv[1] >= (value - spent_value_total):
-                player_data[turn_id].dvalue[sv[0]] -= (value - spent_value_total) 
-                if 0 == player_data[turn_id].dvalue[sv[0]]:
-                    player_data[turn_id].dtype[sv[0]] = 0
+                player_data[t_id].dvalue[sv[0]] -= (value - spent_value_total) 
+                if 0 == player_data[t_id].dvalue[sv[0]]:
+                    player_data[t_id].dtype[sv[0]] = 0
                 # spent_value_total = value
                 return 0
             else:
-                spent_value_total += player_data[turn_id].dvalue[sv[0]]
-                player_data[turn_id].dvalue[sv[0]] = 0
-                player_data[turn_id].dtype[sv[0]] = 0
+                spent_value_total += player_data[t_id].dvalue[sv[0]]
+                player_data[t_id].dvalue[sv[0]] = 0
+                player_data[t_id].dtype[sv[0]] = 0
             
     return 1
 
@@ -1577,7 +1578,7 @@ def total_dock_item(f_id, type):
     
     for i in range(0, dock_num):
         if type == player_data[f_id].dtype[i]:
-            total += player_data[f_id].dvalue    
+            total += player_data[f_id].dvalue[i]   
     return total
     
 def fight_ai(f_id):
@@ -1585,11 +1586,10 @@ def fight_ai(f_id):
     
     cannon_total = 0
     max_cannon_and_dice = 0
+    att = fight_group[0]
     
     # calc total cannon
     cannon_total = total_dock_item(f_id, 3)
-    
-    att = fight_group[0]
     
     # attacker
     if f_id == att:
@@ -1601,7 +1601,7 @@ def fight_ai(f_id):
         # maximum fight dice is 10
         max_cannon_and_dice += 10
     else:
-        # defender
+        # defender       
         if "win" == player_data[att].fight_solution:
             return
         
@@ -1609,12 +1609,21 @@ def fight_ai(f_id):
         max_cannon_and_dice += player_data[att].fight_dice
         
     if cannon_total <= max_cannon_and_dice:
-        spend_dock_resource(3, cannon_total)
+        spend_dock_resource(3, cannon_total, f_id)
         player_data[f_id].fight_cannon = cannon_total
     else:
-        spend_dock_resource(3, max_cannon_and_dice+1)
+        spend_dock_resource(3, max_cannon_and_dice+1, f_id)
         player_data[f_id].fight_cannon = max_cannon_and_dice+1
         
+    # Roll fight dice
+    roll_fight_dice(f_id, att)
+
+def roll_fight_dice(f_id, att):
+    global player_data, fight_group
+    
+    if "win" == player_data[att].fight_solution:
+        return
+    
     # Roll fight dice
     r = random.randint(0, 11)
     player_data[f_id].fight_dice = r
@@ -1634,12 +1643,10 @@ def fight_ai(f_id):
         # f_id == attacker and r < 11
         player_data[f_id].fight_score = player_data[f_id].fight_dice + player_data[f_id].fight_cannon
     
-    # f_id is last    
+    # f_id is last and attacker is NOT win   
     if f_id == fight_group[-1]:
         last_fight_done()
     
-    player_data[f_id].mode = 8
-
 def last_fight_done():
     global player_data
 
@@ -1782,6 +1789,12 @@ def handle_card(mouse_loc):
     if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
         player_data[turn_id].mode = 6
         next_turn()
+
+def next_fight():
+    global fight_id, fight_group
+    
+    fg_index = fight_group.index(fight_id)
+    fight_id = fight_group[(fg_index+1)%len(fight_group)]
         
 #1 for all player mode are 6, 0 for NOT
 def all_player_mode6():
@@ -1791,7 +1804,7 @@ def all_player_mode6():
     return 1
         
 def main():
-    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group, fight_id
+    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group, fight_id, cannon_not_enough
     
     dir1 = 1
     dir2 = 1
@@ -1809,12 +1822,20 @@ def main():
         player_data[i].next_id = 1
         # b_id = 1
         player_data[i].x = player_data[i].loc[1][0]
-        player_data[i].y = player_data[i].loc[1][1]        
-    
+        player_data[i].y = player_data[i].loc[1][1]
+        # add 4 cannon
+        player_data[i].dtype[2] = 3
+        player_data[i].dvalue[2] = 4
+    #fight_id = 2
     #player_data[0].mode = 7
+    #player_data[1].mode = 8
+    #player_data[1].fight_dice = 11
+    #player_data[1].fight_score = "max"
+    #player_data[1].fight_solution = "win"
     turn_id = 1
     start_p = 1
     fight_id = 1
+    
     fight_group = [1, 2, 3, 4, 5, 0]
     # end test p
     while True:        
@@ -1830,6 +1851,27 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if 0 == player_data[fight_id].IsAI:
+                if 7 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    if "win" != player_data[fight_group[0]].fight_solution:
+                        (f_x, f_y) = fight_btn_loc
+                        (c_x, c_y) = cannon_btn_loc
+                        (mouseX, mouseY) = pygame.mouse.get_pos()
+                        if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
+                            roll_fight_dice(fight_id, fight_group[0])
+                            player_data[fight_id].mode = 8
+                            next_fight()
+                        if c_x <= mouseX <= c_x+button1.get_width() and c_y <= mouseY <= c_y+button1.get_height():
+                            # Using 1 cannon if possible
+                            cannon_not_enough = spend_dock_resource(3, 1, fight_id)
+                            if 0 == cannon_not_enough:
+                                player_data[fight_id].fight_cannon += 1
+                    else:
+                        (f_x, f_y) = fight_btn_loc
+                        (mouseX, mouseY) = pygame.mouse.get_pos()
+                        if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
+                            player_data[fight_id].mode = 8
+                            next_fight()
             elif 0 == player_data[turn_id].IsAI:
                 if 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
@@ -1889,9 +1931,8 @@ def main():
                 step_done(turn_id, player_data[turn_id].b_id)
         elif 7 == player_data[fight_id].mode and 1 == player_data[fight_id].IsAI:
             fight_ai(fight_id)
-            fg_index = fight_group.index(fight_id)
-            
-            fight_id = fight_group[(fg_index+1)%len(fight_group)]
+            player_data[fight_id].mode = 8
+            next_fight()
         elif 9 == player_data[turn_id].mode:
             # other player back to mode 6
             for i in range(0, player_num):
