@@ -146,6 +146,7 @@ Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
 cannon_not_enough = 1
+cannon_sel = None
 fight_id = None
 turn_id = 0
 start_p = 0
@@ -164,6 +165,7 @@ player_5_block_start_w = screen_width - block2.get_width()
 dice_value1 = -1
 dice_value2 = -1
 
+# dock image location
 player_image_pos = [[[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]], [[0,0], [0,0], [0,0], [0,0], [0,0]]]
 
 main_map = [0] * map_block_num
@@ -362,7 +364,41 @@ def num_of_treasure_own(t_id):
         if 1 == player_data[t_id].treasure[i]:
             sum += 1
     return sum
+
+def id_to_start_loc(id):
+    if 0 == id:
+        (start_w, start_h) = (player_1_3_block_start_w, player_1_6_block_start_h)
+    elif 1 == id:
+        (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h)
+    elif 2 == id:
+        (start_w, start_h) = (player_1_3_block_start_w, player_3_4_block_start_h)
+    elif 3 == id:
+        (start_w, start_h) = (player_4_6_block_start_w, player_3_4_block_start_h)
+    elif 4 == id:
+        (start_w, start_h) = (player_5_block_start_w, player_2_5_block_start_h)
+    else: # 5 == id
+        (start_w, start_h) = (player_4_6_block_start_w, player_1_6_block_start_h)
     
+    return (start_w, start_h)
+    
+def draw_fight_text(f_id, text = "Fight"):
+    font_size = 14
+    (start_w, start_h) = id_to_start_loc(f_id)
+    
+    #player 2
+    if 1 == f_id:
+        w = start_w + 1
+        h = start_h + dock_num*block2.get_height() + inner_gap + treasure_s.get_height() + inner_gap + 1
+    #player 5
+    elif 4 == f_id:
+        w = start_w - 10
+        h = start_h + dock_num*block2.get_height() + inner_gap + treasure_s.get_height() + inner_gap + 1
+    else:
+        w = start_w + dock_num*block.get_width() + inner_gap + treasure_s.get_width() + inner_gap + 1
+        h = start_h + 1
+        
+    screen.blit(write(text, RED, font_size), (w, h))
+        
 def draw_treasure_w(start_w, start_h, bk_image, t_image, t_id):
     font_size = 22
     #player 3, 4
@@ -400,7 +436,61 @@ def draw_treasure_h(start_w, start_h, bk_image, t_image, t_id):
     if 0 != sum_t:
         screen.blit(t_image, (w, h))
         screen.blit(write(str(sum_t)+"x", RED, font_size), (w+font_gap_x, h+font_gap_y))
+
+# num:-1 for take all, otherwise num should be 0 or positive value        
+# return None if take nothing, else return the number of take items
+def take_item(p_id, dock_id, num = -1):
+    global player_data
+        
+    take_num = 0
     
+    if player_data[p_id].dvalue[dock_id] != 0:
+        if -1 == num:
+            take_num = player_data[p_id].dvalue[dock_id]
+            player_data[p_id].dvalue[dock_id] = 0
+            player_data[p_id].dtype[dock_id] = 0
+        elif num >= 0:
+            # take all if num > exist dock value
+            if num >= player_data[p_id].dvalue[dock_id]:
+                take_num = player_data[p_id].dvalue[dock_id]
+                player_data[p_id].dvalue[dock_id] = 0
+                player_data[p_id].dtype[dock_id] = 0
+            else:
+                take_num = num
+                player_data[p_id].dvalue[dock_id] -= num
+        
+        return take_num
+            
+        
+def use_cannon():
+    global cannon_not_enough, player_data
+    # Using 1 cannon if possible
+    cannon_not_enough = spend_dock_resource(3, 1, fight_id)
+    if 0 == cannon_not_enough:
+        player_data[fight_id].fight_cannon += 1
+        
+def five_block():
+    global cannon_sel
+    
+    (MouseX, MouseY) = pygame.mouse.get_pos()
+    cannon_sel = None
+    
+    for p in range(0, player_num):
+        if 1 == p or 4 == p:
+            b_image = block2
+            bs_image = block2_sel
+        else:
+            b_image = block
+            bs_image = block_sel
+            
+        for i in range(0, dock_num):
+            (x, y) = (player_image_pos[p][i][0], player_image_pos[p][i][1])
+            if 7 == player_data[fight_id].mode and 3 == player_data[fight_id].dtype[i] and player_data[fight_id].dvalue[i] and x <= MouseX <= x + bs_image.get_width() and y <= MouseY <= y + bs_image.get_height():
+                screen.blit(bs_image, (x, y))
+                cannon_sel = i
+            else:
+                screen.blit(b_image, (x, y))
+        
 def five_block_w(start_w, start_h, b_image):
     for i in range(0, dock_num):
         screen.blit(b_image, (start_w + i*b_image.get_width(), start_h))
@@ -795,13 +885,8 @@ def dock_type_id_to_image(type_id):
         return cannon
         
 def draw_dock():
-    # player 1~6
-    five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block)
-    five_block_h(player_2_block_start_w, player_2_5_block_start_h, block2)
-    five_block_w(player_1_3_block_start_w, player_3_4_block_start_h, block)
-    five_block_w(player_4_6_block_start_w, player_3_4_block_start_h, block)
-    five_block_h(player_5_block_start_w, player_2_5_block_start_h, block2)
-    five_block_w(player_4_6_block_start_w, player_1_6_block_start_h, block)
+    # draw dock only
+    five_block()
     
     # draw_dock_item:
     # player 1~6
@@ -819,6 +904,21 @@ def draw_dock():
     draw_treasure_w(player_4_6_block_start_w, player_3_4_block_start_h, block, treasure_s, 3)
     draw_treasure_h(player_5_block_start_w, player_2_5_block_start_h, block2, treasure_s, 4)
     draw_treasure_w(player_4_6_block_start_w, player_1_6_block_start_h, block, treasure_s, 5)
+    
+    # draw fight text
+    if 7 == player_data[fight_id].mode:
+        draw_fight_text(fight_id)
+    elif 8 == player_data[fight_id].mode:
+        att = fight_group[0]
+        if "win" == player_data[fight_id].fight_solution:
+            draw_fight_text(fight_id, "Put")
+            draw_fight_text(att,  "Tale")
+        elif "draw" == player_data[fight_id].fight_solution:
+            draw_fight_text(fight_id, "Draw")
+            draw_fight_text(att,  "Draw")
+        else:
+            draw_fight_text(fight_id, "Take")
+            draw_fight_text(att,  "Put")
     
 def generate_dock():
     global player_data 
@@ -1004,6 +1104,16 @@ def draw_start_and_turn(sp_id, t_id):
     
     screen.blit(s_image, (start_w, start_h))
     screen.blit(t_image, (x, y))
+    
+    # Test Code for player id 5
+    #(start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+    #(x, y) = (start_w-gap-t_image.get_width(), start_h)
+    #
+    #(start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+    #
+    #screen.blit(s_image, (start_w, start_h))
+    #screen.blit(t_image, (x, y))
+    # End Test
             
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, player_data, turn_id, inner_gap, treasure_num, fight_id
@@ -1793,8 +1903,16 @@ def handle_card(mouse_loc):
 def next_fight():
     global fight_id, fight_group
     
+    # if last
+    if fight_id == fight_group[-1] and 8 == player_data[fight_id].mode:
+        fight_id = fight_group[1]
+        return
+    
     fg_index = fight_group.index(fight_id)
     fight_id = fight_group[(fg_index+1)%len(fight_group)]
+    
+    draw_all()
+    time.sleep(1)
         
 #1 for all player mode are 6, 0 for NOT
 def all_player_mode6():
@@ -1862,10 +1980,12 @@ def main():
                             player_data[fight_id].mode = 8
                             next_fight()
                         if c_x <= mouseX <= c_x+button1.get_width() and c_y <= mouseY <= c_y+button1.get_height():
-                            # Using 1 cannon if possible
-                            cannon_not_enough = spend_dock_resource(3, 1, fight_id)
-                            if 0 == cannon_not_enough:
-                                player_data[fight_id].fight_cannon += 1
+                            use_cannon()
+                        if None != cannon_sel:
+                            # Take one cannon
+                            cn = take_item(fight_id, cannon_sel, 1)
+                            if None != cn:
+                                player_data[fight_id].fight_cannon += cn
                     else:
                         (f_x, f_y) = fight_btn_loc
                         (mouseX, mouseY) = pygame.mouse.get_pos()
