@@ -3,7 +3,7 @@ dock_num = 5
 treasure_num = 10
 
 class game_player():
-    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, handle_done = [0, 0] ,steps = 0, mode = 0, direction = [0, 0], Is_Forward = 1, goal_game = 0, selected_card_value = None, marked_card = [0] * total_card_num, remain_card_num = total_card_num, dock_type = [0] * dock_num, dock_value = [0] * dock_num, treasure_own = [0] * treasure_num, fight_dice = None, fight_cannon = 0, fight_score = None, fight_solution = ""):
+    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, handle_done = [0, 0] ,steps = 0, mode = 0, direction = [0, 0], Is_Forward = 1, goal_game = 0, selected_card_value = None, marked_card = [0] * total_card_num, remain_card_num = total_card_num, dock_type = [0] * dock_num, dock_value = [0] * dock_num, treasure_own = [0] * treasure_num, fight_dice = None, fight_cannon = 0, fight_score = None, fight_solution = "", fight_text = ""):
         self.x = x_now
         self.y = y_now
         self.b_id = block_id
@@ -38,3 +38,5 @@ class game_player():
         self.fight_score = fight_score
         # Only three string, 1. null string: "", 2. "win" 3. "draw"
         self.fight_solution = fight_solution
+        # "", "None", "Take", "Put"
+        self.fight_text = fight_text

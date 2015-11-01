@@ -382,6 +382,8 @@ def id_to_start_loc(id):
     return (start_w, start_h)
     
 def draw_fight_text(f_id, text = "Fight"):
+    global player_data
+    
     font_size = 14
     (start_w, start_h) = id_to_start_loc(f_id)
     
@@ -398,6 +400,7 @@ def draw_fight_text(f_id, text = "Fight"):
         h = start_h + 1
         
     screen.blit(write(text, RED, font_size), (w, h))
+    player_data[f_id].fight_text = text
         
 def draw_treasure_w(start_w, start_h, bk_image, t_image, t_id):
     font_size = 22
@@ -485,7 +488,7 @@ def five_block():
             
         for i in range(0, dock_num):
             (x, y) = (player_image_pos[p][i][0], player_image_pos[p][i][1])
-            if 7 == player_data[fight_id].mode and 3 == player_data[fight_id].dtype[i] and player_data[fight_id].dvalue[i] and x <= MouseX <= x + bs_image.get_width() and y <= MouseY <= y + bs_image.get_height():
+            if None != fight_id and 7 == player_data[fight_id].mode and 3 == player_data[fight_id].dtype[i] and player_data[fight_id].dvalue[i] and x <= MouseX <= x + bs_image.get_width() and y <= MouseY <= y + bs_image.get_height():
                 screen.blit(bs_image, (x, y))
                 cannon_sel = i
             else:
@@ -906,25 +909,26 @@ def draw_dock():
     draw_treasure_w(player_4_6_block_start_w, player_1_6_block_start_h, block, treasure_s, 5)
     
     # draw fight text
-    if 7 == player_data[fight_id].mode:
-        draw_fight_text(fight_id)
-    elif 8 == player_data[fight_id].mode:
-        att = fight_group[0]
-        if "win" == player_data[fight_id].fight_solution:
-            if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):
-                draw_fight_text(att, "None")
+    if None != fight_id:
+        if 7 == player_data[fight_id].mode:
+            draw_fight_text(fight_id)
+        elif 8 == player_data[fight_id].mode:
+            att = fight_group[0]
+            if "win" == player_data[fight_id].fight_solution:
+                if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):
+                    draw_fight_text(att, "None")
+                else:
+                    draw_fight_text(fight_id, "Put")
+                    draw_fight_text(att,  "Take")
+            elif "draw" == player_data[fight_id].fight_solution:
+                draw_fight_text(fight_id, "Draw")
+                draw_fight_text(att,  "Draw")
             else:
-                draw_fight_text(fight_id, "Put")
-                draw_fight_text(att,  "Tale")
-        elif "draw" == player_data[fight_id].fight_solution:
-            draw_fight_text(fight_id, "Draw")
-            draw_fight_text(att,  "Draw")
-        else:
-            if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
-                draw_fight_text(fight_id, "None")
-            else:
-                draw_fight_text(fight_id, "Take")
-                draw_fight_text(att,  "Put")
+                if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
+                    draw_fight_text(fight_id, "None")
+                else:
+                    draw_fight_text(fight_id, "Take")
+                    draw_fight_text(att,  "Put")
     
 def generate_dock():
     global player_data 
@@ -1185,34 +1189,35 @@ def draw_inner_item(Surface):
             x += treasure_b.get_width() + inner_gap
             
     # draw fight situation
-    if player_data[fight_id].mode in [7, 8, 9]:
-        f_gap = 5
-        font_size = 18
-        f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
-        f_y = treasure_y
-        
-        #ID: 1-base
-        top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
-        Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
-        f_y += font_size + int(roll_fight.get_height()/2) - 5
-        r_x = f_x + 112
-        r_y = treasure_y + font_size + f_gap
-        for f in fight_group:
-            display_fight_status(Surface, player_data[f].mode, f+1, player_data[f].fight_cannon, player_data[f].fight_dice, player_data[f].fight_score, player_data[f].fight_solution, f_x, f_y, r_x, r_y)
+    if None != fight_id:
+        if player_data[fight_id].mode in [7, 8, 9]:
+            f_gap = 5
+            font_size = 18
+            f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
+            f_y = treasure_y
             
-            r_y += roll_fight.get_height() + f_gap
-            f_y = r_y + 12
-            
-            if f == fight_id and 7 == player_data[fight_id].mode:
-                break
+            #ID: 1-base
+            top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
+            Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
+            f_y += font_size + int(roll_fight.get_height()/2) - 5
+            r_x = f_x + 112
+            r_y = treasure_y + font_size + f_gap
+            for f in fight_group:
+                display_fight_status(Surface, player_data[f].mode, f+1, player_data[f].fight_cannon, player_data[f].fight_dice, player_data[f].fight_score, player_data[f].fight_solution, f_x, f_y, r_x, r_y)
                 
-        # If human
-        if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode:
-            if "win" != player_data[fight_group[0]].fight_solution:
-                draw_button(Surface, fight_btn_loc,  "Fight", BLACK)
-                draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
-            else:
-                draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
+                r_y += roll_fight.get_height() + f_gap
+                f_y = r_y + 12
+                
+                if f == fight_id and 7 == player_data[fight_id].mode:
+                    break
+                    
+            # If human
+            if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode:
+                if "win" != player_data[fight_group[0]].fight_solution:
+                    draw_button(Surface, fight_btn_loc,  "Fight", BLACK)
+                    draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
+                else:
+                    draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
                 
 def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248):
         global fight_group
@@ -1273,28 +1278,28 @@ def spend_dock_resource(type, value, t_id = turn_id):
             
     return 1
 
-def get_dock_resource(type, value):
+def get_dock_resource(type, value, t_id = turn_id):
     global player_data
     
     # dvalue, index is 0 base
     dvalue = [0] * dock_num
     
     for i in range(0, dock_num):
-        if 0 == player_data[turn_id].dtype[i]:
-            player_data[turn_id].dtype[i] = type
-            player_data[turn_id].dvalue[i] = value
+        if 0 == player_data[t_id].dtype[i]:
+            player_data[t_id].dtype[i] = type
+            player_data[t_id].dvalue[i] = value
             # dock NOT full
             return
-        dvalue[i] = (i, player_data[turn_id].dvalue[i])
+        dvalue[i] = (i, player_data[t_id].dvalue[i])
     
     # dock full
     sorted_value = sorted(dvalue, key=lambda l:l[1])
     
     for i in range(0, dock_num):
         sv = sorted_value[i]
-        if type != player_data[turn_id].dtype[sv[0]]:
-            player_data[turn_id].dtype[sv[0]] = type
-            player_data[turn_id].dvalue[sv[0]] = value
+        if type != player_data[t_id].dtype[sv[0]]:
+            player_data[t_id].dtype[sv[0]] = type
+            player_data[t_id].dvalue[sv[0]] = value
             return
     
     # added fail
@@ -1634,12 +1639,12 @@ def forward_ai():
         r_sum = 0
     return s_card, sdir1, sdir2, step_max
     
-def ai():
+def ai(t_id = turn_id):
     global  player_data, dice_value1, dice_value2
     s_card = 0
     dir1 = 1
     dir2 = 1
-    if start_p == turn_id and 0 == player_data[turn_id].mode:
+    if start_p == t_id and 0 == player_data[t_id].mode:
         dice_value1 = random.randint(0, 23)
         dice_value2 = random.randint(0, 23)
         draw_inner_item(screen)
@@ -1672,22 +1677,83 @@ def ai():
                 s_card = card2
                 dir1 = sd1
                 dir2 = sd2
-        player_data[turn_id].selected_card_value = s_card
-        player_data[turn_id].marked_card[s_card] = 1
-        player_data[turn_id].mode = 6
+        player_data[t_id].selected_card_value = s_card
+        player_data[t_id].marked_card[s_card] = 1
+        player_data[t_id].mode = 6
         draw_inner_item(screen)
         pygame.display.update()
-    elif 0 == player_data[turn_id].mode:
+    elif 0 == player_data[t_id].mode:
         r = random.randint(0, 2)
         if 0 == r:
             s_card, dir1, dir2, max1 = forward_ai()
         else: # 1, 2 == r
             s_card, dir1, dir2, max1 = resource_ai()
-        player_data[turn_id].selected_card_value = s_card
-        player_data[turn_id].marked_card[s_card] = 1
-        player_data[turn_id].mode = 6
+        player_data[t_id].selected_card_value = s_card
+        player_data[t_id].marked_card[s_card] = 1
+        player_data[t_id].mode = 6
     
     return dir1, dir2
+
+def after_take():
+    global player_data
+
+    att = fight_group[0]
+    player_data[fight_id].mode = 9
+    # if last
+    if fight_id == fight_group[-1]:
+        player_data[att].mode = 9
+    next_fight()
+
+def take_treasure(put_id, take_id):
+    global player_data
+    
+    ts_num = num_of_treasure_own(take_id)
+    if ts_num <= 0:
+        return
+    r = random.randint(1, ts_num)
+    
+    for i in range (2, treasure_num):
+        if 0 == player_data[take_id].treasure[i]:
+            continue
+        else:
+            r -= 1
+            
+        if 0 == r:
+            player_data[take_id].treasure[i] = 0
+            player_data[put_id].treasure[i] = 1
+            break
+    
+# make sure fight_text is NOT "None" or "Draw" before take    
+def take_ai(put_id, take_id):
+    global player_data
+    
+    take_num = 0
+    
+    # dvalue, index is 0 base
+    dvalue = [0] * dock_num
+    for i in range(0, dock_num):
+        dvalue[i] = (i, player_data[take_id].dvalue[i])
+    
+    # big to little    
+    sorted_value = sorted(dvalue, key=lambda l:l[1], reverse=True)
+    
+    # Check my treasure card, so it's not cheat
+    if [1, 1, 1, 1] != player_data[put_id].treasure[6:]:
+        if num_of_treasure_own(take_id) > 0:
+            take_treasure(put_id, take_id)
+        else:
+            sv = sorted_value[0]
+            type = player_data[take_id].dtype[sv[0]]
+            
+            take_num = take_item(take_id, sv[0])
+            get_dock_resource(type, take_num, put_id)
+    else:
+        sv = sorted_value[0]
+        type = player_data[take_id].dtype[sv[0]]
+        
+        take_num = take_item(take_id, sv[0])
+        get_dock_resource(type, take_num, put_id)
+            
 
 def total_dock_item(f_id, type):
     total = 0
@@ -1818,7 +1884,7 @@ def get_treasure(t_id, b_id):
 
 # return 0: NOT fight, 1: fight
 def do_fight(t_id, b_id):
-    global player_num, player_data, fight_group
+    global player_num, player_data, fight_group, fight_id
     
     near = []
     
@@ -1830,7 +1896,7 @@ def do_fight(t_id, b_id):
     for i in range(1, player_num):
         f = (t_id + i)%player_num
         
-        if b_id == player_data[i].b_id:
+        if b_id == player_data[f].b_id:
             player_data[f].mode = 7
             near.append(f)
             dof = 1
@@ -1941,6 +2007,8 @@ def main():
     #player_data[0].IsAI = 1
     #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
     for i in range(0, player_num):
+        player_data[i].dir[0],  player_data[i].dir[1] = ai(i)
+    
         player_data[i].mode = 7
         player_data[i].b_id = 1
         player_data[i].next_id = 1
@@ -1962,7 +2030,7 @@ def main():
     
     fight_group = [1, 2, 3, 4, 5, 0]
     # end test p
-    while True:        
+    while True:
         draw_all()
         
         if 0 == player_data[turn_id].IsAI:
@@ -1975,7 +2043,7 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            if 0 == player_data[fight_id].IsAI:
+            if None != fight_id and 0 == player_data[fight_id].IsAI:
                 if 7 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     if "win" != player_data[fight_group[0]].fight_solution:
                         (f_x, f_y) = fight_btn_loc
@@ -2055,18 +2123,35 @@ def main():
             if 0 == do_fight(turn_id, player_data[turn_id].b_id):
                 # do spend_dock_resource or get_treasure 
                 step_done(turn_id, player_data[turn_id].b_id)
-        elif 7 == player_data[fight_id].mode and 1 == player_data[fight_id].IsAI:
-            fight_ai(fight_id)
-            player_data[fight_id].mode = 8
-            next_fight()
-        elif 9 == player_data[turn_id].mode:
-            # other player back to mode 6
-            for i in range(0, player_num):
-                if i == turn_id:
-                    continue
-                if player_data[turn_id].b_id == player_data[i].b_id:
-                    player_data[i].mode = 6
-            step_done(turn_id, player_data[turn_id].b_id)
+        elif None != fight_id:
+            if 7 == player_data[fight_id].mode and 1 == player_data[fight_id].IsAI:
+                fight_ai(fight_id)
+                player_data[fight_id].mode = 8
+                next_fight()
+            # for AI and human, but human only for "None" and "Draw"
+            elif 8 == player_data[fight_id].mode:
+                att = fight_group[0]
+                if "None" == player_data[fight_id].fight_text or "None" == player_data[att].fight_text or "Draw" == player_data[fight_id].fight_text:
+                    after_take()
+                elif "Put" == player_data[fight_id].fight_text:
+                    if 1 == player_data[fight_id].IsAI:
+                        take_ai(fight_id, att)
+                        after_take()
+                else: # "Take" == player_data[fight_id]
+                    if 1 == player_data[att].IsAI:
+                        take_ai(att, fight_id)
+                        after_take()
+                
+            elif 9 == player_data[fight_id].mode:
+                # other player back to mode 6
+                for i in range(0, player_num):
+                    if i == turn_id:
+                        continue
+                    if player_data[turn_id].b_id == player_data[i].b_id:
+                        player_data[i].mode = 6
+                fight_id = None
+                fight_group = []
+                step_done(turn_id, player_data[turn_id].b_id)
             
     pygame.quit()
     quit()
