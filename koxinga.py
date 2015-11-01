@@ -1218,7 +1218,23 @@ def draw_inner_item(Surface):
                     draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
                 else:
                     draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
-                
+
+def end_fight():
+    global player_data
+    # other player back to mode 6
+    for i in range(0, player_num):
+        player_data[i].fight_dice = None
+        player_data[i].fight_cannon = 0
+        player_data[i].fight_score = None
+        player_data[i].fight_text = ""
+        if i == turn_id:
+            continue
+        if player_data[turn_id].b_id == player_data[i].b_id:
+            player_data[i].mode = 6
+    fight_id = None
+    fight_group = []
+    step_done(turn_id, player_data[turn_id].b_id)
+                    
 def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248):
         global fight_group
 
@@ -2143,15 +2159,7 @@ def main():
                         after_take()
                 
             elif 9 == player_data[fight_id].mode:
-                # other player back to mode 6
-                for i in range(0, player_num):
-                    if i == turn_id:
-                        continue
-                    if player_data[turn_id].b_id == player_data[i].b_id:
-                        player_data[i].mode = 6
-                fight_id = None
-                fight_group = []
-                step_done(turn_id, player_data[turn_id].b_id)
+                end_fight()
             
     pygame.quit()
     quit()
