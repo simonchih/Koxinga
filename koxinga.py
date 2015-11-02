@@ -436,8 +436,7 @@ def draw_player_treasure(Surface):
         else:
             w = start_w + dock_num*block.get_width() + inner_gap + 1
             h = start_h + 1
-            
-        take_sel = None    
+              
         sum_t = num_of_treasure_own(p)
         if 0 != sum_t:
             screen.blit(treasure_s, (w, h))
@@ -449,7 +448,7 @@ def draw_player_treasure(Surface):
                 (MouseX, MouseY) = pygame.mouse.get_pos()
                 if 0 == player_data[p].IsAI and "Put" == player_data[p].fight_text and w <= MouseX <= w + treasure_s.get_width() and h <= MouseY <= h + treasure_s.get_height():
                         pygame.draw.rect(Surface, RED, (w, h, w + treasure_s.get_width(), h + treasure_s.get_height()), rect_width)
-                        take_sel = 6
+                        take_sel = 5
 
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
@@ -933,6 +932,7 @@ def draw_dock(Surface):
 
 def handle_human_fight_sol(mouseX, mouseY):            
     att = fight_group[0]
+    
     if "win" == player_data[fight_id].fight_solution:
         if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):            
             draw_fight_text(fight_id, "None")
@@ -948,9 +948,9 @@ def handle_human_fight_sol(mouseX, mouseY):
             
             #draw_all()
             #time.sleep(1)
-            
+
             if 0 == player_data[fight_id].IsAI and None != take_sel:
-                if 6 == take_sel:
+                if 5 == take_sel:
                     take_treasure(fight_id, att)
                 else:
                     take_item(fight_id, take_sel)
@@ -980,7 +980,7 @@ def handle_human_fight_sol(mouseX, mouseY):
             #time.sleep(1)
             
             if 0 == player_data[att].IsAI and None != take_sel:
-                if 6 == take_sel:
+                if 5 == take_sel:
                     take_treasure(att, fight_id)
                 else:
                     take_item(att, take_sel)
@@ -2090,12 +2090,15 @@ def handle_card(mouse_loc):
         next_turn()
 
 def next_fight():
-    global fight_id, fight_group, player_data, first_show_fight_sol
+    global fight_id, fight_group, player_data, first_show_fight_sol, cannon_sel, take_sel, cannon_not_enough
     
     draw_all()
     time.sleep(2)
     
+    cannon_not_enough = 1
     first_show_fight_sol = 1
+    cannon_sel = None
+    take_sel   = None
     
     if 7 == player_data[fight_id].mode:
         player_data[fight_id].mode = 8
@@ -2123,7 +2126,7 @@ def all_player_mode6():
     return 1
         
 def main():
-    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group, fight_id, cannon_not_enough
+    global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group, fight_id, cannon_not_enough, cannon_sel, take_sel
     
     dir1 = 1
     dir2 = 1
@@ -2196,7 +2199,6 @@ def main():
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             next_fight()
                 elif 8 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    
                     att = fight_group[0]
                     if 0 == player_data[fight_id].IsAI or 0 == player_data[att].IsAI:
                         (mouseX, mouseY) = pygame.mouse.get_pos()
