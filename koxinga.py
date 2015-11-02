@@ -75,7 +75,7 @@ background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
 block2 = pygame.image.load(block2_image).convert()
 block_sel = pygame.image.load(block_selected_image).convert()
-block2_sel = pygame.image.load(block_selected_image).convert()
+block2_sel = pygame.image.load(block2_selected_image).convert()
 coin = pygame.image.load(coin_image).convert()
 treasure = pygame.image.load(treasure_image).convert()
 treasure_s = pygame.image.load(small_own_treasure_image).convert()
@@ -509,10 +509,14 @@ def draw_five_block():
                     if player_data[att].dvalue[i] and x <= MouseX <= x + bs_image.get_width() and y <= MouseY <= y + bs_image.get_height():
                         screen.blit(bs_image, (x, y))
                         take_sel = i
+                    else:
+                        screen.blit(b_image, (x, y))
                 elif 0 == player_data[att].IsAI and "Put" == player_data[att].fight_text:
                     if player_data[fight_id].dvalue[i] and x <= MouseX <= x + bs_image.get_width() and y <= MouseY <= y + bs_image.get_height():
                         screen.blit(bs_image, (x, y))
                         take_sel = i
+                    else:
+                        screen.blit(b_image, (x, y))
                 else:
                     screen.blit(b_image, (x, y))
             else:
@@ -1006,7 +1010,7 @@ def handle_fight_solution(show = 1):
             draw_all()
             time.sleep(1)
             
-            if 0 == show:
+            if 0 == show and 1 == player_data[fight_id].IsAI:
                 take_ai(fight_id, att)
                 next_fight()
     elif "draw" == player_data[fight_id].fight_solution:
@@ -1035,7 +1039,7 @@ def handle_fight_solution(show = 1):
             draw_all()
             time.sleep(1)
             
-            if 0 == show:
+            if 0 == show and 1 == player_data[att].IsAI:
                 take_ai(att, fight_id)
                 next_fight()
             
