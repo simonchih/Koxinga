@@ -910,13 +910,15 @@ def draw_dock():
     
     # draw fight text
     if None != fight_id:
-        if 7 == player_data[fight_id].mode:
+        if 7 == player_data[fight_id].mode or 8 == player_data[fight_id].mode:
             draw_fight_text(fight_id)
-        elif 8 == player_data[fight_id].mode:
+        # if take is done
+        elif 9 == player_data[fight_id].mode:
             att = fight_group[0]
             if "win" == player_data[fight_id].fight_solution:
                 if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):
-                    draw_fight_text(att, "None")
+                    draw_fight_text(fight_id, "None")
+                    draw_fight_text(att, "Null")
                 else:
                     draw_fight_text(fight_id, "Put")
                     draw_fight_text(att,  "Take")
@@ -925,7 +927,8 @@ def draw_dock():
                 draw_fight_text(att,  "Draw")
             else:
                 if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
-                    draw_fight_text(fight_id, "None")
+                    draw_fight_text(att, "None")
+                    draw_fight_text(fight_id, "Null")
                 else:
                     draw_fight_text(fight_id, "Take")
                     draw_fight_text(att,  "Put")
@@ -1739,7 +1742,7 @@ def take_treasure(put_id, take_id):
             player_data[put_id].treasure[i] = 1
             break
     
-# make sure fight_text is NOT "None" or "Draw" before take    
+# make sure fight_text is NOT "None", "Null" or "Draw" before take    
 def take_ai(put_id, take_id):
     global player_data
     
@@ -1753,24 +1756,24 @@ def take_ai(put_id, take_id):
     # big to little    
     sorted_value = sorted(dvalue, key=lambda l:l[1], reverse=True)
     
+    if [0, 0, 0, 0, 0] == player_data[take_id].dvalue[:]:
+        take_treasure(put_id, take_id)
     # Check my treasure card, so it's not cheat
-    if [1, 1, 1, 1] != player_data[put_id].treasure[6:]:
+    elif [1, 1, 1, 1] != player_data[put_id].treasure[6:]:
         if num_of_treasure_own(take_id) > 0:
             take_treasure(put_id, take_id)
         else:
-            sv = sorted_value[0]
-            type = player_data[take_id].dtype[sv[0]]
-            
-            take_num = take_item(take_id, sv[0])
-            get_dock_resource(type, take_num, put_id)
+            take_dock_item(put_id, take_id, sorted_value[0])
     else:
-        sv = sorted_value[0]
-        type = player_data[take_id].dtype[sv[0]]
-        
-        take_num = take_item(take_id, sv[0])
-        get_dock_resource(type, take_num, put_id)
+        take_dock_item(put_id, take_id, sorted_value[0])
             
-
+def take_dock_item(put_id, take_id, sv):
+    type = player_data[take_id].dtype[sv[0]]
+    
+    take_num = take_item(take_id, sv[0])
+    get_dock_resource(type, take_num, put_id)
+            
+            
 def total_dock_item(f_id, type):
     total = 0
     
@@ -1991,6 +1994,9 @@ def handle_card(mouse_loc):
 def next_fight():
     global fight_id, fight_group
     
+    draw_all()
+    time.sleep(2)
+    
     # if last
     if fight_id == fight_group[-1] and 8 == player_data[fight_id].mode:
         fight_id = fight_group[1]
@@ -1999,8 +2005,6 @@ def next_fight():
     fg_index = fight_group.index(fight_id)
     fight_id = fight_group[(fg_index+1)%len(fight_group)]
     
-    draw_all()
-    time.sleep(1)
         
 #1 for all player mode are 6, 0 for NOT
 def all_player_mode6():
@@ -2147,7 +2151,7 @@ def main():
             # for AI and human, but human only for "None" and "Draw"
             elif 8 == player_data[fight_id].mode:
                 att = fight_group[0]
-                if "None" == player_data[fight_id].fight_text or "None" == player_data[att].fight_text or "Draw" == player_data[fight_id].fight_text:
+                if "None" == player_data[fight_id].fight_text or "Null" == player_data[fight_id].fight_text or "Draw" == player_data[fight_id].fight_text:
                     after_take()
                 elif "Put" == player_data[fight_id].fight_text:
                     if 1 == player_data[fight_id].IsAI:
