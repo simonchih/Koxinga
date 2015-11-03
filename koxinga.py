@@ -146,7 +146,6 @@ Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
 cannon_not_enough = 1
-first_show_fight_sol = 1
 cannon_sel = None
 take_sel   = None
 fight_id = None
@@ -927,122 +926,77 @@ def draw_dock(Surface):
         if 7 == player_data[fight_id].mode:
             draw_fight_text(fight_id)
         # if take is done
-        elif 8 == player_data[fight_id].mode and 1 == first_show_fight_sol:
+        elif 8 == player_data[fight_id].mode:
             handle_fight_solution()
 
-def handle_human_fight_sol(mouseX, mouseY):            
-    att = fight_group[0]
+def handle_human_fight_sol(mouseX, mouseY):
+    put_id, take_id, status = fight_sol()
     
-    if "win" == player_data[fight_id].fight_solution:
-        if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):            
-            draw_fight_text(fight_id, "None")
-            draw_fight_text(att, "Null")
-            
-            draw_all()
-            time.sleep(1)
-            
+    if 0 == status:
+        p_text = "Put"
+        t_text = "Take"
+    elif -1 == status:
+        p_text = "Draw"
+        t_text = "Draw"
+    elif -2 == status:
+        p_text = "None"
+        t_text = "Null"
+        
+    draw_fight_text(put_id, p_text)
+    draw_fight_text(take_id, t_text)
+    
+    if 0 == status:
+        if 0 == player_data[put_id].IsAI and None != take_sel:
+            if dock_num == take_sel:
+                take_treasure(put_id, take_id)
+            else:
+                take_item(put_id, take_sel)
             next_fight()
-        else:
-            draw_fight_text(fight_id, "Put")
-            draw_fight_text(att,  "Take")
-            
-            #draw_all()
-            #time.sleep(1)
-
-            if 0 == player_data[fight_id].IsAI and None != take_sel:
-                if dock_num == take_sel:
-                    take_treasure(fight_id, att)
-                else:
-                    take_item(fight_id, take_sel)
-                next_fight()
-    elif "draw" == player_data[fight_id].fight_solution:
-        draw_fight_text(fight_id, "Draw")
-        draw_fight_text(att,  "Draw")
-        
-        draw_all()
-        time.sleep(1)
-        
-        next_fight()
     else:
-        if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
-            draw_fight_text(att, "None")
-            draw_fight_text(fight_id, "Null")
-            
-            draw_all()
-            time.sleep(1)
-            
-            next_fight()
-        else:
-            draw_fight_text(fight_id, "Take")
-            draw_fight_text(att,  "Put")
-            
-            #draw_all()
-            #time.sleep(1)
-            
-            if 0 == player_data[att].IsAI and None != take_sel:
-                if dock_num == take_sel:
-                    take_treasure(att, fight_id)
-                else:
-                    take_item(att, take_sel)
-                next_fight()
+        next_fight()
     
 # 1 == show, show only. 0 == show, do take/put
 def handle_fight_solution(show = 1):
-    global first_show_fight_sol
+    put_id, take_id, status = fight_sol()
     
-    first_show_fight_sol = 0
+    if 0 == status:
+        p_text = "Put"
+        t_text = "Take"
+    elif -1 == status:
+        p_text = "Draw"
+        t_text = "Draw"
+    elif -2 == status:
+        p_text = "None"
+        t_text = "Null"
+        
+    draw_fight_text(put_id, p_text)
+    draw_fight_text(take_id, t_text)
     
+    if 0 == show:
+        if 0 == status:
+            take_ai(put_id, take_id)
+        next_fight()
+
+# return put_id, take_id, status
+# status:
+#  0: put/take 
+# -1: draw
+# -2: none/null
+def fight_sol():
     att = fight_group[0]
     if "win" == player_data[fight_id].fight_solution:
         if [0, 0, 0, 0, 0] == player_data[att].dvalue[:] and 0 == num_of_treasure_own(att):            
-            draw_fight_text(fight_id, "None")
-            draw_fight_text(att, "Null")
-            
-            draw_all()
-            time.sleep(1)
-            
-            if 0 == show:
-                next_fight()
+            return fight_id, att, -2  
         else:
-            draw_fight_text(fight_id, "Put")
-            draw_fight_text(att,  "Take")
-            
-            draw_all()
-            time.sleep(1)
-            
-            if 0 == show and 1 == player_data[fight_id].IsAI:
-                take_ai(fight_id, att)
-                next_fight()
+            return fight_id, att, 0
     elif "draw" == player_data[fight_id].fight_solution:
-        draw_fight_text(fight_id, "Draw")
-        draw_fight_text(att,  "Draw")
-        
-        draw_all()
-        time.sleep(1)
-        
-        if 0 == show:
-            next_fight()
+        return fight_id, att, -1
     else:
         if [0, 0, 0, 0, 0] == player_data[fight_id].dvalue[:] and 0 == num_of_treasure_own(fight_id):
-            draw_fight_text(att, "None")
-            draw_fight_text(fight_id, "Null")
-            
-            draw_all()
-            time.sleep(1)
-            
-            if 0 == show:
-                next_fight()
+            return att, fight_id, -2
         else:
-            draw_fight_text(fight_id, "Take")
-            draw_fight_text(att,  "Put")
-            
-            draw_all()
-            time.sleep(1)
-            
-            if 0 == show and 1 == player_data[att].IsAI:
-                take_ai(att, fight_id)
-                next_fight()
-            
+            return att, fight_id, 0
+                
 def generate_dock():
     global player_data 
     generate_five_block_w(player_1_3_block_start_w, player_1_6_block_start_h, block, 1)
@@ -2090,13 +2044,12 @@ def handle_card(mouse_loc):
         next_turn()
 
 def next_fight():
-    global fight_id, fight_group, player_data, first_show_fight_sol, cannon_sel, take_sel, cannon_not_enough
+    global fight_id, fight_group, player_data, cannon_sel, take_sel, cannon_not_enough
     
     draw_all()
     time.sleep(2)
     
     cannon_not_enough = 1
-    first_show_fight_sol = 1
     cannon_sel = None
     take_sel = None
     
