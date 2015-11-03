@@ -448,7 +448,7 @@ def draw_player_treasure(Surface):
                 (MouseX, MouseY) = pygame.mouse.get_pos()
                 if 0 == player_data[p].IsAI and "Put" == player_data[p].fight_text and w <= MouseX <= w + treasure_s.get_width() and h <= MouseY <= h + treasure_s.get_height():
                         pygame.draw.rect(Surface, RED, (w, h, w + treasure_s.get_width(), h + treasure_s.get_height()), rect_width)
-                        take_sel = 5
+                        take_sel = dock_num
 
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
@@ -487,7 +487,7 @@ def draw_five_block():
     
     (MouseX, MouseY) = pygame.mouse.get_pos()
     cannon_sel = None
-    take_sel   = None
+    take_sel = None
     
     for p in range(0, player_num):
         if 1 == p or 4 == p:
@@ -950,7 +950,7 @@ def handle_human_fight_sol(mouseX, mouseY):
             #time.sleep(1)
 
             if 0 == player_data[fight_id].IsAI and None != take_sel:
-                if 5 == take_sel:
+                if dock_num == take_sel:
                     take_treasure(fight_id, att)
                 else:
                     take_item(fight_id, take_sel)
@@ -980,7 +980,7 @@ def handle_human_fight_sol(mouseX, mouseY):
             #time.sleep(1)
             
             if 0 == player_data[att].IsAI and None != take_sel:
-                if 5 == take_sel:
+                if dock_num == take_sel:
                     take_treasure(att, fight_id)
                 else:
                     take_item(att, take_sel)
@@ -2098,7 +2098,7 @@ def next_fight():
     cannon_not_enough = 1
     first_show_fight_sol = 1
     cannon_sel = None
-    take_sel   = None
+    take_sel = None
     
     if 7 == player_data[fight_id].mode:
         player_data[fight_id].mode = 8
