@@ -932,7 +932,7 @@ def draw_dock(Surface):
         elif 8 == player_data[fight_id].mode:
             handle_fight_solution()
     
-# 2 == human,1 == show only. 0 == do take/put
+# 2 == human,1 == show only. 0 == ai take/put
 def handle_fight_solution(show = 1):
     put_id, take_id, status = fight_sol()
     
@@ -950,8 +950,10 @@ def handle_fight_solution(show = 1):
     draw_fight_text(take_id, t_text)
     
     if 2 == show:
+        print("status=%d"%status)
         if 0 == status:
             if 0 == player_data[put_id].IsAI and None != take_sel:
+                print("take_sel=%d"%take_sel)
                 if dock_num == take_sel:
                     take_treasure(put_id, take_id)
                 else:
@@ -960,7 +962,7 @@ def handle_fight_solution(show = 1):
         else:
             next_fight()
     if 0 == show:
-        if 0 == status:
+        if 0 == status and 1 == player_data[put_id].IsAI:
             take_ai(put_id, take_id)
         next_fight()
 
@@ -2033,6 +2035,8 @@ def handle_card(mouse_loc):
 def next_fight():
     global fight_id, fight_group, player_data, cannon_sel, take_sel, cannon_not_enough
     
+    print("next fight_id=%d"%fight_id)
+    
     draw_all()
     time.sleep(2)
     
@@ -2044,9 +2048,9 @@ def next_fight():
         player_data[fight_id].mode = 8
     elif 8 == player_data[fight_id].mode:
         player_data[fight_id].mode = 9
-        att = fight_group[0]
         # if last
         if fight_id == fight_group[-1]:
+            att = fight_group[0]
             player_data[att].mode = 9
     
     # if last
@@ -2118,6 +2122,7 @@ def main():
                 pygame.quit()
                 quit()
             if None != fight_id:
+                print("player_data[%d].mode=%d"%(fight_id, player_data[fight_id].mode))
                 if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     if "win" != player_data[fight_group[0]].fight_solution:
                         (f_x, f_y) = fight_btn_loc
@@ -2139,6 +2144,7 @@ def main():
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             next_fight()
                 elif 8 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    print("mouse_down player_data[%d].IsAI=%d"%(fight_id, player_data[fight_id].IsAI))
                     att = fight_group[0]
                     if 0 == player_data[fight_id].IsAI or 0 == player_data[att].IsAI:
                         handle_fight_solution(2)
@@ -2201,6 +2207,7 @@ def main():
                 # do spend_dock_resource or get_treasure 
                 step_done(turn_id, player_data[turn_id].b_id)
         elif None != fight_id:
+            print("f_id=%d"%fight_id)
             if 7 == player_data[fight_id].mode and 1 == player_data[fight_id].IsAI:
                 fight_ai(fight_id)
                 next_fight()
@@ -2209,6 +2216,7 @@ def main():
                 handle_fight_solution(0)
             elif 9 == player_data[fight_id].mode:
                 end_fight()
+            print("after f_id=%d"%fight_id)
             
     pygame.quit()
     quit()
