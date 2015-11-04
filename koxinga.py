@@ -1285,6 +1285,7 @@ def end_fight():
         player_data[i].fight_dice = None
         player_data[i].fight_cannon = 0
         player_data[i].fight_score = None
+        player_data[i].fight_solution = ""
         player_data[i].fight_text = ""
         if i == turn_id:
             continue
