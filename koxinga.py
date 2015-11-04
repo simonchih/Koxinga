@@ -1279,7 +1279,7 @@ def draw_inner_item(Surface):
                     draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
 
 def end_fight():
-    global player_data
+    global player_data, cannon_not_enough, click_take_item, cannon_sel, take_sel, fight_id, fight_group
     # other player back to mode 6
     for i in range(0, player_num):
         player_data[i].fight_dice = None
