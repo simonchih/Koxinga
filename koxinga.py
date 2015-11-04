@@ -1108,13 +1108,6 @@ def next_turn():
     draw_all()
     time.sleep(2)
     
-    cannon_not_enough = 1
-    click_take_item = 0
-    cannon_sel = None
-    take_sel   = None
-    fight_id = None
-    fight_group = []
-    
     if (turn_id + 1)%player_num == start_p:
         if 0 == player_data[turn_id].handle_done[0]:
             turn_id = (turn_id + 1)%player_num
@@ -1297,6 +1290,10 @@ def end_fight():
             continue
         if player_data[turn_id].b_id == player_data[i].b_id:
             player_data[i].mode = 6
+    cannon_not_enough = 1
+    click_take_item = 0
+    cannon_sel = None
+    take_sel   = None
     fight_id = None
     fight_group = []
     step_done(turn_id, player_data[turn_id].b_id)
