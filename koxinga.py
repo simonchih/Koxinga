@@ -3,6 +3,7 @@ import time
 from game_map import *
 from game_player import *
 from mythread import *
+from sys import exit
 
 background_image_filename = 'Image/Formosa-1863_1600x900.jpg'
 block_image = 'Image/wood_40x27.jpg'
@@ -2201,8 +2202,7 @@ def main():
                 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                exit()
             if None != fight_id:
                 click_take_item = 0
                 if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
