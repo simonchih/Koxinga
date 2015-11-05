@@ -145,6 +145,7 @@ BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
 
+end_game = 0
 cannon_not_enough = 1
 click_take_item = 0
 cannon_sel = None
@@ -1130,8 +1131,12 @@ def next_turn():
         turn_id = (turn_id + 1)%player_num
     
 def calc_score():
-    global player_data
+    global player_data, end_game
 
+    if 1 == end_game:
+        return
+        
+    end_game = 1
     score = [0] * player_num
     
     for p in range(0, player_num):
@@ -1144,7 +1149,7 @@ def calc_score():
         # calculate location score
         if 1 == player_data[p].goal_game: # b_id 0 and goal game
             player_data[p].final_location = 15
-        elif player_data[p].b_id > 60 and  player_data[p].b_id < map_block_num: # b_id 61 ~ 70
+        elif 60 < player_data[p].b_id < map_block_num: # b_id 61 ~ 70
             player_data[p].final_location = player_data[p].b_id - 60
         else: # b_id <= 60
             player_data[p].final_location = -5
@@ -1315,6 +1320,18 @@ def draw_inner_item(Surface):
                     draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
                 else:
                     draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
+    elif 1 == end_game:
+        font_gap = 67
+        font_size = 18
+        f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
+        f_y = treasure_y
+            
+        final_message = u"===ID======Gold===Location===Treasure===Final Score===Winner==="
+        Surface.blit(write(str(final_message), GREEN1, font_size), (f_x, f_y))
+        f_y += font_size + int(roll_fight.get_height()/2) - 5
+        for p in range(0, player_num):
+            display_final_status(Surface, p+1, player_data[p].final_gold, player_data[p].final_location, player_data[p].final_treasure, player_data[p].final_score, player_data[p].final_win, font_size, f_x, f_y)
+            f_y += font_gap
 
 def end_fight():
     global player_data, cannon_not_enough, click_take_item, cannon_sel, take_sel, fight_id, fight_group
@@ -1336,7 +1353,15 @@ def end_fight():
     fight_id = None
     fight_group = []
     step_done(turn_id, player_data[turn_id].b_id)
-                    
+
+def display_final_status(Surface, id, gold_score, location_score, treasure_score, player_score, win_status, font_size, f_x, f_y):
+    Surface.blit(write(str(id), BLACK, font_size), (f_x+35, f_y))
+    Surface.blit(write("%2d"%gold_score, Dark_Blue, font_size), (f_x+125, f_y))
+    Surface.blit(write("%2d"%location_score, Dark_Blue, font_size), (f_x+210, f_y))
+    Surface.blit(write("%2d"%treasure_score, Dark_Blue, font_size), (f_x+310, f_y))
+    Surface.blit(write("%3d"%player_score, RED, font_size), (f_x+415, f_y))
+    Surface.blit(write(str(win_status), RED, font_size), (f_x+510, f_y))
+    
 def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248):
         global fight_group
 
@@ -1366,7 +1391,7 @@ def fight_roll_dice(Surface, font_size, f_roll, x, y):
         Surface.blit(fight_win, (x, y))
                 
 # return 0 for OK, and 1 is NOT enough(fail)                
-def spend_dock_resource(type, value, t_id = turn_id):
+def spend_dock_resource(type, value, t_id):
     global player_data
     #type 1:food, 2:gold
     
@@ -1396,7 +1421,7 @@ def spend_dock_resource(type, value, t_id = turn_id):
             
     return 1
 
-def get_dock_resource(type, value, t_id = turn_id):
+def get_dock_resource(type, value, t_id):
     global player_data
     
     # dvalue, index is 0 base
@@ -1454,12 +1479,14 @@ def resource_dest(dest, res, food, gold):
     return r_sum, total_food, total_gold
     
 def handle_step(night, dir):
+    global turn_id
+
     type, dice_point, forward = card_action(night, player_data[turn_id].selected_card_value)
     if 0 != dice_point:
         if 0 == type:
             prepare_move(dice_point, dir, forward)
         else:
-            get_dock_resource(type, dice_point)
+            get_dock_resource(type, dice_point, turn_id)
 
 # return type(0:move, 1:food, 2:gold, 3:cannon), dice_val(0~6), forward (1:forward, 0:back, None)
 def card_action(night, s_card):
@@ -1757,7 +1784,7 @@ def forward_ai():
         r_sum = 0
     return s_card, sdir1, sdir2, step_max
     
-def ai(t_id = turn_id):
+def ai(t_id):
     global  player_data, dice_value1, dice_value2
     s_card = 0
     dir1 = 1
@@ -1984,10 +2011,10 @@ def get_treasure(t_id, b_id):
         
         if 0 == index: #food
             #type 1, food
-            get_dock_resource(1, 7)
+            get_dock_resource(1, 7, turn_id)
         elif 1 == index: #gold
             #type 2, gold
-            get_dock_resource(2, 7)
+            get_dock_resource(2, 7, turn_id)
     main_map[b_id].type = 0
 
 # return 0: NOT fight, 1: fight
@@ -2019,7 +2046,7 @@ def do_fight(t_id, b_id):
     return dof
     
 def step_done(t_id, b_id):
-    global player_data, main_map, draw_player_thread
+    global player_data, main_map, draw_player_thread, turn_id
     #type:0 = nothing,1 = treasure, 2 = gold coin, 3 = food
     type  = main_map[b_id].type
     value = main_map[b_id].value
@@ -2029,10 +2056,10 @@ def step_done(t_id, b_id):
         get_treasure(t_id, b_id)
     elif 2 == type:
         #spend gold
-        fail = spend_dock_resource(2, value)
+        fail = spend_dock_resource(2, value, turn_id)
     elif 3 == type:
         #spend food
-        fail = spend_dock_resource(1, value)
+        fail = spend_dock_resource(1, value, turn_id)
     #else: # 0 == type
     
     if 1 == fail:
@@ -2124,36 +2151,40 @@ def main():
     generate_dock()
     generate_player_card()
     draw_player_thread.start()
-    # test p backward
-    #player_data[0].IsAI = 1
-    player_data[1].treasure = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
-    treasure_card = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
-    turn_id = 1
-    start_p = 1
+    # test
+    # player_data[0].IsAI = 1
     
-    for i in range(0, player_num):
-        player_data[i].dir[0],  player_data[i].dir[1] = ai(i)
+    ## test goal game
+    #player_data[0].goal_game = 1
+    #start_p = 0
+    #turn_id = 5
+    #
+    #for i in range(0, player_num):
+    #    player_data[i].dir[0],  player_data[i].dir[1] = ai(i)
+    ## end test goal game
     
-        player_data[i].mode = 7
-        player_data[i].b_id = 1
-        player_data[i].next_id = 1
-        # b_id = 1
-        player_data[i].x = player_data[i].loc[1][0]
-        player_data[i].y = player_data[i].loc[1][1]
-        # add 4 cannon
-        #player_data[i].dtype[2] = 3
-        #player_data[i].dvalue[2] = 4
-    #fight_id = 2
-    #player_data[0].mode = 7
-    #player_data[1].mode = 8
-    #player_data[1].fight_dice = 11
-    #player_data[1].fight_score = "max"
-    #player_data[1].fight_solution = "win"
-    fight_id = 1    
-    fight_group = [1, 2, 3, 4, 5, 0]
-    player_data[0].dtype[2]  = 3
-    player_data[0].dvalue[2] = 6
-    # end test p
+    ## test fight case
+    #player_data[1].treasure = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
+    #treasure_card = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
+    #turn_id = 1
+    #start_p = 1
+    #
+    #for i in range(0, player_num):
+    #    player_data[i].dir[0],  player_data[i].dir[1] = ai(i)
+    #
+    #    player_data[i].mode = 7
+    #    player_data[i].b_id = 1
+    #    player_data[i].next_id = 1
+    #    # b_id = 1
+    #    player_data[i].x = player_data[i].loc[1][0]
+    #    player_data[i].y = player_data[i].loc[1][1]
+    #
+    #fight_id = 1    
+    #fight_group = [1, 2, 3, 4, 5, 0]
+    #player_data[0].dtype[2]  = 3
+    #player_data[0].dvalue[2] = 6
+    ## end test fight case
+    # end test
     while True:
         draw_all()
         
@@ -2232,9 +2263,8 @@ def main():
                         player_data[turn_id].dir[draw_player_thread.is_night] = 2
                         player_data[turn_id].mode = 1
                 
-        
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].mode:
-            player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai()
+            player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai(turn_id)
             next_turn()
         
         if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:

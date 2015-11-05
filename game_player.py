@@ -8,6 +8,7 @@ class game_player():
         self.y = y_now
         self.b_id = block_id
         self.next_id = next_block_id
+        # loc = [[x0, y0], [x1, y1], [x2, y2] ...]
         self.loc = location
         self.IsAI = IsAI
         self.handle_done = handle_done[:]
