@@ -1130,8 +1130,39 @@ def next_turn():
         turn_id = (turn_id + 1)%player_num
     
 def calc_score():
-    pass
+    global player_data
+
+    score = [0] * player_num
     
+    for p in range(0, player_num):
+        # calculate gold
+        for i in range(0, dock_num):
+            # if 2(gold)
+            if 2 == player_data[p].dtype[i]:
+                player_data[p].final_gold += player_data[p].dvalue[i]
+        
+        # calculate location score
+        if 1 == player_data[p].goal_game: # b_id 0 and goal game
+            player_data[p].final_location = 15
+        elif player_data[p].b_id > 60 and  player_data[p].b_id < map_block_num: # b_id 61 ~ 70
+            player_data[p].final_location = player_data[p].b_id - 60
+        else: # b_id <= 60
+            player_data[p].final_location = -5
+            
+        # calculate treasure score    
+        for t in range(2, treasure_num):
+            if 1 == player_data[p].treasure[t]:
+                player_data[p].final_treasure += t
+        
+        # calculate final score
+        player_data[p].final_score = player_data[p].final_gold + player_data[p].final_location + player_data[p].final_treasure
+        score[p] = player_data[p].final_score
+        
+    win_score = max(score)
+    for p in range(0, player_num):
+        if win_score == player_data[p].final_score:
+            player_data[p].final_win = "Winner"
+            
 def draw_start_and_turn(sp_id, t_id):
     s_image = start_player
     t_image = turn
