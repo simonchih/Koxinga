@@ -452,7 +452,7 @@ def draw_player_treasure(Surface):
             
     # select treasure
     if None != fight_id:
-        if 8 == player_data[fight_id].mode and 0 == player_data[put_id].IsAI:
+        if 8 == player_data[fight_id].mode and 0 == status and 0 == player_data[put_id].IsAI:
             (t_x, t_y) = (treasure_image_pos[take_id][0], treasure_image_pos[take_id][1])
             if num_of_treasure_own(take_id) and t_x <= MouseX <= t_x + treasure_s.get_width() and t_y <= MouseY <= t_y + treasure_s.get_height():
                     pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
@@ -526,7 +526,7 @@ def draw_five_block():
                     if 3 == player_data[fight_id].dtype[i] and player_data[fight_id].dvalue[i] and f_x <= MouseX <= f_x + bs_image.get_width() and f_y <= MouseY <= f_y + bs_image.get_height():
                         screen.blit(bs_image, (f_x, f_y))
                         cannon_sel = i
-            elif 8 == player_data[fight_id].mode and 0 == player_data[put_id].IsAI:
+            elif 8 == player_data[fight_id].mode and 0 == status and 0 == player_data[put_id].IsAI:
                 if 1 == take_id or 4 == take_id:
                     bs_image = block2_sel
                 else:
@@ -1320,6 +1320,11 @@ def draw_inner_item(Surface):
                     draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
                 else:
                     draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
+            if 8 == player_data[fight_id].mode:
+                put_id, take_id, status = fight_sol()
+                if 0 == status and 0 == player_data[put_id].IsAI:
+                    draw_button(Surface, fight_btn_loc,  "Auto Take", BLACK)
+                
     elif 1 == end_game:
         font_gap = 67
         font_size = 18
@@ -2221,6 +2226,14 @@ def main():
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             next_fight()
                 elif 8 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
+                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    put_id, take_id, status = fight_sol()
+                    if 0 == status and 0 == player_data[put_id].IsAI:
+                        (f_x, f_y) = fight_btn_loc
+                        if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
+                            take_ai(put_id, take_id)
+                            next_fight()
+                        
                     if None != take_sel:
                         click_take_item = 1
                     handle_fight_solution(0)
