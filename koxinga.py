@@ -407,8 +407,12 @@ def draw_fight_text(f_id, text = "Fight"):
 def draw_player_treasure(Surface):
     global take_sel
     
+    treasure_image_pos = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+    rect_width = 2
     font_size = 22
     (MouseX, MouseY) = pygame.mouse.get_pos()
+    if None != fight_id and 8 == player_data[fight_id].mode:
+        put_id, take_id, status = fight_sol()
     
     for p in range(0, player_num):
         (start_w, start_h) = id_to_start_loc(p)
@@ -437,18 +441,21 @@ def draw_player_treasure(Surface):
         else:
             w = start_w + dock_num*block.get_width() + inner_gap + 1
             h = start_h + 1
-              
+        
+        treasure_image_pos[p] = (w, h)
+        
         sum_t = num_of_treasure_own(p)
         if 0 != sum_t:
             screen.blit(treasure_s, (w, h))
             screen.blit(write(str(sum_t)+"x", RED, font_size), (w+font_gap_x, h+font_gap_y))
             
-            # select treasure
-            if None != fight_id and 8 == player_data[fight_id].mode:
-                att = fight_group[0]
-                if 0 == player_data[p].IsAI and "Put" == player_data[p].fight_text and w <= MouseX <= w + treasure_s.get_width() and h <= MouseY <= h + treasure_s.get_height():
-                        pygame.draw.rect(Surface, RED, (w, h, w + treasure_s.get_width(), h + treasure_s.get_height()), rect_width)
-                        take_sel = dock_num
+    # select treasure
+    if None != fight_id:
+        if 8 == player_data[fight_id].mode and 0 == player_data[put_id].IsAI:
+            (t_x, t_y) = (treasure_image_pos[take_id][0], treasure_image_pos[take_id][1])
+            if num_of_treasure_own(take_id) and t_x <= MouseX <= t_x + treasure_s.get_width() and t_y <= MouseY <= t_y + treasure_s.get_height():
+                    pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
+                    take_sel = dock_num
 
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
@@ -507,7 +514,7 @@ def draw_five_block():
         draw_normal_block(b_image, p)
         
         if None != fight_id:
-            if 7 == player_data[fight_id].mode:
+            if 7 == player_data[fight_id].mode and 0 == player_data[fight_id].IsAI:
                 if 1 == fight_id or 4 == fight_id:
                     bs_image = block2_sel
                 else:
@@ -518,7 +525,7 @@ def draw_five_block():
                     if 3 == player_data[fight_id].dtype[i] and player_data[fight_id].dvalue[i] and f_x <= MouseX <= f_x + bs_image.get_width() and f_y <= MouseY <= f_y + bs_image.get_height():
                         screen.blit(bs_image, (f_x, f_y))
                         cannon_sel = i
-            elif 8 == player_data[fight_id].mode:
+            elif 8 == player_data[fight_id].mode and 0 == player_data[put_id].IsAI:
                 if 1 == take_id or 4 == take_id:
                     bs_image = block2_sel
                 else:
@@ -2088,7 +2095,8 @@ def main():
     draw_player_thread.start()
     # test p backward
     #player_data[0].IsAI = 1
-    #player_data[0].treasure = [1, 1, 0, 0, 1, 0, 0, 1, 0, 1]
+    player_data[1].treasure = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
+    treasure_card = [0, 0, 1, 0, 1, 0, 1, 0, 1, 1]
     turn_id = 1
     start_p = 1
     
