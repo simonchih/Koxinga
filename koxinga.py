@@ -1305,14 +1305,23 @@ def draw_inner_item(Surface):
             f_y += font_size + int(roll_fight.get_height()/2) - 5
             r_x = f_x + 112
             r_y = treasure_y + font_size + f_gap
+            f_y_org = f_y
+            r_y_org = r_y
             for f in fight_group:
-                display_fight_status(Surface, player_data[f].mode, f+1, player_data[f].fight_cannon, player_data[f].fight_dice, player_data[f].fight_score, player_data[f].fight_solution, f_x, f_y, r_x, r_y)
+                if f == fight_group[0]:
+                    show = 0
+                else:
+                    show = 1
+                display_fight_status(Surface, player_data[f].mode, f+1, player_data[f].fight_cannon, player_data[f].fight_dice, player_data[f].fight_score, player_data[f].fight_solution, f_x, f_y, r_x, r_y, show)
                 
                 r_y += roll_fight.get_height() + f_gap
                 f_y = r_y + 12
                 
-                if f == fight_id and 7 == player_data[fight_id].mode:
+                if 7 == player_data[f].mode:
                     break
+                elif 8 == player_data[f].mode and f == fight_group[-1]:
+                    att = fight_group[0]
+                    display_fight_status(Surface, player_data[att].mode, att+1, player_data[att].fight_cannon, player_data[att].fight_dice, player_data[att].fight_score, player_data[att].fight_solution, f_x, f_y_org, r_x, r_y_org, 1)
                     
             # If human
             if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode:
@@ -1367,8 +1376,9 @@ def display_final_status(Surface, id, gold_score, location_score, treasure_score
     Surface.blit(write("%2d"%treasure_score, Dark_Blue, font_size), (f_x+310, f_y))
     Surface.blit(write("%3d"%player_score, RED, font_size), (f_x+415, f_y))
     Surface.blit(write(str(win_status), RED, font_size), (f_x+510, f_y))
-    
-def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248):
+
+# first_sol = 0, won't show. If first_sol = 1, display    
+def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solution="", f_x=555, f_y=262, r_x=667, r_y=248, first_sol = 1):
         global fight_group
 
         font_size = 18
@@ -1382,7 +1392,8 @@ def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solut
             Surface.blit(write(str(id), GREEN1, font_size), (f_x+35, f_y))
             Surface.blit(write("%2d"%cannon, GREEN1, font_size), (f_x+240, f_y))
             Surface.blit(write(str(score), GREEN1, font_size), (f_x+350, f_y))
-            Surface.blit(write(solution, GREEN1, font_size), (f_x+455, f_y))
+            if 1 == first_sol:
+                Surface.blit(write(solution, GREEN1, font_size), (f_x+455, f_y))
     
 def fight_roll_dice(Surface, font_size, f_roll, x, y):
     f_x = x + 16
@@ -2187,6 +2198,8 @@ def main():
     #
     #fight_id = 1    
     #fight_group = [1, 2, 3, 4, 5, 0]
+    #player_data[1].dtype[2]  = 3
+    #player_data[1].dvalue[2] = 6
     #player_data[0].dtype[2]  = 3
     #player_data[0].dvalue[2] = 6
     ## end test fight case
