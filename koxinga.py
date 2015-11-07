@@ -1344,7 +1344,7 @@ def draw_inner_item(Surface):
                 if "win" != player_data[fight_group[0]].fight_solution:
                     draw_button(Surface, fight_btn_loc,  "Fight", BLACK)
                     draw_button(Surface, cannon_btn_loc, "Add Cannon", BLACK)
-                else:
+                elif 11 == player_data[fight_group[0]].fight_dice:
                     draw_button(Surface, fight_btn_loc,  "Accept", BLACK)
             if 8 == player_data[fight_id].mode:
                 put_id, take_id, status = fight_sol()
