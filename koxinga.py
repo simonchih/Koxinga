@@ -16,7 +16,12 @@ small_own_treasure_image = 'Image/treasure_25x25.gif'
 own_treasure_image = 'Image/treasure_50x50.gif'
 button1_image = 'Image/button1_100x50.gif'
 start_image = 'Image/start_50x50.gif'
-turn_image = 'Image/turn_50x50.gif'
+turn0_image = 'Image/turn0_50x50.gif'
+turn1_image = 'Image/turn1_50x50.gif'
+turn2_image = 'Image/turn2_50x50.gif'
+turn3_image = 'Image/turn3_50x50.gif'
+turn4_image = 'Image/turn4_50x50.gif'
+turn5_image = 'Image/turn5_50x50.gif'
 roll_fight_image = 'Image/Pentagon_50x48.gif'
 fight_win_image = 'Image/win_50x48.gif'
 
@@ -83,7 +88,12 @@ treasure_s = pygame.image.load(small_own_treasure_image).convert()
 treasure_b = pygame.image.load(own_treasure_image).convert()
 button1 = pygame.image.load(button1_image).convert()
 start_player = pygame.image.load(start_image).convert()
-turn = pygame.image.load(turn_image).convert()
+turn0 = pygame.image.load(turn0_image).convert()
+turn1 = pygame.image.load(turn1_image).convert()
+turn2 = pygame.image.load(turn2_image).convert()
+turn3 = pygame.image.load(turn3_image).convert()
+turn4 = pygame.image.load(turn4_image).convert()
+turn5 = pygame.image.load(turn5_image).convert()
 roll_fight = pygame.image.load(roll_fight_image).convert()
 fight_win = pygame.image.load(fight_win_image).convert()
 
@@ -1168,10 +1178,24 @@ def calc_score():
     for p in range(0, player_num):
         if win_score == player_data[p].final_score:
             player_data[p].final_win = "Winner"
+
+def turn_id_to_turn_img(t_id):
+    if 0 == t_id:
+        return turn0
+    elif 1 == t_id:
+        return turn1
+    elif 2 == t_id:
+        return turn2
+    elif 3 == t_id:
+        return turn3
+    elif 4 == t_id:
+        return turn4
+    elif 5 == t_id:
+        return turn5
             
 def draw_start_and_turn(sp_id, t_id):
     s_image = start_player
-    t_image = turn
+    t_image = turn_id_to_turn_img(t_id)
     gap = 20
     show_card_image = turn_id_to_image(t_id)
         
@@ -1217,21 +1241,13 @@ def draw_start_and_turn(sp_id, t_id):
     
     screen.blit(s_image, (start_w, start_h))
     screen.blit(t_image, (x, y))
-    
-    # Test Code for player id 5
-    #(start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
-    #(x, y) = (start_w-gap-t_image.get_width(), start_h)
-    #
-    #(start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
-    #
-    #screen.blit(s_image, (start_w, start_h))
-    #screen.blit(t_image, (x, y))
-    # End Test
             
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, player_data, turn_id, inner_gap, treasure_num, fight_id
     
     rect_width = 2
+    
+    back_card_gap = 10
     
     index1 = index_to_image_dice(dice_value1)
     index2 = index_to_image_dice(dice_value2)
@@ -1347,6 +1363,17 @@ def draw_inner_item(Surface):
         for p in range(0, player_num):
             display_final_status(Surface, p+1, player_data[p].final_gold, player_data[p].final_location, player_data[p].final_treasure, player_data[p].final_score, player_data[p].final_win, font_size, f_x, f_y)
             f_y += font_gap
+            
+    (x, y) = (1200, 250)
+    (font_x, font_y) = (x + back0.get_width() + 5, y + 5)
+    font_size = 32
+    for t in range(0, player_num):
+        back_image = turn_id_to_image(t)
+        if player_data[t].remain_card_num > 0:
+            Surface.blit(back_image, (x, y))
+            Surface.blit(write(str(player_data[t].remain_card_num)+"X", BLACK, font_size), (font_x, font_y))
+        y += back_image.get_height() + back_card_gap
+        font_y += back_image.get_height() + back_card_gap
 
 def end_fight():
     global player_data, cannon_not_enough, click_take_item, cannon_sel, take_sel, fight_id, fight_group
