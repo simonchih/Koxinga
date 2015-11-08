@@ -2253,6 +2253,7 @@ def main():
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             roll_fight_dice(fight_id, fight_group[0])
                             next_fight()
+                            break
                         if c_x <= mouseX <= c_x+button1.get_width() and c_y <= mouseY <= c_y+button1.get_height():
                             use_cannon()
                         if None != cannon_sel:
@@ -2260,11 +2261,12 @@ def main():
                             cn = take_item(fight_id, cannon_sel, 1)
                             if None != cn:
                                 player_data[fight_id].fight_cannon += cn
-                    else:
+                    elif 11 == player_data[fight_group[0]].fight_dice:
                         (f_x, f_y) = fight_btn_loc
                         (mouseX, mouseY) = pygame.mouse.get_pos()
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             next_fight()
+                            break
                 elif 8 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     put_id, take_id, status = fight_sol()
@@ -2273,10 +2275,12 @@ def main():
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             take_ai(put_id, take_id)
                             next_fight()
+                            break
                         
                     if None != take_sel:
                         click_take_item = 1
                     handle_fight_solution(0)
+                    break
                     
             elif 0 == player_data[turn_id].IsAI:
                 if 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
@@ -2288,15 +2292,18 @@ def main():
                         dice_value1 = dice1
                         dice_value2 = dice2
                         player_data[turn_id].mode = 4
+                        break
                 if 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
                     if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
                         (dice_value1, dice_value2) = (dice_value2, dice_value1)
                     handle_card((mouseX, mouseY))
+                    break
                 if 5 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     handle_card((mouseX, mouseY))
+                    break
                 if 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     (mouseX, mouseY) = pygame.mouse.get_pos()
                     aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
@@ -2311,10 +2318,12 @@ def main():
                         player_data[turn_id].next_id = outer
                         player_data[turn_id].dir[draw_player_thread.is_night] = 1
                         player_data[turn_id].mode = 1
+                        break
                     elif x2 < mouseX < x2 + aimg.get_width() and y2 < mouseY < y2 + aimg.get_height():
                         player_data[turn_id].next_id = inner
                         player_data[turn_id].dir[draw_player_thread.is_night] = 2
                         player_data[turn_id].mode = 1
+                        break
                 
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].mode:
             player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai(turn_id)
