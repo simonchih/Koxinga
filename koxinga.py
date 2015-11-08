@@ -155,6 +155,12 @@ RED = (0xff, 0, 0)
 BLACK = (0, 0, 0)
 Dark_Blue = (0, 0, 0xaa)
 GREEN1 = (15, 96, 25)
+P1COLOR = (0, 0, 174)
+P2COLOR = (1, 98, 1)
+P3COLOR = (197, 197, 37)
+P4COLOR = (192, 2, 1)
+P5COLOR = (189, 113, 1)
+P6COLOR = (140, 184, 229)
 
 end_game = 0
 cannon_not_enough = 1
@@ -548,13 +554,13 @@ def draw_five_block():
                         screen.blit(bs_image, (t_x, t_y))
                         take_sel = i
 
-#player is 1 base, but player_image_pos is 0 base
+#player is 1 based, but player_image_pos is 0 based
 def generate_five_block_w(start_w, start_h, b_image, player):
     for i in range(0, dock_num):
         player_image_pos[player-1][i][0] = start_w + i*b_image.get_width()
         player_image_pos[player-1][i][1] = start_h
 
-#player is 1 base, but player_image_pos is 0 base        
+#player is 1 based, but player_image_pos is 0 based    
 def generate_five_block_h(start_w, start_h, b_image, player):
     for i in range(0, dock_num):
         player_image_pos[player-1][i][0] = start_w
@@ -670,7 +676,7 @@ def set_random_item(mark, low, high, type=0, value=0):
                 i += 1
                 index -= 1
 
-#player is 0 base                
+#player is 0 based                
 def map_loc_to_player_loc(map_loc, block_id, player):
     gap = 5
     (x, y) = map_loc
@@ -1315,7 +1321,7 @@ def draw_inner_item(Surface):
             f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
             f_y = treasure_y
             
-            #ID: 1-base
+            #ID: 1-based
             top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
             Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
             f_y += font_size + int(roll_fight.get_height()/2) - 5
@@ -1396,8 +1402,29 @@ def end_fight():
     fight_group = []
     step_done(turn_id, player_data[turn_id].b_id)
 
+# id: 1-based
+def id_to_pcolor(id):
+    if 1 == id:
+        return P1COLOR
+    elif 2 == id:
+        return P2COLOR
+    elif 3 == id:
+        return P3COLOR
+    elif 4 == id:
+        return P4COLOR
+    elif 5 == id:
+        return P5COLOR
+    else: #6 == id
+        return P6COLOR
+
+# id: 1-based
+def draw_id(id, font_color, font_size, Surface, x, y):
+    (r_x, r_y) = (x+15, y+2)
+    Surface.blit(write(str(id), font_color, font_size), (x, y))
+    pygame.draw.rect(Surface, id_to_pcolor(id), (r_x, r_y, 20, 20))
+        
 def display_final_status(Surface, id, gold_score, location_score, treasure_score, player_score, win_status, font_size, f_x, f_y):
-    Surface.blit(write(str(id), BLACK, font_size), (f_x+35, f_y))
+    draw_id(id, Dark_Blue, font_size, Surface, f_x+25, f_y)
     Surface.blit(write("%2d"%gold_score, Dark_Blue, font_size), (f_x+125, f_y))
     Surface.blit(write("%2d"%location_score, Dark_Blue, font_size), (f_x+210, f_y))
     Surface.blit(write("%2d"%treasure_score, Dark_Blue, font_size), (f_x+310, f_y))
@@ -1411,12 +1438,12 @@ def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solut
         font_size = 18
         
         if 7 == mode:
-            Surface.blit(write(str(id), GREEN1, font_size), (f_x+35, f_y))
+            draw_id(id, GREEN1, font_size, Surface, f_x+25, f_y)
             Surface.blit(write("%2d"%cannon, GREEN1, font_size), (f_x+240, f_y))
         # mode == 8, 9
         else:
             fight_roll_dice(Surface, font_size, dice, r_x, r_y)
-            Surface.blit(write(str(id), GREEN1, font_size), (f_x+35, f_y))
+            draw_id(id, GREEN1, font_size, Surface, f_x+25, f_y)
             Surface.blit(write("%2d"%cannon, GREEN1, font_size), (f_x+240, f_y))
             Surface.blit(write(str(score), GREEN1, font_size), (f_x+350, f_y))
             if 1 == first_sol:
@@ -1441,7 +1468,7 @@ def spend_dock_resource(type, value, t_id):
     
     spent_value_total = 0
     
-    # dvalue, index is 0 base
+    # dvalue, index is 0 based
     dvalue = [0] * dock_num
     for i in range(0, dock_num):
         dvalue[i] = (i, player_data[t_id].dvalue[i])
@@ -1468,7 +1495,7 @@ def spend_dock_resource(type, value, t_id):
 def get_dock_resource(type, value, t_id):
     global player_data
     
-    # dvalue, index is 0 base
+    # dvalue, index is 0 based
     dvalue = [0] * dock_num
     
     for i in range(0, dock_num):
@@ -1908,7 +1935,7 @@ def take_ai(put_id, take_id):
     
     take_num = 0
     
-    # dvalue, index is 0 base
+    # dvalue, index is 0 based
     dvalue = [0] * dock_num
     for i in range(0, dock_num):
         dvalue[i] = (i, player_data[take_id].dvalue[i])
