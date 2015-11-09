@@ -7,6 +7,7 @@ Koxinga is the game similar with board game Jamaica.
 4. The fight in Jamaica, using 6 faces dice and the points are 2, 4, 6, 8, 10 and star. Koxinga using 12 faces dice and the points are 0~10 and fire. Fire and star means immediate win.
 5. Jamaica have backward card action that is not in Koxinga. But Koxinga have "forward dice points minus one" or "forward dice points minus two" card action.
 6. When ship holds are full, Koxinga have auto drop items mechanism even human player.
+7. In Koxinga, player won' fight in start point (Formosa strait).
 ...
 
 Following is Chinese user guide.
@@ -97,11 +98,12 @@ Note，前進骰子數減2步，當骰子點數是1時，該卡牌會造成後退一步。
 或者前進骰子數減2步。
 6. 當貨倉滿時，有新物資進來時，牙買加是由玩家選擇丟棄貨倉的物資，
 Koxinga不管人類或是電腦玩家，都會自動丟棄。
-7. 如果地圖上，食物或金幣不足而後退時，牙買加在後退又遇到不足的情形，
+7. Koxinga在起點(Formosa strait)不會發生海戰。
+8. 如果地圖上，食物或金幣不足而後退時，牙買加在後退又遇到不足的情形，
 不會另外扣食物或金幣。Koxinga則會每一格後退，都要扣，且每一次後退，
 遇到其它玩家，都會觸發海戰。
-8. 結算位置分數時，牙買加是-5, 2~10, 15，Koxinga是-5, 1~10, 15。
-9. 美工不同，例如牙買加的棋子是用船，Koxinga是一般棋子。牙買加地圖上，
+9. 結算位置分數時，牙買加是-5, 2~10, 15，Koxinga是-5, 1~10, 15。
+10. 美工不同，例如牙買加的棋子是用船，Koxinga是一般棋子。牙買加地圖上，
 正方形幾個代表需要幾個食物，Koxinga是用圓形。
 ...
 

@@ -75,6 +75,8 @@ dice_6_3 = 'Image/die-6+3.gif'
 dice_6_4 = 'Image/die-6+4.gif'
 dice_6_5 = 'Image/die-6+5.gif'
 
+cannon_fire_sound = 'Sound/Cannon_Fire.ogg'
+
 treasure_alpha = 130
 
 background = pygame.image.load(background_image_filename).convert()
@@ -148,6 +150,8 @@ di_6_2 = pygame.image.load(dice_6_2).convert()
 di_6_3 = pygame.image.load(dice_6_3).convert()
 di_6_4 = pygame.image.load(dice_6_4).convert()
 di_6_5 = pygame.image.load(dice_6_5).convert()
+
+cannon_fire = pygame.mixer.Sound(cannon_fire_sound)
 
 draw_player_thread = mythread(1, screen, 0)
 
@@ -2113,6 +2117,7 @@ def do_fight(t_id, b_id):
         fight_group.extend(near)
         #assign fight_id
         fight_id = t_id
+        cannon_fire.play()
     
     return dof
     
