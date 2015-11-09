@@ -75,7 +75,7 @@ dice_6_3 = 'Image/die-6+3.gif'
 dice_6_4 = 'Image/die-6+4.gif'
 dice_6_5 = 'Image/die-6+5.gif'
 
-cannon_fire_sound = 'Sound/Cannon_Fire.ogg'
+cannon_fire_sound = 'Sound/Cannon_Fire.wav'
 
 treasure_alpha = 130
 

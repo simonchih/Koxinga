@@ -10,6 +10,10 @@ Koxinga is the game similar with board game Jamaica.
 7. In Koxinga, player won' fight in start point (Formosa strait).
 ...
 
+==Environment==
+Resolution 1600x900 or above
+Python 3 and Pygame
+
 Following is Chinese user guide.
 
 Koxinga, 國姓爺，是一個類似桌上遊戲："牙買加"的遊戲。

@@ -158,7 +158,10 @@ setup(name="name",
       #console=[koxinga],
 
       # windows subsystem executables (no console)
-      windows=[koxinga],
+      windows=[ {
+            "script": "koxinga.py",
+            "icon_resources": [(1, "koxinga_default.ico")]
+        }],
 
       # py2exe options
       zipfile=None,
