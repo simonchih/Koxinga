@@ -1045,8 +1045,10 @@ def draw_button(Surface, loc, str, color, size = 14, image = button1):
     else:
         Surface.blit(write(str, color, size), (fontx, fonty))
     
-def draw_show_card(p_id, showc=1):    
+def draw_show_card(p_id, is_night, showc=1):    
     gap = 20
+    rect_width = 2
+    
     if 1 == showc: # show card
         show_card_image = card_id_to_image(player_data[p_id].selected_card_value)
     else: #show back
@@ -1069,6 +1071,18 @@ def draw_show_card(p_id, showc=1):
         (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width(), screen_height - show_card_image.get_height())
     
     screen.blit(show_card_image, (start_w, start_h))
+    
+    if 1 == showc:
+        if 1 == p_id or 4 == p_id:
+            if 0 == is_night:
+                pygame.draw.rect(screen, RED,  (start_w-1, start_h-1, show_card_image.get_width()+1, int(show_card_image.get_height()/2)+1),rect_width)
+            else:
+                pygame.draw.rect(screen, RED,  (start_w-1, start_h+int(show_card_image.get_height()/2)-1, show_card_image.get_width()+1, int(show_card_image.get_height()/2)+1),rect_width)
+        else:
+            if 0 == is_night:
+                pygame.draw.rect(screen, RED,  (start_w-1, start_h-1, int(show_card_image.get_width()/2)+1, show_card_image.get_height()+1),rect_width)
+            else:
+                pygame.draw.rect(screen, RED,  (start_w+int(show_card_image.get_width()/2)-1, start_h-1, int(show_card_image.get_width()/2)+1, show_card_image.get_height()+1),rect_width)
 
 def draw_selected_card(t_id, start, mode=6):
     global player_num, player_data, draw_player_thread
@@ -1087,17 +1101,17 @@ def draw_selected_card(t_id, start, mode=6):
             if s == t_id:
                 break
             #show back card
-            draw_show_card(s, 0)
+            draw_show_card(s, draw_player_thread.is_night, 0)
     elif 1 == draw_player_thread.is_night:
         for i in range(0, player_num):
             s = (start+i)%player_num
             #show card
-            draw_show_card(s, showc)
+            draw_show_card(s, draw_player_thread.is_night, showc)
     elif 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
         for i in range(0, player_num):
             s = (start+i)%player_num
             # draw back card
-            draw_show_card(s, 0)
+            draw_show_card(s, draw_player_thread.is_night, 0)
             if s == t_id:
                 break
     elif 1 == player_data[t_id].handle_done[0]:
@@ -1105,9 +1119,9 @@ def draw_selected_card(t_id, start, mode=6):
             s = (start+i)%player_num
             if 1 == back and 0 == draw_player_thread.is_night:
                 # draw back card
-                draw_show_card(s, 0)
+                draw_show_card(s, draw_player_thread.is_night, 0)
                 continue
-            draw_show_card(s, showc)
+            draw_show_card(s, draw_player_thread.is_night, showc)
             if s == t_id:
                 back = 1
 
@@ -1288,7 +1302,7 @@ def draw_inner_item(Surface):
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
                 # draw player0(human) show card
-                draw_show_card(turn_id)
+                draw_show_card(turn_id, draw_player_thread.is_night)
         elif 5 == player_data[turn_id].mode:
             for i in range(0, total_card_num):
                 if 2 == player_data[turn_id].marked_card[i]:
@@ -1300,7 +1314,7 @@ def draw_inner_item(Surface):
             if None != player_data[turn_id].selected_card_value:
                 draw_button(Surface, (card_x, card_y), "Finish", BLACK)
                 # draw player0(human) show card
-                draw_show_card(turn_id)
+                draw_show_card(turn_id, draw_player_thread.is_night)
                 
     # draw player0(human) treasure
     sum = 0
