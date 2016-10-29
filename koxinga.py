@@ -78,6 +78,7 @@ dice_6_5 = 'Image/die-6+5.gif'
 cannon_fire_sound = 'Sound/Cannon_Fire.wav'
 
 treasure_alpha = 130
+dice_alpha = 110
 
 background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
@@ -150,6 +151,56 @@ di_6_2 = pygame.image.load(dice_6_2).convert()
 di_6_3 = pygame.image.load(dice_6_3).convert()
 di_6_4 = pygame.image.load(dice_6_4).convert()
 di_6_5 = pygame.image.load(dice_6_5).convert()
+
+di_1_2_a = pygame.image.load(dice_1_2).convert()
+di_1_3_a = pygame.image.load(dice_1_3).convert()
+di_1_4_a = pygame.image.load(dice_1_4).convert()
+di_1_5_a = pygame.image.load(dice_1_5).convert()
+di_2_1_a = pygame.image.load(dice_2_1).convert()
+di_2_3_a = pygame.image.load(dice_2_3).convert()
+di_2_4_a = pygame.image.load(dice_2_4).convert()
+di_2_6_a = pygame.image.load(dice_2_6).convert()
+di_3_1_a = pygame.image.load(dice_3_1).convert()
+di_3_2_a = pygame.image.load(dice_3_2).convert()
+di_3_5_a = pygame.image.load(dice_3_5).convert()
+di_3_6_a = pygame.image.load(dice_3_6).convert()
+di_4_1_a = pygame.image.load(dice_4_1).convert()
+di_4_2_a = pygame.image.load(dice_4_2).convert()
+di_4_5_a = pygame.image.load(dice_4_5).convert()
+di_4_6_a = pygame.image.load(dice_4_6).convert()
+di_5_1_a = pygame.image.load(dice_5_1).convert()
+di_5_3_a = pygame.image.load(dice_5_3).convert()
+di_5_4_a = pygame.image.load(dice_5_4).convert()
+di_5_6_a = pygame.image.load(dice_5_6).convert()
+di_6_2_a = pygame.image.load(dice_6_2).convert()
+di_6_3_a = pygame.image.load(dice_6_3).convert()
+di_6_4_a = pygame.image.load(dice_6_4).convert()
+di_6_5_a = pygame.image.load(dice_6_5).convert()
+
+di_1_2_a.set_alpha(dice_alpha)
+di_1_3_a.set_alpha(dice_alpha)
+di_1_4_a.set_alpha(dice_alpha)
+di_1_5_a.set_alpha(dice_alpha)
+di_2_1_a.set_alpha(dice_alpha)
+di_2_3_a.set_alpha(dice_alpha)
+di_2_4_a.set_alpha(dice_alpha)
+di_2_6_a.set_alpha(dice_alpha)
+di_3_1_a.set_alpha(dice_alpha)
+di_3_2_a.set_alpha(dice_alpha)
+di_3_5_a.set_alpha(dice_alpha)
+di_3_6_a.set_alpha(dice_alpha)
+di_4_1_a.set_alpha(dice_alpha)
+di_4_2_a.set_alpha(dice_alpha)
+di_4_5_a.set_alpha(dice_alpha)
+di_4_6_a.set_alpha(dice_alpha)
+di_5_1_a.set_alpha(dice_alpha)
+di_5_3_a.set_alpha(dice_alpha)
+di_5_4_a.set_alpha(dice_alpha)
+di_5_6_a.set_alpha(dice_alpha)
+di_6_2_a.set_alpha(dice_alpha)
+di_6_3_a.set_alpha(dice_alpha)
+di_6_4_a.set_alpha(dice_alpha)
+di_6_5_a.set_alpha(dice_alpha)
 
 cannon_fire = pygame.mixer.Sound(cannon_fire_sound)
 
@@ -308,9 +359,57 @@ def index_to_image_dice(index):
         return di_6_4
     elif 23 == index:
         return di_6_5
-    
-    return None
 
+def index_to_image_dice_alpha(index):
+    if 0 == index:
+        return di_1_2_a
+    elif 1 == index:
+        return di_1_3_a
+    elif 2 == index:
+        return di_1_4_a
+    elif 3 == index:
+        return di_1_5_a
+    elif 4 == index:
+        return di_2_1_a
+    elif 5 == index:
+        return di_2_3_a
+    elif 6 == index:
+        return di_2_4_a
+    elif 7 == index:
+        return di_2_6_a
+    elif 8 == index:
+        return di_3_1_a
+    elif 9 == index:
+        return di_3_2_a
+    elif 10 == index:
+        return di_3_5_a
+    elif 11 == index:
+        return di_3_6_a
+    elif 12 == index:
+        return di_4_1_a
+    elif 13 == index:
+        return di_4_2_a
+    elif 14 == index:
+        return di_4_5_a
+    elif 15 == index:
+        return di_4_6_a
+    elif 16 == index:
+        return di_5_1_a
+    elif 17 == index:
+        return di_5_3_a
+    elif 18 == index:
+        return di_5_4_a
+    elif 19 == index:
+        return di_5_6_a
+    elif 20 == index:
+        return di_6_2_a
+    elif 21 == index:
+        return di_6_3_a
+    elif 22 == index:
+        return di_6_4_a
+    elif 23 == index:
+        return di_6_5_a      
+        
 def draw_item(Surface, type, value, pos):
     (x, y) = pos
     radius = 6
@@ -1265,7 +1364,26 @@ def draw_start_and_turn(sp_id, t_id):
     
     screen.blit(s_image, (start_w, start_h))
     screen.blit(t_image, (x, y))
-            
+
+def draw_dice(Surface, x, y):
+    
+    if player_data[turn_id].mode in [0, 3, 4, 5]:
+        index1 = index_to_image_dice(dice_value1)
+        index2 = index_to_image_dice(dice_value2)
+    elif 0 == draw_player_thread.is_night:
+        index1 = index_to_image_dice(dice_value1)
+        index2 = index_to_image_dice_alpha(dice_value2)
+    elif 1 == draw_player_thread.is_night:
+        index1 = index_to_image_dice_alpha(dice_value1)
+        index2 = index_to_image_dice(dice_value2)
+    
+    if None == index1 or None == index2:
+        return
+    
+    Surface.blit(index1, (x, y))
+    Surface.blit(index2, (x+di_1_2.get_width()+inner_gap, y))
+    
+    
 def draw_inner_item(Surface):
     global dice_value1, dice_value2, player_data, turn_id, inner_gap, treasure_num, fight_id
     
@@ -1273,19 +1391,13 @@ def draw_inner_item(Surface):
     
     back_card_gap = 10
     
-    index1 = index_to_image_dice(dice_value1)
-    index2 = index_to_image_dice(dice_value2)
-    
     card_x =  margin+big_block+inner_gap
     card_y =  margin+big_block+inner_gap+di_1_2.get_height()+button1.get_height()+inner_gap
     
     treasure_x = card_x + 2*(di_1_2.get_width()+inner_gap)
     treasure_y = margin+big_block+inner_gap
     
-    if None != index1:
-        Surface.blit(index1, (margin+big_block+inner_gap, margin+big_block+inner_gap))
-    if None != index2:
-        Surface.blit(index2, (margin+big_block+inner_gap+di_1_2.get_width()+inner_gap, margin+big_block+inner_gap))
+    draw_dice(Surface, margin+big_block+inner_gap, margin+big_block+inner_gap)
 
     if 0 == player_data[turn_id].IsAI:
         if 3 == player_data[turn_id].mode:
