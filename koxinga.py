@@ -151,6 +151,31 @@ di_6_3 = pygame.image.load(dice_6_3).convert()
 di_6_4 = pygame.image.load(dice_6_4).convert()
 di_6_5 = pygame.image.load(dice_6_5).convert()
 
+di2_1_2 = pygame.image.load(dice_1_2).convert()
+di2_1_3 = pygame.image.load(dice_1_3).convert()
+di2_1_4 = pygame.image.load(dice_1_4).convert()
+di2_1_5 = pygame.image.load(dice_1_5).convert()
+di2_2_1 = pygame.image.load(dice_2_1).convert()
+di2_2_3 = pygame.image.load(dice_2_3).convert()
+di2_2_4 = pygame.image.load(dice_2_4).convert()
+di2_2_6 = pygame.image.load(dice_2_6).convert()
+di2_3_1 = pygame.image.load(dice_3_1).convert()
+di2_3_2 = pygame.image.load(dice_3_2).convert()
+di2_3_5 = pygame.image.load(dice_3_5).convert()
+di2_3_6 = pygame.image.load(dice_3_6).convert()
+di2_4_1 = pygame.image.load(dice_4_1).convert()
+di2_4_2 = pygame.image.load(dice_4_2).convert()
+di2_4_5 = pygame.image.load(dice_4_5).convert()
+di2_4_6 = pygame.image.load(dice_4_6).convert()
+di2_5_1 = pygame.image.load(dice_5_1).convert()
+di2_5_3 = pygame.image.load(dice_5_3).convert()
+di2_5_4 = pygame.image.load(dice_5_4).convert()
+di2_5_6 = pygame.image.load(dice_5_6).convert()
+di2_6_2 = pygame.image.load(dice_6_2).convert()
+di2_6_3 = pygame.image.load(dice_6_3).convert()
+di2_6_4 = pygame.image.load(dice_6_4).convert()
+di2_6_5 = pygame.image.load(dice_6_5).convert()
+
 cannon_fire = pygame.mixer.Sound(cannon_fire_sound)
 
 draw_player_thread = mythread(1, screen, 0)
@@ -259,7 +284,7 @@ def pick_up_one_card(player_id):
            player_data[player_id].remain_card_num -= 1
            return i
 
-def index_to_image_dice(index):
+def index_to_image_dice1(index):
     if 0 == index:
         return di_1_2
     elif 1 == index:
@@ -307,7 +332,57 @@ def index_to_image_dice(index):
     elif 22 == index:
         return di_6_4
     elif 23 == index:
-        return di_6_5     
+        return di_6_5       
+
+def index_to_image_dice2(index):
+    if 0 == index:
+        return di2_1_2
+    elif 1 == index:
+        return di2_1_3
+    elif 2 == index:
+        return di2_1_4
+    elif 3 == index:
+        return di2_1_5
+    elif 4 == index:
+        return di2_2_1
+    elif 5 == index:
+        return di2_2_3
+    elif 6 == index:
+        return di2_2_4
+    elif 7 == index:
+        return di2_2_6
+    elif 8 == index:
+        return di2_3_1
+    elif 9 == index:
+        return di2_3_2
+    elif 10 == index:
+        return di2_3_5
+    elif 11 == index:
+        return di2_3_6
+    elif 12 == index:
+        return di2_4_1
+    elif 13 == index:
+        return di2_4_2
+    elif 14 == index:
+        return di2_4_5
+    elif 15 == index:
+        return di2_4_6
+    elif 16 == index:
+        return di2_5_1
+    elif 17 == index:
+        return di2_5_3
+    elif 18 == index:
+        return di2_5_4
+    elif 19 == index:
+        return di2_5_6
+    elif 20 == index:
+        return di2_6_2
+    elif 21 == index:
+        return di2_6_3
+    elif 22 == index:
+        return di2_6_4
+    elif 23 == index:
+        return di2_6_5 
         
 def draw_item(Surface, type, value, pos):
     (x, y) = pos
@@ -337,7 +412,7 @@ def draw_item(Surface, type, value, pos):
             pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
             pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
-def five_block_item_w(start_w, start_h, p_id):
+def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take_item_id = None,  take_item_value = None):
     item_gap = 1
     font_size = 22
     #player 3, 4
@@ -351,14 +426,19 @@ def five_block_item_w(start_w, start_h, p_id):
     
     for i in range(0, dock_num):
         b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
-        if None != b_image:
-            value = player_data[p_id].dvalue[i]
+        if None != b_image:            
             x = start_w + int((block.get_width()-b_image.get_width())/2) + i*block.get_width()
-            y = start_h
-            screen.blit(b_image, (x+item_gap, y+item_gap))
-            screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
+            y = start_h            
+            b_image.set_alpha(alpha)
+            if i == take_item_id:
+                screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
+                screen.blit(write(str(take_item_value)+"x", RED, font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
+            else:
+                value = player_data[p_id].dvalue[i]
+                screen.blit(b_image, (x+item_gap, y+item_gap))
+                screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
       
-def five_block_item_h(start_w, start_h, p_id):
+def five_block_item_h(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255, take_item_id = None,  take_item_value = None):
     item_gap = 1
     font_size = 22
     #player 2
@@ -371,12 +451,17 @@ def five_block_item_h(start_w, start_h, p_id):
         font_gap_y = 0
     for i in range(0, dock_num):
         b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
-        if None != b_image:
-            value = player_data[p_id].dvalue[i]
+        if None != b_image:            
             x = start_w
-            y = start_h + int((block2.get_height()-b_image.get_height())/2) + i*block2.get_height()
-            screen.blit(b_image, (x+item_gap, y+item_gap))
-            screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
+            y = start_h + int((block2.get_height()-b_image.get_height())/2) + i*block2.get_height()            
+            b_image.set_alpha(alpha)
+            if i ==  take_item_id:
+                screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
+                screen.blit(write(str(take_item_value)+"x", RED, font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
+            else:
+                value = player_data[p_id].dvalue[i]
+                screen.blit(b_image, (x+item_gap, y+item_gap))
+                screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
 
 # num_of_treasure_own(t_id) won't display 0:food and 1:gold
 def num_of_treasure_own(t_id):
@@ -477,6 +562,59 @@ def draw_player_treasure(Surface):
                     pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
                     take_sel = dock_num
 
+# org_value should equal or great than dest_value                    
+def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
+    (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
+    item_image = dock_type_id_to_image(org_dtype)
+    if 0 == p_id or 5 == p_id:
+        for v in range(org_dvalue, dest_dvalue, -1):
+            al = 0
+            for yv in range (-1, (-1)*item_image.get_height(), -1):
+                al += 2
+                alpha = 250 - al
+                
+                screen.blit(background, (0,0))
+                draw_five_block
+                five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
+                
+                pygame.display.update(start_w, start_h - 3*block.get_height(), dock_num*block.get_width(), 4*block.get_height())
+    elif 1 == p_id:
+        for v in range(org_dvalue, dest_dvalue, -1):
+            al = 0
+            for xv in range (item_image.get_width()):
+                al += 2
+                alpha = 250 - al
+                
+                screen.blit(background, (0,0))
+                draw_five_block
+                five_block_item_w(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
+                
+                pygame.display.update(start_w, start_h, 4*block2.get_width(), dock_num*block2.get_height())
+    elif 2 == p_id or 3 == p_id:
+        for v in range(org_dvalue, dest_dvalue, -1):
+            al = 0
+            for yv in range (item_image.get_height()):
+                al += 2
+                alpha = 250 - al
+                
+                screen.blit(background, (0,0))
+                draw_five_block
+                five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
+                
+                pygame.display.update(start_w, start_h, dock_num*block.get_width(), 4*block.get_height())
+    elif 4 == p_id:
+        for v in range(org_dvalue, dest_dvalue, -1):
+            al = 0
+            for xv in range (-1, (-1)*item_image.get_width(), -1):
+                al += 2
+                alpha = 250 - al
+                
+                screen.blit(background, (0,0))
+                draw_five_block
+                five_block_item_w(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
+                
+                pygame.display.update(start_w - 3*block2_get_width(), start_h, 4*block2.get_width(), dock_num*block2.get_height())
+                    
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
 def take_item(p_id, dock_id, num = -1):
@@ -487,16 +625,22 @@ def take_item(p_id, dock_id, num = -1):
     if player_data[p_id].dvalue[dock_id] != 0:
         if -1 == num:
             take_num = player_data[p_id].dvalue[dock_id]
+            take_animation(player_data[p_id].dtype[dock_id], player_data[p_id].dvalue[dock_id], 0, p_id, dock_id)
+            
             player_data[p_id].dvalue[dock_id] = 0
             player_data[p_id].dtype[dock_id] = 0
         elif num >= 0:
             # take all if num > exist dock value
             if num >= player_data[p_id].dvalue[dock_id]:
                 take_num = player_data[p_id].dvalue[dock_id]
+                take_animation(player_data[p_id].dtype[dock_id], player_data[p_id].dvalue[dock_id], 0, p_id, dock_id)
+                
                 player_data[p_id].dvalue[dock_id] = 0
                 player_data[p_id].dtype[dock_id] = 0
             else:
                 take_num = num
+                take_animation(player_data[p_id].dtype[dock_id], player_data[p_id].dvalue[dock_id], player_data[p_id].dvalue[dock_id] - num, p_id, dock_id)
+                
                 player_data[p_id].dvalue[dock_id] -= num
         
         return take_num
@@ -1268,8 +1412,8 @@ def draw_dice(Surface, x, y):
     
     dice_alpha = 120
     
-    index1 = index_to_image_dice(dice_value1)
-    index2 = index_to_image_dice(dice_value2)
+    index1 = index_to_image_dice1(dice_value1)
+    index2 = index_to_image_dice2(dice_value2)
     
     if None == index1 or None == index2:
         return
@@ -1514,6 +1658,8 @@ def spend_dock_resource(type, value, t_id):
         sv = sorted_value[i]
         if type == player_data[t_id].dtype[sv[0]] and sv[1] > 0:
             if sv[1] >= (value - spent_value_total):
+                take_animation(player_data[t_id].dtype[sv[0]], player_data[t_id].dvalue[sv[0]], player_data[t_id].dvalue[sv[0]] - (value - spent_value_total), t_id, sv[0])
+                
                 player_data[t_id].dvalue[sv[0]] -= (value - spent_value_total) 
                 if 0 == player_data[t_id].dvalue[sv[0]]:
                     player_data[t_id].dtype[sv[0]] = 0
@@ -1521,6 +1667,8 @@ def spend_dock_resource(type, value, t_id):
                 return 0
             else:
                 spent_value_total += player_data[t_id].dvalue[sv[0]]
+                take_animation(player_data[t_id].dtype[sv[0]], player_data[t_id].dvalue[sv[0]], 0, t_id, sv[0])
+                
                 player_data[t_id].dvalue[sv[0]] = 0
                 player_data[t_id].dtype[sv[0]] = 0
             
