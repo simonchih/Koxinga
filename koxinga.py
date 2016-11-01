@@ -1733,8 +1733,8 @@ def get_dock_resource(type, value, t_id):
     
     for i in range(0, dock_num):
         if 0 == player_data[t_id].dtype[i]:
-            get_animation(value, t_id, i)
             player_data[t_id].dtype[i] = type
+            get_animation(value, t_id, i)
             player_data[t_id].dvalue[i] = value
             # dock NOT full
             return
@@ -1747,8 +1747,8 @@ def get_dock_resource(type, value, t_id):
         sv = sorted_value[i]
         if type != player_data[t_id].dtype[sv[0]]:
             take_animation(player_data[t_id].dtype[sv[0]], player_data[t_id].dvalue[sv[0]], 0, t_id, sv[0])
-            get_animation(value, t_id, sv[0])
             player_data[t_id].dtype[sv[0]] = type
+            get_animation(value, t_id, sv[0])
             player_data[t_id].dvalue[sv[0]] = value
             return
     
