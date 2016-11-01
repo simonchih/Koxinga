@@ -105,6 +105,9 @@ treasure_b.set_alpha(treasure_alpha)
 food = pygame.image.load(food_image).convert()
 gold = pygame.image.load(gold_image).convert()
 cannon = pygame.image.load(cannon_image).convert()
+food_alpha = pygame.image.load(food_image).convert()
+gold_alpha = pygame.image.load(gold_image).convert()
+cannon_alpha = pygame.image.load(cannon_image).convert()
 
 # card
 mv2       = pygame.image.load(move2).convert()
@@ -426,12 +429,15 @@ def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take
     
     for i in range(0, dock_num):
         b_image = dock_type_id_to_image(player_data[p_id].dtype[i])
+        
         if None != b_image:            
             x = start_w + int((block.get_width()-b_image.get_width())/2) + i*block.get_width()
             y = start_h            
-            b_image.set_alpha(alpha)
+            
             if i == take_item_id:
-                screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
+                ba_image = dock_type_id_to_image_alpha(player_data[p_id].dtype[i])
+                ba_image.set_alpha(alpha)
+                screen.blit(ba_image, (x+item_gap+xa, y+item_gap+ya))
                 screen.blit(write(str(take_item_value)+"x", RED, take_font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
             else:
                 value = player_data[p_id].dvalue[i]
@@ -454,9 +460,11 @@ def five_block_item_h(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255, take_
         if None != b_image:            
             x = start_w
             y = start_h + int((block2.get_height()-b_image.get_height())/2) + i*block2.get_height()            
-            b_image.set_alpha(alpha)
+            
             if i ==  take_item_id:
-                screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
+                ba_image = dock_type_id_to_image(player_data[p_id].dtype[i])
+                ba_image.set_alpha(alpha)
+                screen.blit(ba_image, (x+item_gap+xa, y+item_gap+ya))
                 screen.blit(write(str(take_item_value)+"x", RED, take_font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
             else:
                 value = player_data[p_id].dvalue[i]
@@ -561,11 +569,47 @@ def draw_player_treasure(Surface):
             if num_of_treasure_own(take_id) and t_x <= MouseX <= t_x + treasure_s.get_width() and t_y <= MouseY <= t_y + treasure_s.get_height():
                     pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
                     take_sel = dock_num
-
+                   
+def get_animation(org_dtype, get_dvalue, p_id, take_item_id):
+    (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
+    item_image = dock_type_id_to_image(org_dtype)
+    fmargin = margin - 2
+    
+    if 0 == p_id or 5 == p_id:
+        for alpha in range (256):            
+            screen.blit(background, (0,0))
+            draw_five_block()
+            five_block_item_w(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
+            
+            pygame.display.update(start_w, screen_height - fmargin, dock_num*block.get_width(), fmargin)
+    elif 1 == p_id:
+        for alpha in range (256):            
+            screen.blit(background, (0,0))
+            draw_five_block()
+            five_block_item_h(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
+                
+            pygame.display.update(start_w, start_h, fmargin, dock_num*block2.get_height())
+    elif 2 == p_id or 3 == p_id:
+        for alpha in range (256):            
+            screen.blit(background, (0,0))
+            draw_five_block()
+            five_block_item_w(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
+                
+            pygame.display.update(start_w, start_h, dock_num*block.get_width(), fmargin)
+    elif 4 == p_id:
+        for alpha in range (256):            
+            screen.blit(background, (0,0))
+            draw_five_block()
+            five_block_item_h(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
+                
+            pygame.display.update(screen_width - fmargin, start_h, fmargin, dock_num*block2.get_height())                    
+                    
 # org_value should equal or great than dest_value                    
 def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
     (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
     item_image = dock_type_id_to_image(org_dtype)
+    fmargin = margin - 2
+    
     if 0 == p_id or 5 == p_id:
         for v in range(org_dvalue, dest_dvalue, -1):
             al = 0
@@ -574,10 +618,10 @@ def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
                 alpha = 250 - al
                 
                 screen.blit(background, (0,0))
-                draw_five_block
+                draw_five_block()
                 five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
                 
-                pygame.display.update(start_w, start_h - 3*block.get_height(), dock_num*block.get_width(), 4*block.get_height())
+                pygame.display.update(start_w, screen_height - fmargin, dock_num*block.get_width(), fmargin)
     elif 1 == p_id:
         for v in range(org_dvalue, dest_dvalue, -1):
             al = 0
@@ -586,10 +630,10 @@ def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
                 alpha = 250 - al
                 
                 screen.blit(background, (0,0))
-                draw_five_block
-                five_block_item_w(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
+                draw_five_block()
+                five_block_item_h(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
                 
-                pygame.display.update(start_w, start_h, 4*block2.get_width(), dock_num*block2.get_height())
+                pygame.display.update(start_w, start_h, fmargin, dock_num*block2.get_height())
     elif 2 == p_id or 3 == p_id:
         for v in range(org_dvalue, dest_dvalue, -1):
             al = 0
@@ -598,10 +642,10 @@ def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
                 alpha = 250 - al
                 
                 screen.blit(background, (0,0))
-                draw_five_block
+                draw_five_block()
                 five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
                 
-                pygame.display.update(start_w, start_h, dock_num*block.get_width(), 4*block.get_height())
+                pygame.display.update(start_w, start_h, dock_num*block.get_width(), fmargin)
     elif 4 == p_id:
         for v in range(org_dvalue, dest_dvalue, -1):
             al = 0
@@ -610,10 +654,10 @@ def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
                 alpha = 250 - al
                 
                 screen.blit(background, (0,0))
-                draw_five_block
-                five_block_item_w(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
+                draw_five_block()
+                five_block_item_h(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
                 
-                pygame.display.update(start_w - 3*block2_get.width(), start_h, 4*block2.get_width(), dock_num*block2.get_height())
+                pygame.display.update(screen_width - fmargin, start_h, fmargin, dock_num*block2.get_height())
                     
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
@@ -1084,6 +1128,14 @@ def dock_type_id_to_image(type_id):
         return gold
     elif 3 == type_id:
         return cannon
+
+def dock_type_id_to_image_alpha(type_id):
+    if 1 == type_id:
+        return food_alpha
+    elif 2 == type_id:
+        return gold_alpha
+    elif 3 == type_id:
+        return cannon_alpha
         
 def draw_dock(Surface):
     # draw dock only
@@ -1682,6 +1734,7 @@ def get_dock_resource(type, value, t_id):
     
     for i in range(0, dock_num):
         if 0 == player_data[t_id].dtype[i]:
+            get_animation(type, value, t_id, i)
             player_data[t_id].dtype[i] = type
             player_data[t_id].dvalue[i] = value
             # dock NOT full
@@ -1694,6 +1747,8 @@ def get_dock_resource(type, value, t_id):
     for i in range(0, dock_num):
         sv = sorted_value[i]
         if type != player_data[t_id].dtype[sv[0]]:
+            take_animation(player_data[t_id].dtype[sv[0]], player_data[t_id].dvalue[sv[0]], 0, t_id, sv[0])
+            get_animation(type, value, t_id, sv[0])
             player_data[t_id].dtype[sv[0]] = type
             player_data[t_id].dvalue[sv[0]] = value
             return
@@ -2406,7 +2461,7 @@ def main():
     generate_player_card()
     draw_player_thread.start()
     # test
-    # player_data[0].IsAI = 1
+    #player_data[0].IsAI = 1
     
     ## test goal game
     #player_data[0].goal_game = 1
