@@ -570,9 +570,8 @@ def draw_player_treasure(Surface):
                     pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
                     take_sel = dock_num
                    
-def get_animation(org_dtype, get_dvalue, p_id, take_item_id):
+def get_animation(get_dvalue, p_id, take_item_id):
     (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
-    item_image = dock_type_id_to_image(org_dtype)
     fmargin = margin - 2
     
     if 0 == p_id or 5 == p_id:
@@ -1734,7 +1733,7 @@ def get_dock_resource(type, value, t_id):
     
     for i in range(0, dock_num):
         if 0 == player_data[t_id].dtype[i]:
-            get_animation(type, value, t_id, i)
+            get_animation(value, t_id, i)
             player_data[t_id].dtype[i] = type
             player_data[t_id].dvalue[i] = value
             # dock NOT full
@@ -1748,7 +1747,7 @@ def get_dock_resource(type, value, t_id):
         sv = sorted_value[i]
         if type != player_data[t_id].dtype[sv[0]]:
             take_animation(player_data[t_id].dtype[sv[0]], player_data[t_id].dvalue[sv[0]], 0, t_id, sv[0])
-            get_animation(type, value, t_id, sv[0])
+            get_animation(value, t_id, sv[0])
             player_data[t_id].dtype[sv[0]] = type
             player_data[t_id].dvalue[sv[0]] = value
             return
