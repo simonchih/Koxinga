@@ -569,7 +569,8 @@ def draw_player_treasure(Surface):
             if num_of_treasure_own(take_id) and t_x <= MouseX <= t_x + treasure_s.get_width() and t_y <= MouseY <= t_y + treasure_s.get_height():
                     pygame.draw.rect(Surface, RED, (t_x, t_y, treasure_s.get_width(), treasure_s.get_height()), rect_width)
                     take_sel = dock_num
-                   
+
+# set dtype for get resource before call this function                   
 def get_animation(get_dvalue, p_id, take_item_id):
     (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
     fmargin = margin - 2
