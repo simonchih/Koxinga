@@ -412,7 +412,7 @@ def draw_item(Surface, type, value, pos):
             pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
             pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
 
-def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take_item_id = None,  take_item_value = None):
+def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take_item_id = None,  take_item_value = None, take_font_size = 24):
     item_gap = 1
     font_size = 22
     #player 3, 4
@@ -432,13 +432,13 @@ def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take
             b_image.set_alpha(alpha)
             if i == take_item_id:
                 screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
-                screen.blit(write(str(take_item_value)+"x", RED, font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
+                screen.blit(write(str(take_item_value)+"x", RED, take_font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
             else:
                 value = player_data[p_id].dvalue[i]
                 screen.blit(b_image, (x+item_gap, y+item_gap))
                 screen.blit(write(str(value)+"x", RED, font_size), (x+font_gap_x, y+font_gap_y))
       
-def five_block_item_h(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255, take_item_id = None,  take_item_value = None):
+def five_block_item_h(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255, take_item_id = None,  take_item_value = None, take_font_size = 24):
     item_gap = 1
     font_size = 22
     #player 2
@@ -457,7 +457,7 @@ def five_block_item_h(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255, take_
             b_image.set_alpha(alpha)
             if i ==  take_item_id:
                 screen.blit(b_image, (x+item_gap+xa, y+item_gap+ya))
-                screen.blit(write(str(take_item_value)+"x", RED, font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
+                screen.blit(write(str(take_item_value)+"x", RED, take_font_size), (x+font_gap_x+xa, y+font_gap_y+ya))
             else:
                 value = player_data[p_id].dvalue[i]
                 screen.blit(b_image, (x+item_gap, y+item_gap))
@@ -613,7 +613,7 @@ def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
                 draw_five_block
                 five_block_item_w(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
                 
-                pygame.display.update(start_w - 3*block2_get_width(), start_h, 4*block2.get_width(), dock_num*block2.get_height())
+                pygame.display.update(start_w - 3*block2_get.width(), start_h, 4*block2.get_width(), dock_num*block2.get_height())
                     
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
