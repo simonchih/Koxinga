@@ -1281,12 +1281,9 @@ def draw_show_card(p_id, is_night, showc=1):
 def draw_selected_card(t_id, start, mode=6):
     global player_num, player_data, draw_player_thread
     
-    back = 0
     
     if 0 == mode:
         return
-    
-    showc = 1
     
     # human mode 3, 4, 5
     if 0 == player_data[t_id].IsAI and player_data[t_id].mode in [3, 4, 5]:
@@ -1296,28 +1293,17 @@ def draw_selected_card(t_id, start, mode=6):
                 break
             #show back card
             draw_show_card(s, draw_player_thread.is_night, 0)
-    elif 1 == draw_player_thread.is_night:
-        for i in range(0, player_num):
-            s = (start+i)%player_num
-            #show card
-            draw_show_card(s, draw_player_thread.is_night, showc)
     elif 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
         for i in range(0, player_num):
             s = (start+i)%player_num
             # draw back card
-            draw_show_card(s, draw_player_thread.is_night, 0)
+            draw_show_card(s, draw_player_thread.is_night, player_data[s].show_card)
             if s == t_id:
                 break
-    elif 1 == player_data[t_id].handle_done[0]:
-        for i in range(0, player_num):
+    else:
+        for i in range(player_num):
             s = (start+i)%player_num
-            if 1 == back and 0 == draw_player_thread.is_night:
-                # draw back card
-                draw_show_card(s, draw_player_thread.is_night, 0)
-                continue
-            draw_show_card(s, draw_player_thread.is_night, showc)
-            if s == t_id:
-                back = 1
+            draw_show_card(s, draw_player_thread.is_night, player_data[s].show_card)
 
 def draw_all():            
     screen.blit(background, (0,0))
@@ -2388,6 +2374,7 @@ def end_turn():
         player_data[i].mode = 0
         player_data[i].handle_done = [0, 0]
         player_data[i].selected_card_value = None
+        player_data[i].show_card = 0
         pick_up_one_card(i)
     
     draw_player_thread.is_night = 0
@@ -2596,6 +2583,10 @@ def main():
         
         if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
+                player_data[turn_id].show_card = 1
+                draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
+                pygame.display.update()
+                
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
                 player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
             elif 1 == player_data[turn_id].handle_done[draw_player_thread.is_night] and 0 == player_data[turn_id].step:
