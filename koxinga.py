@@ -2584,11 +2584,12 @@ def main():
         if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:
             if 0 == player_data[turn_id].handle_done[draw_player_thread.is_night]:
                 player_data[turn_id].show_card = 1
+                player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
                 draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
                 pygame.display.update()
                 
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
-                player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
+                
             elif 1 == player_data[turn_id].handle_done[draw_player_thread.is_night] and 0 == player_data[turn_id].step:
                 next_turn()
             
