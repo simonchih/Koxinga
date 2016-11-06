@@ -3,7 +3,7 @@ dock_num = 5
 treasure_num = 10
 
 class game_player():
-    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, handle_done = [0, 0] ,steps = 0, mode = 0, direction = [0, 0], Is_Forward = 1, goal_game = 0, selected_card_value = None, marked_card = [0] * total_card_num, remain_card_num = total_card_num, show_card = 0, dock_type = [0] * dock_num, dock_value = [0] * dock_num, treasure_own = [0] * treasure_num, fight_dice = None, fight_cannon = 0, fight_score = None, fight_solution = "", fight_text = "", final_gold = 0, final_location = 0, final_treasure = 0, final_score = 0, final_win = ""):
+    def __init__(self, x_now = 0, y_now = 0, block_id = 0, next_block_id = 0, location=(0, 0), IsAI = 1, handle_done = [0, 0] ,steps = 0, mode = 0, direction = [0, 0], Is_Forward = 1, goal_game = 0, selected_card_value = None, marked_card = [0] * total_card_num, remain_card_num = total_card_num, show_card = 2, dock_type = [0] * dock_num, dock_value = [0] * dock_num, treasure_own = [0] * treasure_num, fight_dice = None, fight_cannon = 0, fight_score = None, fight_solution = "", fight_text = "", final_gold = 0, final_location = 0, final_treasure = 0, final_score = 0, final_win = ""):
         self.x = x_now
         self.y = y_now
         self.b_id = block_id
@@ -24,6 +24,7 @@ class game_player():
         # 0: unused, 1: showed card, 2:own card
         self.marked_card = marked_card[:]
         self.remain_card_num = remain_card_num
+        #0:back card, 1:show card, 2: won't show anything
         self.show_card = show_card
         
         # 0: unused, 1:food, 2:gold, 3: cannon

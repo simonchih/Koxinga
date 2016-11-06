@@ -1245,8 +1245,10 @@ def draw_show_card(p_id, is_night, showc=1):
     
     if 1 == showc: # show card
         show_card_image = card_id_to_image(player_data[p_id].selected_card_value)
-    else: #show back
+    elif 0 == showc: #show back
         show_card_image = turn_id_to_image(p_id)
+    else: # won't show (2 == showc)
+        return
         
     if 1 == p_id or 4 == p_id:
         show_card_image = pygame.transform.rotate(show_card_image, 270)
@@ -1293,13 +1295,6 @@ def draw_selected_card(t_id, start, mode=6):
                 break
             #show back card
             draw_show_card(s, draw_player_thread.is_night, 0)
-    elif 6 == player_data[t_id].mode and 0 == player_data[t_id].handle_done[0]:
-        for i in range(0, player_num):
-            s = (start+i)%player_num
-            # draw back card
-            draw_show_card(s, draw_player_thread.is_night, player_data[s].show_card)
-            if s == t_id:
-                break
     else:
         for i in range(player_num):
             s = (start+i)%player_num
@@ -2374,7 +2369,7 @@ def end_turn():
         player_data[i].mode = 0
         player_data[i].handle_done = [0, 0]
         player_data[i].selected_card_value = None
-        player_data[i].show_card = 0
+        player_data[i].show_card = 2
         pick_up_one_card(i)
     
     draw_player_thread.is_night = 0
@@ -2399,6 +2394,7 @@ def handle_card(mouse_loc):
             card_y += mv2.get_height() + inner_gap
     if None != player_data[turn_id].selected_card_value and card_x <= mouseX <= card_x + button1.get_width() and card_y <= mouseY <= card_y + button1.get_height():
         player_data[turn_id].mode = 6
+        player_data[turn_id].show_card = 0
         next_turn()
 
 def next_fight():
@@ -2579,6 +2575,8 @@ def main():
                 
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].mode:
             player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai(turn_id)
+            # display back card
+            player_data[turn_id].show_card = 0
             next_turn()
         
         if 1 == all_player_mode6() and 6 == player_data[turn_id].mode:
