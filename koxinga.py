@@ -1454,6 +1454,9 @@ def draw_dice(Surface, x, y):
     if player_data[turn_id].mode in [0, 3, 4, 5]:
         index1.set_alpha(255)
         index2.set_alpha(255)
+    elif 6 == player_data[turn_id].mode and 0 == all_player_mode6():
+        index1.set_alpha(255)
+        index2.set_alpha(255)
     elif 0 == draw_player_thread.is_night:
         index1.set_alpha(255)
         index2.set_alpha(dice_alpha)
