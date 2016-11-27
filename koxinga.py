@@ -2442,10 +2442,14 @@ def main():
     dir1 = 1
     dir2 = 1
     
+    start_p = random.randint(0, player_num-1)
+    turn_id = start_p
+    
     generate_map()
     generate_dock()
     generate_player_card()
     draw_player_thread.start()
+    
     # test
     #player_data[0].IsAI = 1
     
