@@ -197,12 +197,14 @@ P6COLOR = (140, 184, 229)
 end_game = 0
 cannon_not_enough = 1
 click_take_item = 0
+inner_gap = 5
 cannon_sel = None
 take_sel   = None
 fight_id = None
-turn_id = 0
-start_p = 0
-inner_gap = 5
+
+start_p = random.randint(0, player_num-1)
+turn_id = start_p
+
 fight_btn_loc  = (555, 560)
 cannon_btn_loc = (855, 560)
 player1_start_w = 400
@@ -2441,9 +2443,6 @@ def main():
     
     dir1 = 1
     dir2 = 1
-    
-    start_p = random.randint(0, player_num-1)
-    turn_id = start_p
     
     generate_map()
     generate_dock()
