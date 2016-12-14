@@ -1326,7 +1326,7 @@ def next_turn():
     global turn_id, start_p, draw_player_thread, player_data, cannon_not_enough, click_take_item, cannon_sel, take_sel, fight_id, fight_group
     
     draw_all()
-    time.sleep(2)
+    time.sleep(1)
     
     if (turn_id + 1)%player_num == start_p:
         if 0 == player_data[turn_id].handle_done[0]:
