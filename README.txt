@@ -1,5 +1,8 @@
 Koxinga is the game similar with board game Jamaica.
 
+==Game Rule==
+Please see "Koxinga_English_User_Guide.pdf"
+
 ==Major deference between Koxinga and Jamaica== 
 1. Jamaica is not random map and map size is also different.
 2. Jamaica execute two dice action(morning and night action) each player. But Koxinga execute one dice action and execute the other dice action on next turn.
@@ -22,6 +25,3 @@ Koxinga, 國姓爺，是一個類似桌上遊戲："牙買加"的遊戲。
 程式語言：Python3 + Pygame
 
 玩法：請參閱"國姓爺中文說明.pdf"
-
-==牙買加規則影片==
-https://www.youtube.com/watch?v=XFj-ybHdqbg
