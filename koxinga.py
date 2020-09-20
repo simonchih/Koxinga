@@ -78,6 +78,7 @@ dice_6_5 = 'Image/die-6+5.gif'
 cannon_fire_sound = 'Sound/Cannon_Fire.wav'
 
 treasure_alpha = 130
+turn_alpha = 130
 
 background = pygame.image.load(background_image_filename).convert()
 block = pygame.image.load(block_image).convert()
@@ -1394,33 +1395,48 @@ def turn_id_to_turn_img(t_id):
     elif 5 == t_id:
         return turn5
             
-def draw_start_and_turn(sp_id, t_id):
+def draw_start_and_turn(sp_id, target_id):
     s_image = start_player
-    t_image = turn_id_to_turn_img(t_id)
+   
     gap = 20
-    show_card_image = turn_id_to_image(t_id)
-        
-    if 1 == t_id or 4 == t_id:
-        show_card_image = pygame.transform.rotate(show_card_image, 270)
     
-    if 0 == t_id:
-        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
-        (x, y) = (start_w-gap-t_image.get_width(), start_h)
-    elif 1 == t_id:
-        (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
-        (x, y) = (start_w, start_h-gap-t_image.get_height())
-    elif 2 == t_id:
-        (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
-        (x, y) = (start_w-gap-t_image.get_width(), start_h)
-    elif 3 == t_id:
-        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
-        (x, y) = (start_w-gap-t_image.get_width(), start_h)
-    elif 4 == t_id:
-        (start_w, start_h) = (screen_width - s_image.get_width(), player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
-        (x, y) = (start_w, start_h-gap-t_image.get_height())
-    elif 5 == t_id:
-        (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
-        (x, y) = (start_w-gap-t_image.get_width(), start_h)
+    
+    # Simon modify 20200920
+    player_num = 6
+    
+    for t_id in range(player_num):
+    
+        t_image = turn_id_to_turn_img(t_id)
+        show_card_image = turn_id_to_image(t_id)
+        
+        if 1 == t_id or 4 == t_id:
+            show_card_image = pygame.transform.rotate(show_card_image, 270)
+        
+        if 0 == t_id:
+            (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+            (x, y) = (start_w-gap-t_image.get_width(), start_h)
+        elif 1 == t_id:
+            (start_w, start_h) = (player_2_block_start_w, player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
+            (x, y) = (start_w, start_h-gap-t_image.get_height())
+        elif 2 == t_id:
+            (start_w, start_h) = (player_1_3_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+            (x, y) = (start_w-gap-t_image.get_width(), start_h)
+        elif 3 == t_id:
+            (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), player_3_4_block_start_h)
+            (x, y) = (start_w-gap-t_image.get_width(), start_h)
+        elif 4 == t_id:
+            (start_w, start_h) = (screen_width - s_image.get_width(), player_2_5_block_start_h-gap-show_card_image.get_height()-gap-s_image.get_height())
+            (x, y) = (start_w, start_h-gap-t_image.get_height())
+        elif 5 == t_id:
+            (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
+            (x, y) = (start_w-gap-t_image.get_width(), start_h)
+        
+        if t_id == target_id:
+            t_image.set_alpha(255)
+        else:
+            t_image.set_alpha(turn_alpha)
+        screen.blit(t_image, (x, y))
+    # End Simon 20200920
     
     show_card_image2 = turn_id_to_image(sp_id)
     
@@ -1441,8 +1457,7 @@ def draw_start_and_turn(sp_id, t_id):
         (start_w, start_h) = (player_4_6_block_start_w-gap-show_card_image2.get_width()-gap-s_image.get_width(), screen_height - s_image.get_height())
     
     screen.blit(s_image, (start_w, start_h))
-    screen.blit(t_image, (x, y))
-
+    
 def draw_dice(Surface, x, y):
     
     dice_alpha = 120
