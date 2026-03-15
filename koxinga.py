@@ -1682,7 +1682,7 @@ def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solut
     
 def fight_roll_dice(Surface, font_size, f_roll, x, y):
     f_x = x + 16
-    f_y = y + 15
+    f_y = y + 10
     if None == f_roll:
         return
     elif f_roll < 11:
