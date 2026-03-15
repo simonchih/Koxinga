@@ -22,7 +22,7 @@ turn2_image = 'Image/turn2_50x50.gif'
 turn3_image = 'Image/turn3_50x50.gif'
 turn4_image = 'Image/turn4_50x50.gif'
 turn5_image = 'Image/turn5_50x50.gif'
-roll_fight_image = 'Image/Pentagon_50x48.gif'
+roll_fight_image = 'Image/12f_die.gif'
 fight_win_image = 'Image/win_50x48.gif'
 
 # resource
@@ -1555,7 +1555,7 @@ def draw_inner_item(Surface):
             #ID: 1-based
             top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
             Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
-            f_y += font_size + int(roll_fight.get_height()/2) - 5
+            f_y += font_size + int(roll_fight.get_height()/2) - 8
             r_x = f_x + 112
             r_y = treasure_y + font_size + f_gap
             f_y_org = f_y
