@@ -1,5 +1,7 @@
 import random
 import time
+import argparse
+import presentation as ui
 from game_map import *
 from game_player import *
 from mythread import *
@@ -80,122 +82,123 @@ cannon_fire_sound = 'Sound/Cannon_Fire.wav'
 treasure_alpha = 130
 turn_alpha = 130
 
-background = pygame.image.load(background_image_filename).convert()
-block = pygame.image.load(block_image).convert()
-block2 = pygame.image.load(block2_image).convert()
-block_sel = pygame.image.load(block_selected_image).convert()
-block2_sel = pygame.image.load(block2_selected_image).convert()
-coin = pygame.image.load(coin_image).convert()
-treasure = pygame.image.load(treasure_image).convert()
-treasure_s = pygame.image.load(small_own_treasure_image).convert()
-treasure_b = pygame.image.load(own_treasure_image).convert()
-button1 = pygame.image.load(button1_image).convert()
-start_player = pygame.image.load(start_image).convert()
-turn0 = pygame.image.load(turn0_image).convert()
-turn1 = pygame.image.load(turn1_image).convert()
-turn2 = pygame.image.load(turn2_image).convert()
-turn3 = pygame.image.load(turn3_image).convert()
-turn4 = pygame.image.load(turn4_image).convert()
-turn5 = pygame.image.load(turn5_image).convert()
-roll_fight = pygame.image.load(roll_fight_image).convert()
-fight_win = pygame.image.load(fight_win_image).convert()
+background = pygame.image.load(ui.asset(background_image_filename)).convert()
+block = pygame.image.load(ui.asset(block_image)).convert()
+block2 = pygame.image.load(ui.asset(block2_image)).convert()
+block_sel = pygame.image.load(ui.asset(block_selected_image)).convert()
+block2_sel = pygame.image.load(ui.asset(block2_selected_image)).convert()
+coin = pygame.image.load(ui.asset(coin_image)).convert()
+treasure = pygame.image.load(ui.asset(treasure_image)).convert()
+treasure_s = pygame.image.load(ui.asset(small_own_treasure_image)).convert()
+treasure_b = pygame.image.load(ui.asset(own_treasure_image)).convert()
+button1 = pygame.image.load(ui.asset(button1_image)).convert()
+start_player = pygame.image.load(ui.asset(start_image)).convert()
+turn0 = pygame.image.load(ui.asset(turn0_image)).convert()
+turn1 = pygame.image.load(ui.asset(turn1_image)).convert()
+turn2 = pygame.image.load(ui.asset(turn2_image)).convert()
+turn3 = pygame.image.load(ui.asset(turn3_image)).convert()
+turn4 = pygame.image.load(ui.asset(turn4_image)).convert()
+turn5 = pygame.image.load(ui.asset(turn5_image)).convert()
+roll_fight = pygame.image.load(ui.asset(roll_fight_image)).convert()
+fight_win = pygame.image.load(ui.asset(fight_win_image)).convert()
 
 treasure_b.set_alpha(treasure_alpha)
 
 # resource
-food = pygame.image.load(food_image).convert()
-gold = pygame.image.load(gold_image).convert()
-cannon = pygame.image.load(cannon_image).convert()
-food_alpha = pygame.image.load(food_image).convert()
-gold_alpha = pygame.image.load(gold_image).convert()
-cannon_alpha = pygame.image.load(cannon_image).convert()
+food = pygame.image.load(ui.asset(food_image)).convert()
+gold = pygame.image.load(ui.asset(gold_image)).convert()
+cannon = pygame.image.load(ui.asset(cannon_image)).convert()
+food_alpha = pygame.image.load(ui.asset(food_image)).convert()
+gold_alpha = pygame.image.load(ui.asset(gold_image)).convert()
+cannon_alpha = pygame.image.load(ui.asset(cannon_image)).convert()
 
 # card
-mv2       = pygame.image.load(move2).convert()
-mv_cannon = pygame.image.load(move_cannon).convert()
-cannon_mv = pygame.image.load(cannon_move).convert()
-m1_food   = pygame.image.load(n1_food).convert()
-m2_gold   = pygame.image.load(n2_gold).convert()
-food_m2   = pygame.image.load(food_n2).convert()
-gold_m1   = pygame.image.load(gold_n1).convert()
-fd_gd     = pygame.image.load(food_gold).convert()
-gd_fd     = pygame.image.load(gold_food).convert()
-ca_ca     = pygame.image.load(cannon_cannon).convert()
-back_mv   = pygame.image.load(back_move).convert()
-mv_back   = pygame.image.load(move_back).convert()
-back0     = pygame.image.load(back_card0).convert()
-back1     = pygame.image.load(back_card1).convert()
-back2     = pygame.image.load(back_card2).convert()
-back3     = pygame.image.load(back_card3).convert()
-back4     = pygame.image.load(back_card4).convert()
-back5     = pygame.image.load(back_card5).convert()
+mv2       = pygame.image.load(ui.asset(move2)).convert()
+mv_cannon = pygame.image.load(ui.asset(move_cannon)).convert()
+cannon_mv = pygame.image.load(ui.asset(cannon_move)).convert()
+m1_food   = pygame.image.load(ui.asset(n1_food)).convert()
+m2_gold   = pygame.image.load(ui.asset(n2_gold)).convert()
+food_m2   = pygame.image.load(ui.asset(food_n2)).convert()
+gold_m1   = pygame.image.load(ui.asset(gold_n1)).convert()
+fd_gd     = pygame.image.load(ui.asset(food_gold)).convert()
+gd_fd     = pygame.image.load(ui.asset(gold_food)).convert()
+ca_ca     = pygame.image.load(ui.asset(cannon_cannon)).convert()
+back_mv   = pygame.image.load(ui.asset(back_move)).convert()
+mv_back   = pygame.image.load(ui.asset(move_back)).convert()
+back0     = pygame.image.load(ui.asset(back_card0)).convert()
+back1     = pygame.image.load(ui.asset(back_card1)).convert()
+back2     = pygame.image.load(ui.asset(back_card2)).convert()
+back3     = pygame.image.load(ui.asset(back_card3)).convert()
+back4     = pygame.image.load(ui.asset(back_card4)).convert()
+back5     = pygame.image.load(ui.asset(back_card5)).convert()
 
-di_1_2 = pygame.image.load(dice_1_2).convert()
-di_1_3 = pygame.image.load(dice_1_3).convert()
-di_1_4 = pygame.image.load(dice_1_4).convert()
-di_1_5 = pygame.image.load(dice_1_5).convert()
-di_2_1 = pygame.image.load(dice_2_1).convert()
-di_2_3 = pygame.image.load(dice_2_3).convert()
-di_2_4 = pygame.image.load(dice_2_4).convert()
-di_2_6 = pygame.image.load(dice_2_6).convert()
-di_3_1 = pygame.image.load(dice_3_1).convert()
-di_3_2 = pygame.image.load(dice_3_2).convert()
-di_3_5 = pygame.image.load(dice_3_5).convert()
-di_3_6 = pygame.image.load(dice_3_6).convert()
-di_4_1 = pygame.image.load(dice_4_1).convert()
-di_4_2 = pygame.image.load(dice_4_2).convert()
-di_4_5 = pygame.image.load(dice_4_5).convert()
-di_4_6 = pygame.image.load(dice_4_6).convert()
-di_5_1 = pygame.image.load(dice_5_1).convert()
-di_5_3 = pygame.image.load(dice_5_3).convert()
-di_5_4 = pygame.image.load(dice_5_4).convert()
-di_5_6 = pygame.image.load(dice_5_6).convert()
-di_6_2 = pygame.image.load(dice_6_2).convert()
-di_6_3 = pygame.image.load(dice_6_3).convert()
-di_6_4 = pygame.image.load(dice_6_4).convert()
-di_6_5 = pygame.image.load(dice_6_5).convert()
+di_1_2 = pygame.image.load(ui.asset(dice_1_2)).convert()
+di_1_3 = pygame.image.load(ui.asset(dice_1_3)).convert()
+di_1_4 = pygame.image.load(ui.asset(dice_1_4)).convert()
+di_1_5 = pygame.image.load(ui.asset(dice_1_5)).convert()
+di_2_1 = pygame.image.load(ui.asset(dice_2_1)).convert()
+di_2_3 = pygame.image.load(ui.asset(dice_2_3)).convert()
+di_2_4 = pygame.image.load(ui.asset(dice_2_4)).convert()
+di_2_6 = pygame.image.load(ui.asset(dice_2_6)).convert()
+di_3_1 = pygame.image.load(ui.asset(dice_3_1)).convert()
+di_3_2 = pygame.image.load(ui.asset(dice_3_2)).convert()
+di_3_5 = pygame.image.load(ui.asset(dice_3_5)).convert()
+di_3_6 = pygame.image.load(ui.asset(dice_3_6)).convert()
+di_4_1 = pygame.image.load(ui.asset(dice_4_1)).convert()
+di_4_2 = pygame.image.load(ui.asset(dice_4_2)).convert()
+di_4_5 = pygame.image.load(ui.asset(dice_4_5)).convert()
+di_4_6 = pygame.image.load(ui.asset(dice_4_6)).convert()
+di_5_1 = pygame.image.load(ui.asset(dice_5_1)).convert()
+di_5_3 = pygame.image.load(ui.asset(dice_5_3)).convert()
+di_5_4 = pygame.image.load(ui.asset(dice_5_4)).convert()
+di_5_6 = pygame.image.load(ui.asset(dice_5_6)).convert()
+di_6_2 = pygame.image.load(ui.asset(dice_6_2)).convert()
+di_6_3 = pygame.image.load(ui.asset(dice_6_3)).convert()
+di_6_4 = pygame.image.load(ui.asset(dice_6_4)).convert()
+di_6_5 = pygame.image.load(ui.asset(dice_6_5)).convert()
 
-di2_1_2 = pygame.image.load(dice_1_2).convert()
-di2_1_3 = pygame.image.load(dice_1_3).convert()
-di2_1_4 = pygame.image.load(dice_1_4).convert()
-di2_1_5 = pygame.image.load(dice_1_5).convert()
-di2_2_1 = pygame.image.load(dice_2_1).convert()
-di2_2_3 = pygame.image.load(dice_2_3).convert()
-di2_2_4 = pygame.image.load(dice_2_4).convert()
-di2_2_6 = pygame.image.load(dice_2_6).convert()
-di2_3_1 = pygame.image.load(dice_3_1).convert()
-di2_3_2 = pygame.image.load(dice_3_2).convert()
-di2_3_5 = pygame.image.load(dice_3_5).convert()
-di2_3_6 = pygame.image.load(dice_3_6).convert()
-di2_4_1 = pygame.image.load(dice_4_1).convert()
-di2_4_2 = pygame.image.load(dice_4_2).convert()
-di2_4_5 = pygame.image.load(dice_4_5).convert()
-di2_4_6 = pygame.image.load(dice_4_6).convert()
-di2_5_1 = pygame.image.load(dice_5_1).convert()
-di2_5_3 = pygame.image.load(dice_5_3).convert()
-di2_5_4 = pygame.image.load(dice_5_4).convert()
-di2_5_6 = pygame.image.load(dice_5_6).convert()
-di2_6_2 = pygame.image.load(dice_6_2).convert()
-di2_6_3 = pygame.image.load(dice_6_3).convert()
-di2_6_4 = pygame.image.load(dice_6_4).convert()
-di2_6_5 = pygame.image.load(dice_6_5).convert()
+di2_1_2 = pygame.image.load(ui.asset(dice_1_2)).convert()
+di2_1_3 = pygame.image.load(ui.asset(dice_1_3)).convert()
+di2_1_4 = pygame.image.load(ui.asset(dice_1_4)).convert()
+di2_1_5 = pygame.image.load(ui.asset(dice_1_5)).convert()
+di2_2_1 = pygame.image.load(ui.asset(dice_2_1)).convert()
+di2_2_3 = pygame.image.load(ui.asset(dice_2_3)).convert()
+di2_2_4 = pygame.image.load(ui.asset(dice_2_4)).convert()
+di2_2_6 = pygame.image.load(ui.asset(dice_2_6)).convert()
+di2_3_1 = pygame.image.load(ui.asset(dice_3_1)).convert()
+di2_3_2 = pygame.image.load(ui.asset(dice_3_2)).convert()
+di2_3_5 = pygame.image.load(ui.asset(dice_3_5)).convert()
+di2_3_6 = pygame.image.load(ui.asset(dice_3_6)).convert()
+di2_4_1 = pygame.image.load(ui.asset(dice_4_1)).convert()
+di2_4_2 = pygame.image.load(ui.asset(dice_4_2)).convert()
+di2_4_5 = pygame.image.load(ui.asset(dice_4_5)).convert()
+di2_4_6 = pygame.image.load(ui.asset(dice_4_6)).convert()
+di2_5_1 = pygame.image.load(ui.asset(dice_5_1)).convert()
+di2_5_3 = pygame.image.load(ui.asset(dice_5_3)).convert()
+di2_5_4 = pygame.image.load(ui.asset(dice_5_4)).convert()
+di2_5_6 = pygame.image.load(ui.asset(dice_5_6)).convert()
+di2_6_2 = pygame.image.load(ui.asset(dice_6_2)).convert()
+di2_6_3 = pygame.image.load(ui.asset(dice_6_3)).convert()
+di2_6_4 = pygame.image.load(ui.asset(dice_6_4)).convert()
+di2_6_5 = pygame.image.load(ui.asset(dice_6_5)).convert()
 
-cannon_fire = pygame.mixer.Sound(cannon_fire_sound)
+cannon_fire = pygame.mixer.Sound(ui.asset(cannon_fire_sound)) if pygame.mixer.get_init() else None
 
 draw_player_thread = mythread(1, screen, 0)
 
-RED = (0xff, 0, 0)
-BLACK = (0, 0, 0)
-Dark_Blue = (0, 0, 0xaa)
-GREEN1 = (15, 96, 25)
-P1COLOR = (0, 0, 174)
-P2COLOR = (1, 98, 1)
-P3COLOR = (197, 197, 37)
-P4COLOR = (192, 2, 1)
-P5COLOR = (189, 113, 1)
-P6COLOR = (140, 184, 229)
+RED = (244, 182, 92)
+BLACK = ui.CREAM
+Dark_Blue = (191, 166, 110)
+GREEN1 = (175, 217, 207)
+P1COLOR = ui.COLORS[0]
+P2COLOR = ui.COLORS[1]
+P3COLOR = ui.COLORS[2]
+P4COLOR = ui.COLORS[3]
+P5COLOR = ui.COLORS[4]
+P6COLOR = ui.COLORS[5]
 
 end_game = 0
+show_help = False
 cannon_not_enough = 1
 click_take_item = 0
 inner_gap = 5
@@ -391,32 +394,13 @@ def index_to_image_dice2(index):
         return di2_6_5 
         
 def draw_item(Surface, type, value, pos):
-    (x, y) = pos
-    radius = 6
-    width = 2
-    c_left = 7
-    c_middle = 15
-    c_right = 22
-    c_top = 7
-    c_bottom = 22
-    if 1 == type:
-        Surface.blit(treasure, (x, y))
-    elif 2 == type:
-        Surface.blit(write(str(value), Dark_Blue, 14), (x, y))
-        Surface.blit(coin, (x+15, y+2))
-    elif 3 == type:
-        if 2 == value:
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_middle), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_middle), radius, width)
-        elif 3 == value:
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_middle, y+c_top), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
-        elif 4 == value:
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_top), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_top), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_left, y+c_bottom), radius, width)
-            pygame.draw.circle(Surface, Dark_Blue, (x+c_right, y+c_bottom), radius, width)
+    x,y = pos
+    if type == 1:
+        Surface.blit(treasure, (x,y))
+    elif type in (2,3):
+        ui.panel(Surface, (x-7,y,45,30), 235, (121,143,140))
+        Surface.blit(ui.sprite('gold' if type == 2 else 'food',(23,23)), (x-5,y+3))
+        Surface.blit(write(str(value), ui.CREAM, 17), (x+20,y+3))
 
 def five_block_item_w(start_w, start_h, p_id, xa = 0, ya = 0, alpha = 255,  take_item_id = None,  take_item_value = None, take_font_size = 24):
     item_gap = 1
@@ -526,7 +510,7 @@ def draw_player_treasure(Surface):
     treasure_image_pos = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
     rect_width = 2
     font_size = 22
-    (MouseX, MouseY) = pygame.mouse.get_pos()
+    (MouseX, MouseY) = ui.mouse_pos()
     if None != fight_id and 8 == player_data[fight_id].mode:
         put_id, take_id, status = fight_sol()
     
@@ -575,93 +559,14 @@ def draw_player_treasure(Surface):
 
 # set dtype for get resource before call this function                   
 def get_animation(get_dvalue, p_id, take_item_id):
-    (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
-    fmargin = margin - 2
-    
-    if 0 == p_id or 5 == p_id:
-        for alpha in range (256):            
-            screen.blit(background, (0,0))
-            draw_five_block()
-            five_block_item_w(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
-            
-            pygame.display.update(start_w, screen_height - fmargin, dock_num*block.get_width(), fmargin)
-    elif 1 == p_id:
-        for alpha in range (256):            
-            screen.blit(background, (0,0))
-            draw_five_block()
-            five_block_item_h(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
-                
-            pygame.display.update(start_w, start_h, fmargin, dock_num*block2.get_height())
-    elif 2 == p_id or 3 == p_id:
-        for alpha in range (256):            
-            screen.blit(background, (0,0))
-            draw_five_block()
-            five_block_item_w(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
-                
-            pygame.display.update(start_w, start_h, dock_num*block.get_width(), fmargin)
-    elif 4 == p_id:
-        for alpha in range (256):            
-            screen.blit(background, (0,0))
-            draw_five_block()
-            five_block_item_h(start_w, start_h, p_id, 0, 0, alpha, take_item_id, get_dvalue)
-                
-            pygame.display.update(screen_width - fmargin, start_h, fmargin, dock_num*block2.get_height())                    
-                    
-# org_value should equal or great than dest_value                    
+    x,y = player_image_pos[p_id][take_item_id]
+    ui.burst((max(20,min(1500,x)),max(35,min(790,y))), ui.GOLD, 22, '+'+str(get_dvalue))
+
+
 def take_animation(org_dtype, org_dvalue, dest_dvalue, p_id, take_item_id):
-    (start_w, start_h) = (player_image_pos[p_id][0][0], player_image_pos[p_id][0][1])
-    item_image = dock_type_id_to_image(org_dtype)
-    fmargin = margin - 2
-    
-    if 0 == p_id or 5 == p_id:
-        for v in range(org_dvalue, dest_dvalue, -1):
-            al = 0
-            for yv in range (-1, (-1)*item_image.get_height(), -1):
-                al += 2
-                alpha = 250 - al
-                
-                screen.blit(background, (0,0))
-                draw_five_block()
-                five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
-                
-                pygame.display.update(start_w, screen_height - fmargin, dock_num*block.get_width(), fmargin)
-    elif 1 == p_id:
-        for v in range(org_dvalue, dest_dvalue, -1):
-            al = 0
-            for xv in range (item_image.get_width()):
-                al += 2
-                alpha = 250 - al
-                
-                screen.blit(background, (0,0))
-                draw_five_block()
-                five_block_item_h(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
-                
-                pygame.display.update(start_w, start_h, fmargin, dock_num*block2.get_height())
-    elif 2 == p_id or 3 == p_id:
-        for v in range(org_dvalue, dest_dvalue, -1):
-            al = 0
-            for yv in range (item_image.get_height()):
-                al += 2
-                alpha = 250 - al
-                
-                screen.blit(background, (0,0))
-                draw_five_block()
-                five_block_item_w(start_w, start_h, p_id, 0, yv, alpha, take_item_id, v)
-                
-                pygame.display.update(start_w, start_h, dock_num*block.get_width(), fmargin)
-    elif 4 == p_id:
-        for v in range(org_dvalue, dest_dvalue, -1):
-            al = 0
-            for xv in range (-1, (-1)*item_image.get_width(), -1):
-                al += 2
-                alpha = 250 - al
-                
-                screen.blit(background, (0,0))
-                draw_five_block()
-                five_block_item_h(start_w, start_h, p_id, xv, 0, alpha, take_item_id, v)
-                
-                pygame.display.update(screen_width - fmargin, start_h, fmargin, dock_num*block2.get_height())
-                    
+    x,y = player_image_pos[p_id][take_item_id]
+    ui.burst((max(20,min(1500,x)),max(35,min(790,y))), (237,121,105), 12, '-'+str(org_dvalue-dest_dvalue))
+
 # num:-1 for take all, otherwise num should be 0 or positive value        
 # return None if take nothing, else return the number of take items
 def take_item(p_id, dock_id, num = -1):
@@ -710,7 +615,7 @@ def draw_normal_block(b_img, p):
 def draw_five_block():
     global cannon_sel, take_sel
     
-    (MouseX, MouseY) = pygame.mouse.get_pos()
+    (MouseX, MouseY) = ui.mouse_pos()
     cannon_sel = None
     take_sel = None
     if None != fight_id and 8 == player_data[fight_id].mode:
@@ -765,7 +670,7 @@ def draw_map(Surface):
     width = 2
     twidth = 1
     
-    fs_text = "Formosa Strait"
+    fs_text = "臺 灣 海 峽"
     fs_x = 1390 
     fs_y = 70
     sc_x = margin + big_block + 8*wblock + int(wblock/2) - 12
@@ -840,11 +745,10 @@ def draw_map(Surface):
         if map_type != 0:
             draw_item(Surface, map_type, map_value, map_loc)      
 
-def write(msg="pygame is cool", color= (0,0,0), size = 14):
-    myfont = pygame.font.Font("wqy-zenhei.ttf", size)
-    mytext = myfont.render(msg, True, color)
-    mytext = mytext.convert_alpha()
-    return mytext 
+def write(msg="", color=ui.CREAM, size=14):
+    if color == (0,0,0):
+        color = ui.CREAM
+    return ui.text(str(msg), tuple(color), size)
 
 def set_random_item(mark, low, high, type=0, value=0):
     global main_map
@@ -871,7 +775,8 @@ def set_random_item(mark, low, high, type=0, value=0):
 
 #player is 0 based                
 def map_loc_to_player_loc(map_loc, block_id, player):
-    gap = 5
+    # Six 26px ships fit the narrowest 80px route cell in a 3-by-2 grid.
+    gap = 1
     (x, y) = map_loc
     
     # right and left on the map
@@ -1229,19 +1134,9 @@ def generate_dock():
         player_data[i].dtype[1] = 2
         player_data[i].dvalue[1] = 3
 
-def draw_button(Surface, loc, str, color, size = 14, image = button1):
-    (mouseX, mouseY) = pygame.mouse.get_pos()
-    if len(str) > 8:
-        fontx = loc[0]+ 45 - int(len(str)/2*6)
-    else:
-        fontx = loc[0]+ 50 - int(len(str)/2*6)
-    fonty = loc[1]+15
-    Surface.blit(image, loc)
-    if loc[0] <= mouseX <= loc[0]+image.get_width() and loc[1] <= mouseY <= loc[1]+image.get_height():
-        Surface.blit(write(str, RED, size), (fontx, fonty))
-    else:
-        Surface.blit(write(str, color, size), (fontx, fonty))
-    
+def draw_button(Surface, loc, str, color, size=14, image=button1):
+    ui.button(Surface, loc, str, image)
+
 def draw_show_card(p_id, is_night, showc=1):    
     gap = 20
     rect_width = 2
@@ -1305,13 +1200,21 @@ def draw_selected_card(t_id, start, mode=6):
 
 def draw_all():            
     screen.blit(background, (0,0))
+    ui.chrome(screen, player_data, turn_id, draw_player_thread.is_night, fight_id, end_game)
     draw_dock(screen)
     draw_map(screen)
     draw_inner_item(screen)        
-    draw_player_thread.run()
+    if not show_help and not end_game:
+        draw_player_thread.run()
+    else:
+        for p, player in enumerate(player_data):
+            screen.blit(player_id_to_image(p), (player.x, player.y))
     draw_start_and_turn(start_p, turn_id)
     draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
-    pygame.display.update()
+    ui.effects(screen, player_data, turn_id)
+    if show_help:
+        ui.help_overlay(screen)
+    ui.present(screen)
 
 #return 1:there is at least one goal game, 0:No one goal game
 def any_goal_game():
@@ -1327,7 +1230,7 @@ def next_turn():
     global turn_id, start_p, draw_player_thread, player_data, cannon_not_enough, click_take_item, cannon_sel, take_sel, fight_id, fight_group
     
     draw_all()
-    time.sleep(1)
+    ui.pause(0.45)
     
     if (turn_id + 1)%player_num == start_p:
         if 0 == player_data[turn_id].handle_done[0]:
@@ -1466,6 +1369,8 @@ def draw_dice(Surface, x, y):
     index2 = index_to_image_dice2(dice_value2)
     
     if None == index1 or None == index2:
+        Surface.blit(roll_fight, (x,y))
+        Surface.blit(roll_fight, (x+55,y))
         return
     
     if player_data[turn_id].mode in [0, 3, 4, 5]:
@@ -1508,7 +1413,7 @@ def draw_inner_item(Surface):
             for i in range(0, total_card_num):
                 if 2 == player_data[turn_id].marked_card[i]:
                     Surface.blit(card_id_to_image(i), (card_x, card_y))
-                    (MouseX, MouseY) = pygame.mouse.get_pos()
+                    (MouseX, MouseY) = ui.mouse_pos()
                     if card_x <= MouseX <= card_x + mv2.get_width() and card_y <= MouseY <= card_y + mv2.get_height():
                         pygame.draw.rect(Surface, RED, (card_x, card_y, mv2.get_width(), mv2.get_height()), rect_width)
                     card_y += mv2.get_height() + inner_gap
@@ -1520,7 +1425,7 @@ def draw_inner_item(Surface):
             for i in range(0, total_card_num):
                 if 2 == player_data[turn_id].marked_card[i]:
                     Surface.blit(card_id_to_image(i), (card_x, card_y))
-                    (MouseX, MouseY) = pygame.mouse.get_pos()
+                    (MouseX, MouseY) = ui.mouse_pos()
                     if card_x <= MouseX <= card_x + mv2.get_width() and card_y <= MouseY <= card_y + mv2.get_height():
                         pygame.draw.rect(Surface, RED, (card_x, card_y, mv2.get_width(), mv2.get_height()), rect_width)
                     card_y += mv2.get_height() + inner_gap
@@ -1553,8 +1458,8 @@ def draw_inner_item(Surface):
             f_y = treasure_y
             
             #ID: 1-based
-            top_message = u"===ID=====Roll Dice====Cannon=====Score=====Solution==="
-            Surface.blit(write(str(top_message), GREEN1, font_size), (f_x, f_y))
+            for title, offset in [('艦隊',25),('戰骰',112),('火砲',240),('戰力',350),('結果',455)]:
+                Surface.blit(write(title, GREEN1, font_size), (f_x+offset, f_y))
             f_y += font_size + int(roll_fight.get_height()/2) - 8
             r_x = f_x + 112
             r_y = treasure_y + font_size + f_gap
@@ -1594,8 +1499,8 @@ def draw_inner_item(Surface):
         f_x = treasure_x + 4*(treasure_b.get_width() + inner_gap)
         f_y = treasure_y
             
-        final_message = u"===ID======Gold===Location===Treasure===Final Score===Winner==="
-        Surface.blit(write(str(final_message), GREEN1, font_size), (f_x, f_y))
+        for title, offset in [('艦隊',25),('金幣',125),('位置',210),('寶藏',310),('總分',415),('勝者',510)]:
+            Surface.blit(write(title, GREEN1, font_size), (f_x+offset, f_y))
         f_y += font_size + int(roll_fight.get_height()/2) - 5
         for p in range(0, player_num):
             display_final_status(Surface, p+1, player_data[p].final_gold, player_data[p].final_location, player_data[p].final_treasure, player_data[p].final_score, player_data[p].final_win, font_size, f_x, f_y)
@@ -1681,16 +1586,17 @@ def display_fight_status(Surface, mode, id, cannon, dice=None, score=None, solut
                 Surface.blit(write(solution, GREEN1, font_size), (f_x+455, f_y))
     
 def fight_roll_dice(Surface, font_size, f_roll, x, y):
-    f_x = x + 16
     f_y = y + 10
     if None == f_roll:
         return
     elif f_roll < 11:
         Surface.blit(roll_fight, (x, y))
-        Surface.blit(write("%2d"%f_roll, RED, font_size), (f_x, f_y))
+        number = write(str(f_roll), RED, font_size)
+        number_rect = number.get_rect(midtop=(x + roll_fight.get_width() // 2, f_y))
+        Surface.blit(number, number_rect)
     # f_roll == 11
     else:
-        Surface.blit(fight_win, (x, y))
+        Surface.blit(ui.sprite("fire", (50,48)), (x, y))
                 
 # return 0 for OK, and 1 is NOT enough(fail)                
 def spend_dock_resource(type, value, t_id):
@@ -2102,8 +2008,8 @@ def ai(t_id):
         dice_value1 = random.randint(0, 23)
         dice_value2 = random.randint(0, 23)
         draw_inner_item(screen)
-        pygame.display.update()
-        time.sleep(1)
+        ui.present(screen)
+        ui.pause(0.45)
         r = random.randint(0, 2)
         if 0 == r:
             card1, d1, d2, max1 = forward_ai()
@@ -2135,7 +2041,7 @@ def ai(t_id):
         player_data[t_id].marked_card[s_card] = 1
         player_data[t_id].mode = 6
         draw_inner_item(screen)
-        pygame.display.update()
+        ui.present(screen)
     elif 0 == player_data[t_id].mode:
         r = random.randint(0, 2)
         if 0 == r:
@@ -2351,7 +2257,9 @@ def do_fight(t_id, b_id):
         fight_group.extend(near)
         #assign fight_id
         fight_id = t_id
-        cannon_fire.play()
+        ui.burst((800, 430), (255, 154, 60), 70, "海戰！")
+        if cannon_fire is not None:
+            cannon_fire.play()
     
     return dof
     
@@ -2421,7 +2329,7 @@ def next_fight():
     global fight_id, fight_group, player_data, cannon_sel, take_sel, cannon_not_enough
     
     draw_all()
-    time.sleep(2)
+    ui.pause(0.6)
     
     cannon_not_enough = 1
     click_take_item = 0
@@ -2453,16 +2361,22 @@ def all_player_mode6():
             return 0
     return 1
         
-def main():
+def main(options=None):
     global draw_player_thread, player_data, dice_value1, dice_value2, turn_id, start_p, player_num, fight_group, fight_id, cannon_not_enough, cannon_sel, take_sel, click_take_item
     
-    dir1 = 1
-    dir2 = 1
-    
+    global show_help
+    options = options or argparse.Namespace(autoplay=False, frames=0, screenshot=None, skip_title=False)
+    clock = pygame.time.Clock()
+    frame = 0
+    if not options.skip_title and not options.autoplay:
+        ui.title_screen(screen, background)
     generate_map()
     generate_dock()
     generate_player_card()
-    draw_player_thread.start()
+    # Rendering and movement stay on the display thread.
+    if options.autoplay:
+        for player in player_data:
+            player.IsAI = 1
     
     # test
     #player_data[0].IsAI = 1
@@ -2501,7 +2415,26 @@ def main():
     ## end test fight case
     # end test
     while True:
+        if not ui.FAST:
+            clock.tick(60)
+        frame += 1
         draw_all()
+        if (options.frames and frame >= options.frames) or (options.autoplay and end_game):
+            if options.screenshot:
+                pygame.image.save(screen, options.screenshot)
+            print('Run complete:', frame, 'frames; game finished:', bool(end_game))
+            pygame.quit()
+            return
+        if show_help:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    ui.quit_game()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        ui.quit_game()
+                    if event.key == pygame.K_F1:
+                        show_help = False
+            continue
         
         if 0 == player_data[turn_id].IsAI:
             if start_p == turn_id and 0 == player_data[turn_id].mode:
@@ -2511,14 +2444,22 @@ def main():
                 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit()
+                ui.quit_game()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    ui.quit_game()
+                if event.key == pygame.K_F1:
+                    show_help = True
+                    break
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button != 1:
+                continue
             if None != fight_id:
                 click_take_item = 0
                 if 0 == player_data[fight_id].IsAI and 7 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
                     if "win" != player_data[fight_group[0]].fight_solution:
                         (f_x, f_y) = fight_btn_loc
                         (c_x, c_y) = cannon_btn_loc
-                        (mouseX, mouseY) = pygame.mouse.get_pos()
+                        (mouseX, mouseY) = ui.mouse_pos()
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             roll_fight_dice(fight_id, fight_group[0])
                             next_fight()
@@ -2532,12 +2473,12 @@ def main():
                                 player_data[fight_id].fight_cannon += cn
                     elif 11 == player_data[fight_group[0]].fight_dice:
                         (f_x, f_y) = fight_btn_loc
-                        (mouseX, mouseY) = pygame.mouse.get_pos()
+                        (mouseX, mouseY) = ui.mouse_pos()
                         if f_x <= mouseX <= f_x+button1.get_width() and f_y <= mouseY <= f_y+button1.get_height():
                             next_fight()
                             break
                 elif 8 == player_data[fight_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (mouseX, mouseY) = ui.mouse_pos()
                     put_id, take_id, status = fight_sol()
                     if 0 == status and 0 == player_data[put_id].IsAI:
                         (f_x, f_y) = fight_btn_loc
@@ -2553,28 +2494,29 @@ def main():
                     
             elif 0 == player_data[turn_id].IsAI:
                 if 3 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (mouseX, mouseY) = ui.mouse_pos()
                     (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
                     if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
                         dice1 = random.randint(0, 23)
                         dice2 = random.randint(0, 23)
                         dice_value1 = dice1
                         dice_value2 = dice2
+                        ui.burst((275,250), ui.GOLD, 30)
                         player_data[turn_id].mode = 4
                         break
                 if 4 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (mouseX, mouseY) = ui.mouse_pos()
                     (x, y) = (margin+big_block+inner_gap, margin+big_block+inner_gap+di_1_2.get_height())
                     if x <= mouseX <= x+button1.get_width() and y <= mouseY <= y+button1.get_height():
                         (dice_value1, dice_value2) = (dice_value2, dice_value1)
                     handle_card((mouseX, mouseY))
                     break
                 if 5 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (mouseX, mouseY) = ui.mouse_pos()
                     handle_card((mouseX, mouseY))
                     break
                 if 2 == player_data[turn_id].mode and event.type == pygame.MOUSEBUTTONDOWN:
-                    (mouseX, mouseY) = pygame.mouse.get_pos()
+                    (mouseX, mouseY) = ui.mouse_pos()
                     aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(player_data[turn_id].b_id)
                     (x1, y1) = loc1
                     (x2, y2) = loc2
@@ -2594,6 +2536,8 @@ def main():
                         player_data[turn_id].mode = 1
                         break
                 
+        if show_help or end_game:
+            continue
         if 1 == player_data[turn_id].IsAI and 0 == player_data[turn_id].mode:
             player_data[turn_id].dir[0],  player_data[turn_id].dir[1] =  ai(turn_id)
             # display back card
@@ -2605,7 +2549,7 @@ def main():
                 player_data[turn_id].show_card = 1
                 player_data[turn_id].handle_done[draw_player_thread.is_night] = 1
                 draw_selected_card(turn_id, start_p, player_data[turn_id].mode)
-                pygame.display.update()
+                ui.present(screen)
                 
                 handle_step(draw_player_thread.is_night, player_data[turn_id].dir[draw_player_thread.is_night])
                 
@@ -2633,4 +2577,15 @@ def main():
     quit()
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Koxinga 國姓爺")
+    parser.add_argument('--skip-title', action='store_true')
+    parser.add_argument('--autoplay', action='store_true', help='Run all six fleets with AI')
+    parser.add_argument('--frames', type=int, default=0, help='Exit after a bounded number of frames')
+    parser.add_argument('--seed', type=int)
+    parser.add_argument('--screenshot')
+    options = parser.parse_args()
+    if options.seed is not None:
+        random.seed(options.seed)
+        start_p = random.randint(0, player_num-1)
+        turn_id = start_p
+    main(options)

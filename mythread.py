@@ -1,12 +1,11 @@
 import threading
 import pygame
+import presentation as ui
 
 screen_width = 1599
 screen_height = 860
 
-pygame.init()
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Koxinga')
+screen = ui.init_display()
 
 big_block = 160
 margin = 60
@@ -47,18 +46,18 @@ piece3_image = 'Image/pawn5.gif'
 piece4_image = 'Image/pawn6.gif'
 piece5_image = 'Image/pawn8.gif'
 
-up_arrow = pygame.image.load(up_arrow_image).convert()
-piece0 = pygame.image.load(piece0_image).convert()
-piece1 = pygame.image.load(piece1_image).convert()
-piece2 = pygame.image.load(piece2_image).convert()
-piece3 = pygame.image.load(piece3_image).convert()
-piece4 = pygame.image.load(piece4_image).convert()
-piece5 = pygame.image.load(piece5_image).convert()
+up_arrow = pygame.image.load(ui.asset(up_arrow_image)).convert()
+piece0 = ui.ship_token(0)
+piece1 = ui.ship_token(1)
+piece2 = ui.ship_token(2)
+piece3 = ui.ship_token(3)
+piece4 = ui.ship_token(4)
+piece5 = ui.ship_token(5)
 
 left_arrow = pygame.transform.rotate(up_arrow, 90)
 down_arrow = pygame.transform.rotate(up_arrow, 180)
 right_arrow = pygame.transform.rotate(up_arrow, 270)
-up_arrow2 = pygame.image.load(up_arrow_image).convert()
+up_arrow2 = pygame.image.load(ui.asset(up_arrow_image)).convert()
 left_arrow2 = pygame.transform.rotate(up_arrow, 90)
 down_arrow2 = pygame.transform.rotate(up_arrow, 180)
 right_arrow2 = pygame.transform.rotate(up_arrow, 270)
@@ -301,7 +300,7 @@ class mythread (threading.Thread):
     def run(self):
         for p in range(0, player_num):
             if 2 == self.player_data[p].mode:
-                (mouseX, mouseY) = pygame.mouse.get_pos()
+                (mouseX, mouseY) = ui.mouse_pos()
                 aimg, aimg_alpha, loc1, loc2 = bid_to_arrow_image_and_pos(self.player_data[p].b_id)
                 (x1, y1) = loc1
                 (x2, y2) = loc2
@@ -373,13 +372,13 @@ class mythread (threading.Thread):
                                     #self.player_data[p].mode = 6
                                     #self.player_data[p].forward = 1
                 if x < self.player_data[p].loc[n_id][0]:
-                    self.player_data[p].x += 1
+                    self.player_data[p].x = min(self.player_data[p].x + 4, self.player_data[p].loc[n_id][0])
                 if y < self.player_data[p].loc[n_id][1]:
-                    self.player_data[p].y += 1
+                    self.player_data[p].y = min(self.player_data[p].y + 4, self.player_data[p].loc[n_id][1])
                 if x > self.player_data[p].loc[n_id][0]:
-                    self.player_data[p].x -= 1
+                    self.player_data[p].x = max(self.player_data[p].x - 4, self.player_data[p].loc[n_id][0])
                 if y > self.player_data[p].loc[n_id][1]:
-                    self.player_data[p].y -= 1
+                    self.player_data[p].y = max(self.player_data[p].y - 4, self.player_data[p].loc[n_id][1])
                                         
         for p in range(0, player_num):
                 (x, y) = (self.player_data[p].x, self.player_data[p].y)
