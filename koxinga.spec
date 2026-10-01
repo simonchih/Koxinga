@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+import sys
 
 a = Analysis(
     ['koxinga.py'],
@@ -32,7 +32,7 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    target_arch='arm64' if sys.platform == 'darwin' else None,
     codesign_identity=None,
     entitlements_file=None,
 )

@@ -4,7 +4,36 @@ Pygame 電子桌遊：一名玩家與五支電腦艦隊，在隨機配置的航�
 
 ## 啟動
 
-Windows 可直接雙擊 `start_game.bat`。本工作區已建立 `.venv` 並安裝執行依賴。
+Windows 可直接雙擊 `start_game.bat`。
+
+macOS Apple Silicon 可直接執行已建置的單一檔案：
+
+```bash
+./dist/koxinga
+```
+
+執行檔已包含 Python、Pygame、圖片、音效與中文字型，可單獨複製到其他目錄執行。
+
+### macOS arm64 建置
+
+使用原生 arm64 Python（建置腳本會檢查平台與架構）：
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-build.txt
+PYTHON=.venv/bin/python ./build_macos.sh
+```
+
+產物為 `dist/koxinga`，是單一 Mach-O arm64 執行檔。PyInstaller 執行時會將內含資源解壓至系統暫存目錄。
+目前使用本機 ad-hoc 簽章，尚未進行 Developer ID 簽署或 Apple 公證。
+
+2026-10-01 已在 macOS 26.6.2／Apple Silicon 實際驗證：
+
+- `file`、`lipo -archs` 確認只有 arm64，`codesign --verify` 通過。
+- 僅複製執行檔至 `/private/tmp/koxinga-arm64-validation`，從該目錄啟動。
+- 原生視窗以 `--skip-title --seed 2 --frames 180` 執行，圖片和中文正常，退出碼 0。
+- 單檔以 SDL dummy 驅動執行 `--autoplay --seed 42 --frames 60000`，8,900 幀完成對局及計分，退出碼 0。
+- 原始碼 14 項整合測試全部通過。
 
 其他電腦首次使用：
 
@@ -57,4 +86,4 @@ python -m venv .venv
 
 `--autoplay` 將六支艦隊全部交給 AI；`--frames` 限制執行幀數。
 環境變數 `KOXINGA_FAST=1` 僅供測試取消幀率限制和回合停頓。
-`koxinga.spec` 已包含圖片、封面、音效與字型；本次未建置獨立 EXE。
+`koxinga.spec` 已包含圖片、封面、音效與字型；macOS 建置明確指定 arm64，使用 one-file 打包。
